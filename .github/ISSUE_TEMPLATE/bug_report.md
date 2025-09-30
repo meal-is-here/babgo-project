@@ -2,7 +2,7 @@
 name: Bug report
 about: 버그에 관한 내용을 작성합니다.
 title: "[BUG] "
-labels: "\U0001F41B bug, \U0001F914 feature"
+labels: "\U0001F41B bug"
 assignees: ''
 
 ---
