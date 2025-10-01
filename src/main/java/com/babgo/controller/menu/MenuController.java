@@ -4,6 +4,7 @@ import com.babgo.application.menu.MenuService;
 import com.babgo.domain.menu.Menu;
 import com.babgo.controller.menu.dto.MenuRequest;
 import com.babgo.controller.menu.dto.MenuResponse;
+import com.babgo.domain.menu.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +52,19 @@ public class MenuController {
                         m.getMenuStatus()
                 ))
                 .toList();
+    }
+
+    @GetMapping("{menuId}")
+    public MenuResponse getMenu(@PathVariable UUID menuId) {
+        Menu menu =  menuService.getMenu(menuId);
+        return new MenuResponse(
+                menu.getMenuId(),
+                menu.getName(),
+                menu.getPrice(),
+                menu.getDescription(),
+                menu.getCategory(),
+                menu.getMenuStatus()
+        );
     }
 
 }
