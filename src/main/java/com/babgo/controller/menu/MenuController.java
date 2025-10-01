@@ -91,4 +91,28 @@ public class MenuController {
                 menu.getMenuStatus()
         );
     }
+
+    // 메뉴 정보 변경
+    @PutMapping("/{menuId}")
+    public MenuResponse updateMenuInfo(@PathVariable UUID storeId,
+                                       @PathVariable UUID menuId,
+                                       @RequestBody MenuRequest request) {
+        Menu menu = menuService.updateMenuInfo(
+                menuId,
+                request.getName(),
+                request.getPrice(),
+                request.getDescription(),
+                request.getCategory(),
+                request.getUpdatedBy()
+        );
+
+        return new MenuResponse(
+                menu.getMenuId(),
+                menu.getName(),
+                menu.getPrice(),
+                menu.getDescription(),
+                menu.getCategory(),
+                menu.getMenuStatus()
+        );
+    }
 }

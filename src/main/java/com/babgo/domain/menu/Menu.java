@@ -84,9 +84,22 @@ public class Menu {
 //        this.store = store;
     }
 
-    // 상태 변경을 위한 세터 메서드 (세터 최소화를 위함)
+    // 메뉴 상태 변경을 위한 세터 메서드 (세터 최소화를 위함)
     public void changeStatus(MenuStatus menuStatus, String updatedBy) {
         this.menuStatus = menuStatus;
+        this.updatedAt = LocalDateTime.now();
+        this.updatedBy = updatedBy;
+    }
+
+    // 메뉴 정보 변경을 위한 세터 메서드
+    public void updateMenuInfo(String name, Long price, String description,
+                               String category, String updatedBy) {
+        // non-nullable 값에 null 값이 입력 되면 변경이 되지 아니함
+        if (name != null) this.name = name;
+        if (price != null) this.price = price;
+        this.description = description;
+        this.category = category;
+
         this.updatedAt = LocalDateTime.now();
         this.updatedBy = updatedBy;
     }
