@@ -65,4 +65,12 @@ public class MenuService {
         menu.updateMenuInfo(name, price, description, category, updateBy);
         return menuRepository.save(menu);
     }
+
+    public Menu deleteMenu(UUID menuId, String deleteBy) {
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("메뉴를 찾을 수 없습니다."));
+
+        menu.deleteMenu(deleteBy);
+        return menuRepository.save(menu);
+    }
 }

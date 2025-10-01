@@ -115,4 +115,21 @@ public class MenuController {
                 menu.getMenuStatus()
         );
     }
+
+    // 메뉴 논리적 삭제
+    @DeleteMapping("/{menuId}")
+    public MenuResponse deleteMenu(// @PathVariable UUID storeId,
+                                   @PathVariable UUID menuId,
+                                   @RequestBody MenuRequest request) {
+        Menu menu = menuService.deleteMenu(menuId, request.getUpdatedBy());
+
+        return new MenuResponse(
+                menu.getMenuId(),
+                menu.getName(),
+                menu.getPrice(),
+                menu.getDescription(),
+                menu.getCategory(),
+                menu.getMenuStatus()
+        );
+    }
 }

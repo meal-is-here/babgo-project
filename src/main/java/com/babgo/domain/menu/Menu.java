@@ -103,4 +103,16 @@ public class Menu {
         this.updatedAt = LocalDateTime.now();
         this.updatedBy = updatedBy;
     }
+
+    // 메뉴 논리 삭제를 위한 세터 메서드
+    // 실제 DB row는 그대로 남음 -> 삭제된 메뉴는 조회할 때 상태로 필터링 가능
+    public void deleteMenu(String deletedBy) {
+        this.menuStatus = MenuStatus.DELETED;
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = deletedBy;
+
+        // 업데이트 시각/사용자도 같이 갱신
+        this.updatedAt = LocalDateTime.now();
+        this.updatedBy = deletedBy;
+    }
 }
