@@ -1,4 +1,4 @@
-package com.babgo.global.dto;
+package com.babgo.global.api;
 
 import java.util.Collections;
 import java.util.List;
