@@ -14,7 +14,7 @@ import lombok.Getter;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class BaseTimeEntity {
+public abstract class BaseTimeEntity {
 
 	@CreatedDate
 	@Column(updatable = false)
@@ -26,6 +26,14 @@ public class BaseTimeEntity {
 	protected LocalDateTime deletedAt;
 
 	public void markAsDeleted() {
-		this.deletedAt = LocalDateTime.now();
+		if (deletedAt == null) {
+			deletedAt = LocalDateTime.now();
+		}
+	}
+
+	public void restore(){
+		if(deletedAt != null){
+			this.deletedAt = null;
+		}
 	}
 }
