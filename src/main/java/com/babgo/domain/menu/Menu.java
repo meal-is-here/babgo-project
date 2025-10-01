@@ -84,4 +84,10 @@ public class Menu {
 //        this.store = store;
     }
 
+    // 상태 변경을 위한 세터 메서드 (세터 최소화를 위함)
+    public void changeStatus(MenuStatus menuStatus, String updatedBy) {
+        this.menuStatus = menuStatus;
+        this.updatedAt = LocalDateTime.now();
+        this.updatedBy = updatedBy;
+    }
 }
