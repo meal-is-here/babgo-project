@@ -56,16 +56,26 @@ public class UserController {
 
         UserResponse.LoginResponse response = userService.login(request);
 
+        String cookieValue = String.format(
+                "accessToken=%s; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=900",
+                response.getAccessToken()
+        );
+
         return ResponseEntity
                 .ok()
-                .header("Authorization", "Bearer " + response.getAccessToken())
+                .header("Set-Cookie", cookieValue)
                 .body(ApiResponse.success("로그인 성공"));
     }
 
-    // TODO: 필요한 추가 API를 작성하세요
-    // - GET /api/auth/me : 현재 로그인한 사용자 정보 조회
-    // - PUT /api/auth/me : 사용자 정보 수정
-    // - PUT /api/auth/password : 비밀번호 변경
-    // - POST /api/auth/refresh : 토큰 갱신 (Refresh Token 구현시)
-    // - POST /api/auth/logout : 로그아웃 (Refresh Token 삭제)
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout() {
+        log.info("로그아웃 요청");
+
+        String cookieValue = "accessToken=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0";
+
+        return ResponseEntity
+                .ok()
+                .header("Set-Cookie", cookieValue)
+                .body(ApiResponse.success("로그아웃 성공"));
+    }
 }
