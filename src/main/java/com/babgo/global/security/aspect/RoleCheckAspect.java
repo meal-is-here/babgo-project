@@ -38,18 +38,6 @@ public class RoleCheckAspect {
     @Around("@annotation(com.babgo.global.security.annotation.UserRole)")
     public Object checkRole(ProceedingJoinPoint joinPoint) throws Throwable {
         // 구현 필요
-        // 1. Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // 2. if (authentication == null || !authentication.isAuthenticated()) {
-        //        throw new AccessDeniedException("인증이 필요합니다");
-        //    }
-        // 3. MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        //    RequireRole requireRole = signature.getMethod().getAnnotation(RequireRole.class);
-        // 4. UserRole[] requiredRoles = requireRole.value();
-        // 5. CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        //    UserRole userRole = userDetails.getRole();
-        // 6. boolean hasRole = Arrays.asList(requiredRoles).contains(userRole);
-        // 7. if (hasRole) { return joinPoint.proceed(); }
-        // 8. else { throw new AccessDeniedException("접근 권한이 없습니다"); }
         return null;
     }
 
@@ -65,18 +53,6 @@ public class RoleCheckAspect {
     @Around("@within(com.babgo.global.security.annotation.UserRole)")
     public Object checkRoleOnClass(ProceedingJoinPoint joinPoint) throws Throwable {
         // 구현 필요
-        // 1. Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // 2. if (authentication == null || !authentication.isAuthenticated()) {
-        //        throw new AccessDeniedException("인증이 필요합니다");
-        //    }
-        // 3. Class<?> targetClass = joinPoint.getTarget().getClass();
-        //    RequireRole requireRole = targetClass.getAnnotation(RequireRole.class);
-        // 4. UserRole[] requiredRoles = requireRole.value();
-        // 5. CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        //    UserRole userRole = userDetails.getRole();
-        // 6. boolean hasRole = Arrays.asList(requiredRoles).contains(userRole);
-        // 7. if (hasRole) { return joinPoint.proceed(); }
-        // 8. else { throw new AccessDeniedException("접근 권한이 없습니다"); }
         return null;
     }
 }
