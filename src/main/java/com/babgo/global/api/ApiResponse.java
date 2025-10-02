@@ -29,10 +29,10 @@ public class ApiResponse<T> {
 	}
 
 	// 성공 응답용
-	public static <T> ApiResponse<T> success(String message, T data) {
+	public static <T> ApiResponse<T> success(T data) {
 		return ApiResponse.<T>builder()
 						  .success(true)
-						  .message(message)
+						  .message("성공")
 						  .data(data)
 						  .timestamp(LocalDateTime.now())
 						  .build();

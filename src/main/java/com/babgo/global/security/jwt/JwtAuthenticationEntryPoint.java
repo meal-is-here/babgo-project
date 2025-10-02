@@ -24,20 +24,9 @@ import java.util.Map;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     /**
-     * TODO: 인증 실패시 호출되는 메소드를 작성해야 합니다
+     * 인증 실패시 호출되는 메소드
      * - 401 Unauthorized 에러 반환
      * - JSON 형식으로 에러 메시지 전달
-     *
-     * 처리 순서:
-     * 1. 로그 출력 (log.error)
-     * 2. response.setStatus(HttpServletResponse.SC_UNAUTHORIZED) - 401 설정
-     * 3. response.setContentType("application/json;charset=UTF-8")
-     * 4. JSON 응답 생성 (에러 정보 포함)
-     *    - status: 401
-     *    - error: "Unauthorized"
-     *    - message: "인증이 필요합니다" 또는 authException.getMessage()
-     *    - path: request.getRequestURI()
-     * 5. ObjectMapper로 JSON 변환 후 response.getWriter().write()
      *
      * @param request HttpServletRequest
      * @param response HttpServletResponse
@@ -51,16 +40,18 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException, ServletException {
-        // 구현 필요
-        // 1. log.error("인증 실패: {}", authException.getMessage());
-        // 2. response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        // 3. response.setContentType("application/json;charset=UTF-8");
-        // 4. Map<String, Object> errorDetails = new HashMap<>();
-        //    errorDetails.put("status", 401);
-        //    errorDetails.put("error", "Unauthorized");
-        //    errorDetails.put("message", "인증이 필요합니다");
-        //    errorDetails.put("path", request.getRequestURI());
-        // 5. ObjectMapper objectMapper = new ObjectMapper();
-        //    response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
+        log.error("인증 실패: {}", authException.getMessage());
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put("status", 401);
+        errorDetails.put("error", "Unauthorized");
+        errorDetails.put("message", "인증이 필요합니다");
+        errorDetails.put("path", request.getRequestURI());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
     }
 }

@@ -35,148 +35,135 @@ public class JwtTokenProvider {
     private final JwtProperties jwtProperties;
     private SecretKey secretKey;
 
-    /**
-     * TODO: Bean 초기화 후 SecretKey를 생성하는 메소드를 작성해야 합니다
-     * - @PostConstruct 어노테이션이 붙어있어 Bean 생성 후 자동 실행됩니다
-     * - jwtProperties.getSecret()을 바이트 배열로 변환합니다
-     * - Keys.hmacShaKeyFor()를 사용하여 SecretKey를 생성합니다
-     */
+    //Bean 초기화 후 SecretKey를 생성하는 메소드
     @PostConstruct
     public void init() {
-        // 구현 필요
+        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
+        log.info("JWT Secret Key init complete");
     }
 
-    /**
-     * TODO: Access Token을 생성하는 메소드를 작성해야 합니다
-     * - 사용자 ID, 이메일, 권한 정보를 담습니다
-     * - Jwts.builder()를 사용합니다
-     * - subject: 사용자 ID
-     * - claim "email": 이메일
-     * - claim "role": 권한 (예: "ROLE_CUSTOMER")
-     * - issuedAt: 현재 시간
-     * - expiration: 현재 시간 + accessTokenExpiration
-     * - signWith(secretKey): 서명
-     *
-     * @param userId 사용자 ID
-     * @param email 이메일
-     * @param role 권한
-     * @return Access Token 문자열
-     */
+    // Access Token을 생성하는 메소드
     public String generateAccessToken(String userId, String email, UserRole role) {
-        // 구현 필요
-        return null;
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtProperties.getAccessTokenExpiration());
+        return Jwts.builder()
+                .subject(userId)
+                .claim("email", email)
+                .claim("role", role.getKey())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(this.secretKey)
+                .compact();
     }
 
+    //Refresh Token을 생성하는 메소드
+    //public String generateRefreshToken(String userId) {
+    //    Date now = new Date();
+    //    Date expiryDate = new Date(now.getTime() + jwtProperties.getRefreshTokenExpiration());
+//
+    //     return Jwts.builder()
+      //          .subject(userId)
+          //      .issuedAt(now)
+           //     .expiration(expiryDate)
+             //   .signWith(this.secretKey)
+               // .compact();
+    //}
     /**
-     * TODO: Refresh Token을 생성하는 메소드를 작성해야 합니다
-     * - Access Token과 달리 최소한의 정보만 담습니다
-     * - subject: 사용자 ID만 포함
-     * - issuedAt: 현재 시간
-     * - expiration: 현재 시간 + refreshTokenExpiration
-     * - signWith(secretKey): 서명
-     *
-     * @param userId 사용자 ID
-     * @return Refresh Token 문자열
-     */
-    public String generateRefreshToken(String userId) {
-        // 구현 필요
-        return null;
-    }
-
-    /**
-     * TODO: Token에서 사용자 ID를 추출하는 메소드를 작성해야 합니다
-     * - Jwts.parser()를 사용합니다
-     * - verifyWith(secretKey)로 서명 검증
-     * - build().parseSignedClaims(token)으로 파싱
-     * - getPayload().getSubject()로 사용자 ID 추출
-     *
-     * @param token JWT 토큰
-     * @return 사용자 ID
+     * Token에서 사용자 ID를 추출하는 메소드
+     * - JWT의 subject에서 userId를 가져옵니다
      */
     public String getUserId(String token) {
-        // 구현 필요
-        return null;
+        return getClaims(token).getSubject();
     }
 
     /**
-     * TODO: Token에서 이메일을 추출하는 메소드를 작성해야 합니다
-     * - getClaims(token).get("email", String.class) 사용
-     *
-     * @param token JWT 토큰
-     * @return 이메일
+     * Token에서 이메일을 추출하는 메소드
+     * - JWT의 claims에서 email을 가져옵니다
      */
     public String getEmail(String token) {
-        // 구현 필요
-        return null;
+        return getClaims(token).get("email", String.class);
     }
 
     /**
-     * TODO: Token에서 권한을 추출하는 메소드를 작성해야 합니다
-     * - getClaims(token).get("role", String.class) 사용
-     *
-     * @param token JWT 토큰
-     * @return 권한 문자열 (예: "ROLE_CUSTOMER")
+     * Token에서 권한을 추출하는 메소드
+     * - JWT의 claims에서 role을 가져옵니다
      */
     public String getRole(String token) {
-        // 구현 필요
-        return null;
+        return getClaims(token).get("role", String.class);
     }
 
     /**
-     * TODO: Token에서 Claims를 추출하는 private 메소드를 작성해야 합니다
-     * - Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload() 사용
-     *
-     * @param token JWT 토큰
-     * @return Claims
+     * Token에서 Claims를 추출하는 private 메소드
+     * - JWT를 파싱하여 payload 정보를 가져옵니다
      */
     private Claims getClaims(String token) {
-        // 구현 필요
-        return null;
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**
-     * TODO: Token 유효성을 검증하는 메소드를 작성해야 합니다
-     * - try-catch로 예외 처리
-     * - Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token) 실행
-     * - 성공하면 true 반환
-     * - 실패하면 (ExpiredJwtException, SecurityException, MalformedJwtException, IllegalArgumentException 등) false 반환
-     * - 각 예외마다 적절한 로그 출력 (log.error 사용)
-     *
-     * @param token JWT 토큰
-     * @return 유효하면 true, 아니면 false
+     * Token 유효성을 검증하는 메소드
+     * - 토큰이 유효하면 true, 아니면 false 반환
+     * - 만료, 변조, 형식 오류 등을 체크합니다
      */
     public boolean validateToken(String token) {
-        // 구현 필요
+        try {
+            Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            log.error("만료된 JWT 토큰입니다: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.error("지원되지 않는 JWT 토큰입니다: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.error("잘못된 형식의 JWT 토큰입니다: {}", e.getMessage());
+        } catch (SecurityException e) {
+            log.error("JWT 서명이 유효하지 않습니다: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("JWT 토큰이 비어있습니다: {}", e.getMessage());
+        }
         return false;
     }
 
     /**
-     * TODO: Token으로부터 Authentication 객체를 생성하는 메소드를 작성해야 합니다
-     * - getUserId(), getEmail(), getRole()로 정보 추출
-     * - SimpleGrantedAuthority로 권한 객체 생성
-     * - UserDetails 객체 생성 (User.builder() 사용)
-     * - UsernamePasswordAuthenticationToken 생성하여 반환
+     * Token으로부터 Authentication 객체를 생성하는 메소드
      * - Spring Security의 SecurityContext에 저장될 인증 객체입니다
-     *
-     * @param token JWT 토큰
-     * @return Authentication 객체
+     * - 토큰에서 사용자 정보와 권한을 추출하여 생성합니다
      */
     public Authentication getAuthentication(String token) {
-        // 구현 필요
-        return null;
+        String userId = getUserId(token);
+        String email = getEmail(token);
+        String role = getRole(token);
+
+        // 권한 객체 생성
+        Collection<GrantedAuthority> authorities = Arrays.asList(
+                new SimpleGrantedAuthority(role)
+        );
+
+        // UserDetails 객체 생성
+        UserDetails principal = User.builder()
+                .username(userId)
+                .password("")  // 토큰 기반 인증에서는 비밀번호 불필요
+                .authorities(authorities)
+                .build();
+
+        // Authentication 객체 생성 및 반환
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
     /**
-     * TODO: Token의 남은 유효시간을 밀리초로 반환하는 메소드를 작성해야 합니다
-     * - getClaims(token).getExpiration()으로 만료 시간 추출
-     * - 만료 시간 - 현재 시간을 계산하여 반환
+     * Token의 남은 유효시간을 밀리초로 반환하는 메소드
      * - Redis TTL 설정시 사용됩니다 (초 단위로 변환 필요)
-     *
-     * @param token JWT 토큰
-     * @return 남은 유효시간 (밀리초)
      */
     public Long getTokenExpirationTime(String token) {
-        // 구현 필요
-        return null;
+        Date expiration = getClaims(token).getExpiration();
+        Date now = new Date();
+        return expiration.getTime() - now.getTime();
     }
 }

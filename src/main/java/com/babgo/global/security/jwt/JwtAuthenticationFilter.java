@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * TODO: 요청을 필터링하는 메인 메소드를 작성해야 합니다
+     * 요청을 필터링하는 메인 메소드
      * - OncePerRequestFilter를 상속받아 요청당 한 번만 실행됩니다
      *
      * 처리 순서:
@@ -50,17 +50,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        // 구현 필요
-        // 1. String token = resolveToken(request);
-        // 2. if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-        // 3.     Authentication authentication = jwtTokenProvider.getAuthentication(token);
-        // 4.     SecurityContextHolder.getContext().setAuthentication(authentication);
-        // 5. }
-        // 6. filterChain.doFilter(request, response);
+        try {
+            // 1. 요청에서 JWT 토큰 추출
+            String token = resolveToken(request);
+
+            // 2. 토큰이 있고 유효하면
+            if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+                // 3. Authentication 객체 생성
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                // 4. SecurityContext에 저장
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.debug("Security Context에 인증 정보 저장: {}", authentication.getName());
+            }
+        } catch (Exception e) {
+            log.error("Security Context에 인증 정보를 설정할 수 없습니다: {}", e.getMessage());
+        }
+
+        // 5. 다음 필터로 요청 전달
+        filterChain.doFilter(request, response);
     }
 
     /**
-     * TODO: HTTP 요청의 Header에서 JWT 토큰을 추출하는 메소드를 작성해야 합니다
+     * HTTP 요청의 Header에서 JWT 토큰을 추출하는 메소드
      * - "Authorization" 헤더에서 토큰 추출
      * - "Bearer {token}" 형식으로 전달됨
      * - "Bearer " 접두사를 제거하고 토큰만 반환
@@ -76,7 +87,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @return JWT 토큰 문자열 또는 null
      */
     private String resolveToken(HttpServletRequest request) {
-        // 구현 필요
+        String bearerToken = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+
         return null;
     }
 }
