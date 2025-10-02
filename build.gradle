@@ -14,12 +14,13 @@ java {
 }
 
 //인코딩 깨짐 방지
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     systemProperty 'file.encoding', 'UTF-8'
+    useJUnitPlatform()
 }
 
 repositories {

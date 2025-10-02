@@ -4,6 +4,7 @@ src/main/resources/application.yml
 .env
 AUTH_IMPLEMENTATION_GUIDE.md
 ISSUE_JWT_TOKEN_PROVIDER.md
+AUTH_API_ROADMAP.md
 
 http_ca.crt
 
