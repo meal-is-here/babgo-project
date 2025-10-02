@@ -17,7 +17,7 @@ import lombok.*;
 public class UserEntity extends BaseTimeEntity {
 
     @Id
-    @Column(name = "user_id")
+    @Column(name = "user_id", length = 50)
     private String userId;
 
     @Column(name = "email", nullable = false, length = 100, unique = true)

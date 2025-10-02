@@ -28,24 +28,16 @@ public class UserResponse {
     }
 
 
-    // 로그인 응답 DTO
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
     public static class LoginResponse {
-
         private String accessToken;
-        private String tokenType;  // "Bearer"
-        private Long expiresIn;    // 토큰 만료 시간 (밀리초)
-
         private String userId;
         private String email;
         private String name;
         private UserRole role;
-
-        // TODO: Refresh Token 구현시 추가
-        // private String refreshToken;
     }
 
     // 사용자 정보 조회 응답 DTO

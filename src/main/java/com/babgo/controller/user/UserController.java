@@ -49,19 +49,17 @@ public class UserController {
                 .body(ApiResponse.success(response));
     }
 
-    /**
-     * 로그인 API
-     * POST /api/auth/login
-     */
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserResponse.LoginResponse>> login(
+    public ResponseEntity<ApiResponse<String>> login(
             @Valid @RequestBody UserRequest.LoginRequest request) {
         log.info("로그인 요청: email={}", request.getEmail());
 
         UserResponse.LoginResponse response = userService.login(request);
 
         return ResponseEntity
-                .ok(ApiResponse.success(response));
+                .ok()
+                .header("Authorization", "Bearer " + response.getAccessToken())
+                .body(ApiResponse.success("로그인 성공"));
     }
 
     // TODO: 필요한 추가 API를 작성하세요

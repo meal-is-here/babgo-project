@@ -21,7 +21,7 @@ public class UserDetailService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    //username(userId)로 사용자를 조회하는 메소드
+    //userId로 사용자를 조회하는 메소드
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -30,19 +30,6 @@ public class UserDetailService implements UserDetailsService {
 
         if (user.getIsUserDeleted()) {
             throw new UsernameNotFoundException("삭제된 사용자입니다: " + username);
-        }
-
-        return new UserDetailInfo(user);
-    }
-
-    // eamil로 사용자를 조회하는 추가 메소드 for 로그인을 위해
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
-
-        if (user.getIsUserDeleted()) {
-            throw new UsernameNotFoundException("삭제된 사용자입니다: " + email);
         }
 
         return new UserDetailInfo(user);

@@ -120,11 +120,8 @@ public class UserService {
 
         log.info("로그인 성공: userId={}, email={}, role={}", user.getUserId(), user.getEmail(), user.getRole());
 
-        // 4. 로그인 응답 반환
         return UserResponse.LoginResponse.builder()
                 .accessToken(accessToken)
-                .tokenType("Bearer")
-                .expiresIn(jwtProperties.getAccessTokenExpiration())
                 .userId(user.getUserId())
                 .email(user.getEmail())
                 .name(user.getName())
