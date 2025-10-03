@@ -147,18 +147,28 @@ public class Store extends BaseTimeEntity {
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
 
-        if (phoneNumber.length() > 20) {
+        if (!phoneNumber.matches("^[0-9-]+$")) {
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
 
-        String digits = normalizePhone(phoneNumber);
-        if (!digits.matches("^0\\d{8,10}$")) {
+        // 2) 하이픈 사용 여부에 따라 정확한 형식 검증
+        if (phoneNumber.contains("-")) {
+            // 예: 02-123-4567 / 031-1234-5678 / 010-1234-5678
+            if (!phoneNumber.matches("^0\\d{1,2}-\\d{3,4}-\\d{4}$")) {
+                throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            }
+        } else {
+            // 하이픈 미사용: 총 9~11자리(0으로 시작)
+            if (!phoneNumber.matches("^0\\d{8,10}$")) {
+                throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            }
+        }
+
+        // 3) 보조 안전망: 하이픈 제거 후 자리수 재확인(9~11)
+        String digits = phoneNumber.replaceAll("-", "");
+        if (digits.length() < 9 || digits.length() > 11) {
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
-    }
-
-    private static String normalizePhone(String phoneNumber) {
-        return phoneNumber.replaceAll("\\D", "");
     }
 
     private static void validateMinOrderAmount(int minOrderAmount) {

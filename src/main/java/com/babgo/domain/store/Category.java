@@ -21,4 +21,11 @@ public class Category {
     @Column(nullable = false)
     private String categoryName;
 
+    private Category(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public static Category of(String categoryName) {
+        return new Category(categoryName);
+    }
 }
