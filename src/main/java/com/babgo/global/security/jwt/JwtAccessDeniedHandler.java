@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+// JWT 인가 실패시 처리하는 클래스
 @Slf4j
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {

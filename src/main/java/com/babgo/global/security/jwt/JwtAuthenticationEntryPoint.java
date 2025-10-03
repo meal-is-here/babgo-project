@@ -13,12 +13,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * JWT 인증 실패 처리 핸들러
- *
- * 인증되지 않은 사용자가 보호된 리소스에 접근할 때 호출됩니다.
- * 401 Unauthorized 에러를 JSON 형식으로 반환합니다.
- */
+
+// JWT 인증 실패시 처리하는 클래스
 @Slf4j
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {

@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+// JWT 설정 정보를 담는 클래스
 @Getter
 @Setter
 @Component

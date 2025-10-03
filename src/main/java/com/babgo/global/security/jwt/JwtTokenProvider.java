@@ -20,9 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
-/**
- * JWT 토큰 생성 및 검증 클래스
- */
+ //JWT 토큰 생성 및 검증 클래스
 @Slf4j
 @Component
 @RequiredArgsConstructor

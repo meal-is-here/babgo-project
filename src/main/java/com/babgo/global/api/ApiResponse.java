@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 
+// 사용중
 @Getter
 public class ApiResponse<T> {
 	private final boolean success;

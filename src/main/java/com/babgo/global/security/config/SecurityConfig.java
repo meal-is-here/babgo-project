@@ -19,11 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Spring Security 설정 클래스
- *
- * JWT 기반 인증/인가를 위한 Spring Security 설정입니다.
- */
+// Spring Security 설정 클래스
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity  // @PreAuthorize, @PostAuthorize 등 메소드 레벨 시큐리티 활성화
