@@ -58,6 +58,10 @@ public class Store extends BaseTimeEntity {
 
     private String deletedBy;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     private Store(
             String storeName,
             String addressLine,
@@ -67,7 +71,8 @@ public class Store extends BaseTimeEntity {
             int minOrderAmount,
             LocalTime openingHours,
             LocalTime closingHours,
-            StoreStatus storeStatus
+            StoreStatus storeStatus,
+            Category category
     ) {
         validateLength(storeName);
         validateLength(addressLine);
@@ -75,6 +80,7 @@ public class Store extends BaseTimeEntity {
         validatePhoneNumber(phoneNumber);
         validateMinOrderAmount(minOrderAmount);
         validateBusinessHours(openingHours, closingHours);
+        validateCategory(category);
 
         this.storeName = storeName;
         this.addressLine = addressLine;
@@ -85,8 +91,12 @@ public class Store extends BaseTimeEntity {
         this.openingHours = openingHours;
         this.closingHours = closingHours;
         this.storeStatus = storeStatus;
+        this.category = category;
     }
 
+    /**
+     * StoreStatus 는 생성 시점에 기본 값: PREPARING
+     */
     public static Store of(
             String storeName,
             String addressLine,
@@ -95,7 +105,8 @@ public class Store extends BaseTimeEntity {
             String phoneNumber,
             int minOrderAmount,
             LocalTime openingHours,
-            LocalTime closingHours
+            LocalTime closingHours,
+            Category category
     ) {
         return new Store(
                 storeName,
@@ -106,7 +117,8 @@ public class Store extends BaseTimeEntity {
                 minOrderAmount,
                 openingHours,
                 closingHours,
-                StoreStatus.PREPARING
+                StoreStatus.PREPARING,
+                category
         );
     }
 
@@ -161,6 +173,12 @@ public class Store extends BaseTimeEntity {
         }
 
         if (openingHours.equals(closingHours)) {
+            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+        }
+    }
+
+    private static void validateCategory(Category category) {
+        if (category == null) {
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
     }
