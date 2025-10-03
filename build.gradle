@@ -37,3 +37,4 @@ dependencies {
 springBoot {
     mainClass = "com.babgo.BabgoApplication"
 }
+
