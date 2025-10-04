@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -47,18 +46,6 @@ public class StoreInfo {
                     closingHours,
                     categoryId
             );
-        }
-    }
-
-    @Getter
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Result {
-        private final UUID storeId;
-        private final LocalDateTime createdAt;
-        private final String createdBy;
-
-        public static Result of(UUID storeId, LocalDateTime createdAt, String createdBy) {
-            return new Result(storeId, createdAt, createdBy);
         }
     }
 }
