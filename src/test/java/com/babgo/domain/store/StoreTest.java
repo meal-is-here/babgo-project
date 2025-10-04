@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -21,8 +20,8 @@ class StoreTest {
 
     private static final String VALID_NAME = "홍대 김치찌개";
     private static final String VALID_ADDR = "서울시 마포구 양화로 123";
-    private static final BigDecimal VALID_LAT = new BigDecimal("37.5665");
-    private static final BigDecimal VALID_LON = new BigDecimal("126.9780");
+    private static final double VALID_LAT = 37.5665;
+    private static final double VALID_LON = 126.9780;
     private static final String VALID_PHONE = "02-1234-5678";
     private static final int VALID_MIN_ORDER = 15000;
     private static final LocalTime VALID_OPEN = LocalTime.of(9, 0);
@@ -98,8 +97,8 @@ class StoreTest {
 
     @ParameterizedTest
     @MethodSource("invalidLatLon")
-    @DisplayName("위/경도(null 또는 범위초과)면 객체 생성에 실패한다.")
-    void lat_and_lon_invalid(BigDecimal lat, BigDecimal lon) {
+    @DisplayName("위/경도(범위초과)면 객체 생성에 실패한다.")
+    void lat_and_lon_invalid(double lat, double lon) {
         assertThatThrownBy(() -> Store.of(
                 VALID_NAME, VALID_ADDR, lat, lon,
                 VALID_PHONE, VALID_MIN_ORDER, VALID_OPEN, VALID_CLOSE,
@@ -178,12 +177,10 @@ class StoreTest {
 
     static Stream<Arguments> invalidLatLon() {
         return Stream.of(
-                Arguments.of(null, VALID_LON),
-                Arguments.of(VALID_LAT, null),
-                Arguments.of(new BigDecimal("-90.0001"), VALID_LON),
-                Arguments.of(new BigDecimal("90.0001"), VALID_LON),
-                Arguments.of(VALID_LAT, new BigDecimal("-180.0001")),
-                Arguments.of(VALID_LAT, new BigDecimal("180.0001"))
+                Arguments.of(-90.0001, VALID_LON),
+                Arguments.of(90.0001, VALID_LON),
+                Arguments.of(VALID_LAT, -180.0001),
+                Arguments.of(VALID_LAT, 180.0001)
         );
     }
 
