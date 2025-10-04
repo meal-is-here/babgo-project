@@ -13,7 +13,6 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 public class User extends BaseTimeEntity {
 
     @Id
@@ -40,18 +39,56 @@ public class User extends BaseTimeEntity {
     private UserRole role;
 
     @Column(name = "is_user_deleted")
-    @Builder.Default
     private Boolean isUserDeleted = false;
 
     @Column(name = "deleted_by")
     private String deletedBy;
 
     @Column(name = "is_profile_public")
-    @Builder.Default
     private Boolean isProfilePublic = true;
 
     @Column(name = "profile_public_at")
     private java.time.LocalDateTime profilePublicAt;
+
+    /**
+     * 고객 사용자 생성 팩토리 메서드
+     */
+    public static User ofCustomer(String userId, String email, String encodedPassword,
+                                   String name, String nickname, String phoneNumber) {
+        return new User(
+                userId,
+                email,
+                encodedPassword,
+                name,
+                nickname,
+                phoneNumber,
+                UserRole.CUSTOMER,
+                false,
+                null,
+                true,
+                null
+        );
+    }
+
+    /**
+     * 사장 사용자 생성 팩토리 메서드
+     */
+    public static User ofOwner(String userId, String email, String encodedPassword,
+                               String name, String nickname, String phoneNumber) {
+        return new User(
+                userId,
+                email,
+                encodedPassword,
+                name,
+                nickname,
+                phoneNumber,
+                UserRole.OWNER,
+                false,
+                null,
+                true,
+                null
+        );
+    }
 
     // TODO: 소프트 딜리트 처리 메소드를 작성해야 합니다
     // - isUserDeleted를 true로 설정

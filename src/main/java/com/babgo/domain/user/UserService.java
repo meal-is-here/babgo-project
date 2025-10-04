@@ -34,30 +34,29 @@ public class UserService {
         }
 
         // 2. User 엔티티 생성
-        User user = User.builder()
-                .userId(request.getUserId())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .name(request.getName())
-                .nickname(request.getNickname())
-                .phoneNumber(request.getPhoneNumber())
-                .role(UserRole.CUSTOMER)
-                .build();
+        User user = User.ofCustomer(
+                request.getUserId(),
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getName(),
+                request.getNickname(),
+                request.getPhoneNumber()
+        );
 
         // 3. 저장
         User savedUser = userRepository.save(user);
         log.info("고객 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
 
         // 4. 응답 반환
-        return UserResponse.SignUpResponse.builder()
-                .userId(savedUser.getUserId())
-                .email(savedUser.getEmail())
-                .name(savedUser.getName())
-                .nickname(savedUser.getNickname())
-                .role(savedUser.getRole())
-                .createdAt(savedUser.getCreatedAt())
-                .message("고객 회원가입이 완료되었습니다")
-                .build();
+        return UserResponse.SignUpResponse.of(
+                savedUser.getUserId(),
+                savedUser.getEmail(),
+                savedUser.getName(),
+                savedUser.getNickname(),
+                savedUser.getRole(),
+                savedUser.getCreatedAt(),
+                "고객 회원가입이 완료되었습니다"
+        );
     }
 
     /**
@@ -71,30 +70,29 @@ public class UserService {
         }
 
         // 2. User 엔티티 생성 (OWNER 권한)
-        User user = User.builder()
-                .userId(request.getUserId())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .name(request.getName())
-                .nickname(request.getNickname())
-                .phoneNumber(request.getPhoneNumber())
-                .role(UserRole.OWNER)
-                .build();
+        User user = User.ofOwner(
+                request.getUserId(),
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getName(),
+                request.getNickname(),
+                request.getPhoneNumber()
+        );
 
         // 3. 저장
         User savedUser = userRepository.save(user);
         log.info("사장 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
 
         // 4. 응답 반환
-        return UserResponse.SignUpResponse.builder()
-                .userId(savedUser.getUserId())
-                .email(savedUser.getEmail())
-                .name(savedUser.getName())
-                .nickname(savedUser.getNickname())
-                .role(savedUser.getRole())
-                .createdAt(savedUser.getCreatedAt())
-                .message("사장 회원가입이 완료되었습니다")
-                .build();
+        return UserResponse.SignUpResponse.of(
+                savedUser.getUserId(),
+                savedUser.getEmail(),
+                savedUser.getName(),
+                savedUser.getNickname(),
+                savedUser.getRole(),
+                savedUser.getCreatedAt(),
+                "사장 회원가입이 완료되었습니다"
+        );
     }
 
     /**
@@ -120,13 +118,13 @@ public class UserService {
 
         log.info("로그인 성공: userId={}, email={}, role={}", user.getUserId(), user.getEmail(), user.getRole());
 
-        return UserResponse.LoginResponse.builder()
-                .accessToken(accessToken)
-                .userId(user.getUserId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .role(user.getRole())
-                .build();
+        return UserResponse.LoginResponse.of(
+                accessToken,
+                user.getUserId(),
+                user.getEmail(),
+                user.getName(),
+                user.getRole()
+        );
     }
 
     // TODO: 필요한 추가 메소드를 작성하세요

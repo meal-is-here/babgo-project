@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +14,6 @@ public class UserRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
     public static class CustomerSignUpRequest {
 
         @NotBlank(message = "사용자 ID는 필수입니다")
@@ -44,7 +42,6 @@ public class UserRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
     public static class OwnerSignUpRequest {
 
         @NotBlank(message = "사용자 ID는 필수입니다")
@@ -75,7 +72,6 @@ public class UserRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
     public static class LoginRequest {
 
         @NotBlank(message = "이메일은 필수입니다")

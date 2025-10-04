@@ -6,7 +6,6 @@ import com.babgo.global.exception.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import lombok.Builder;
 import lombok.Getter;
 
 // 사용중
@@ -20,7 +19,6 @@ public class ApiResponse<T> {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private final LocalDateTime timestamp;
 
-	@Builder
 	private ApiResponse(boolean success, String message, T data, String errorCode, LocalDateTime timestamp) {
 		this.success = success;
 		this.message = message;
@@ -31,42 +29,20 @@ public class ApiResponse<T> {
 
 	// 성공 응답용
 	public static <T> ApiResponse<T> success(T data) {
-		return ApiResponse.<T>builder()
-						  .success(true)
-						  .message("성공")
-						  .data(data)
-						  .timestamp(LocalDateTime.now())
-						  .build();
+		return new ApiResponse<>(true, "성공", data, null, LocalDateTime.now());
 	}
 
 	public static <T> ApiResponse<T> success(String message) {
-		return ApiResponse.<T>builder()
-						  .success(true)
-						  .message(message)
-						  .data(null)
-						  .timestamp(LocalDateTime.now())
-						  .build();
+		return new ApiResponse<>(true, message, null, null, LocalDateTime.now());
 	}
 
 	// 실패 응답용
 	public static <T> ApiResponse<T> fail(ErrorCode errorCode) {
-		return ApiResponse.<T>builder()
-						  .success(false)
-						  .message(errorCode.getMessage())
-						  .data(null)
-						  .errorCode(errorCode.name())
-						  .timestamp(LocalDateTime.now())
-						  .build();
+		return new ApiResponse<>(false, errorCode.getMessage(), null, errorCode.name(), LocalDateTime.now());
 	}
 
 	// 커스텀 실패 응답용
 	public static <T> ApiResponse<T> fail(String message, ErrorCode errorCode) {
-		return ApiResponse.<T>builder()
-						  .success(false)
-						  .message(message)
-						  .data(null)
-						  .errorCode(errorCode.name())
-						  .timestamp(LocalDateTime.now())
-						  .build();
+		return new ApiResponse<>(false, message, null, errorCode.name(), LocalDateTime.now());
 	}
 }
