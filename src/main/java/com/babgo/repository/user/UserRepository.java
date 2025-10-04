@@ -1,16 +1,16 @@
 package com.babgo.repository.user;
 
-import com.babgo.domain.user.UserEntity;
+import com.babgo.domain.user.User;
 
 import java.util.Optional;
 
 public interface UserRepository {
 
-    UserEntity save(UserEntity user);
+    User save(User user);
 
-    Optional<UserEntity> findById(String userId);
+    Optional<User> findById(String userId);
 
-    Optional<UserEntity> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
 }

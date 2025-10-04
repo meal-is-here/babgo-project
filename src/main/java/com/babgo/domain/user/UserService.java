@@ -33,8 +33,8 @@ public class UserService {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다");
         }
 
-        // 2. UserEntity 엔티티 생성
-        UserEntity user = UserEntity.builder()
+        // 2. User 엔티티 생성
+        User user = User.builder()
                 .userId(request.getUserId())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -45,7 +45,7 @@ public class UserService {
                 .build();
 
         // 3. 저장
-        UserEntity savedUser = userRepository.save(user);
+        User savedUser = userRepository.save(user);
         log.info("고객 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
 
         // 4. 응답 반환
@@ -70,8 +70,8 @@ public class UserService {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다");
         }
 
-        // 2. UserEntity 엔티티 생성 (OWNER 권한)
-        UserEntity user = UserEntity.builder()
+        // 2. User 엔티티 생성 (OWNER 권한)
+        User user = User.builder()
                 .userId(request.getUserId())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -82,7 +82,7 @@ public class UserService {
                 .build();
 
         // 3. 저장
-        UserEntity savedUser = userRepository.save(user);
+        User savedUser = userRepository.save(user);
         log.info("사장 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
 
         // 4. 응답 반환
@@ -103,7 +103,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponse.LoginResponse login(UserRequest.LoginRequest request) {
         // 1. 이메일로 사용자 조회
-        UserEntity user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 잘못되었습니다"));
 
         // 2. 비밀번호 검증

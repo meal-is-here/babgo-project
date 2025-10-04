@@ -1,6 +1,6 @@
 package com.babgo.application.user;
 
-import com.babgo.domain.user.UserEntity;
+import com.babgo.domain.user.User;
 import com.babgo.domain.user.UserRole;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,14 +12,14 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * UserEntity 엔티티를 Spring Security가 사용할 수 있는 형태로 변환합니다.
+ * User 엔티티를 Spring Security가 사용할 수 있는 형태로 변환합니다.
  * 인증/인가 과정에서 사용자 정보를 제공합니다.
  */
 @Getter
 @RequiredArgsConstructor
 public class UserDetailInfo implements UserDetails {
 
-    private final UserEntity user;  // 실제 사용자 엔티티
+    private final User user;  // 실제 사용자 엔티티
 
     // 사용자의 권한 목록을 반환하는 메소드
     @Override

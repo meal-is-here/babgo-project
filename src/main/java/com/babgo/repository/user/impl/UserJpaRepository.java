@@ -1,13 +1,13 @@
 package com.babgo.repository.user.impl;
 
-import com.babgo.domain.user.UserEntity;
+import com.babgo.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-interface UserJpaRepository extends JpaRepository<UserEntity, String> {
+interface UserJpaRepository extends JpaRepository<User, String> {
 
-    Optional<UserEntity> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
 }

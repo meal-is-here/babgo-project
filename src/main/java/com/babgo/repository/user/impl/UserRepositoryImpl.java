@@ -1,6 +1,6 @@
 package com.babgo.repository.user.impl;
 
-import com.babgo.domain.user.UserEntity;
+import com.babgo.domain.user.User;
 import com.babgo.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,17 +14,17 @@ public class UserRepositoryImpl implements UserRepository {
     private final UserJpaRepository userJpaRepository;
 
     @Override
-    public UserEntity save(UserEntity user) {
+    public User save(User user) {
         return userJpaRepository.save(user);
     }
 
     @Override
-    public Optional<UserEntity> findById(String userId) {
+    public Optional<User> findById(String userId) {
         return userJpaRepository.findById(userId);
     }
 
     @Override
-    public Optional<UserEntity> findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return userJpaRepository.findByEmail(email);
     }
 
