@@ -9,7 +9,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -30,11 +29,11 @@ public class Store extends BaseTimeEntity {
     @Column(nullable = false, length = 100)
     private String addressLine;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal latitude;
+    @Column(nullable = false)
+    private double latitude;
 
-    @Column(nullable = false, precision = 10, scale = 7)
-    private BigDecimal longitude;
+    @Column(nullable = false)
+    private double longitude;
 
     @Column(nullable = false, length = 20)
     private String phoneNumber;
@@ -59,14 +58,14 @@ public class Store extends BaseTimeEntity {
     private String deletedBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     private Store(
             String storeName,
             String addressLine,
-            BigDecimal latitude,
-            BigDecimal longitude,
+            double latitude,
+            double longitude,
             String phoneNumber,
             int minOrderAmount,
             LocalTime openingHours,
@@ -100,8 +99,8 @@ public class Store extends BaseTimeEntity {
     public static Store of(
             String storeName,
             String addressLine,
-            BigDecimal latitude,
-            BigDecimal longitude,
+            double latitude,
+            double longitude,
             String phoneNumber,
             int minOrderAmount,
             LocalTime openingHours,
@@ -122,24 +121,27 @@ public class Store extends BaseTimeEntity {
         );
     }
 
+    public void markOwnerName(String ownerName) {
+        if (createdBy == null || createdBy.isBlank()) {
+            this.createdBy = "가게 사장님 이름";
+        }
+    }
+
     private static void validateLength(String value) {
         if (value == null || value.isBlank() || value.trim().length() > 100) {
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
     }
 
-    private static void validateLatAndLon(BigDecimal latitude, BigDecimal longitude) {
-        if (latitude == null || longitude == null) {
+    private static void validateLatAndLon(double latitude, double longitude) {
+        if (latitude < -90.0 || latitude > 90.0) {
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
 
-        if (latitude.compareTo(BigDecimal.valueOf(-90)) < 0 || latitude.compareTo(BigDecimal.valueOf(90)) > 0) {
+        if (longitude < -180.0 || longitude > 180.0) {
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
 
-        if (longitude.compareTo(BigDecimal.valueOf(-180)) < 0 || longitude.compareTo(BigDecimal.valueOf(180)) > 0) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
-        }
     }
 
     private static void validatePhoneNumber(String phoneNumber) {
