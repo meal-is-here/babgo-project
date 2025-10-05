@@ -36,6 +36,10 @@ public class ApiResponse<T> {
 		return new ApiResponse<>(true, message, null, null, LocalDateTime.now());
 	}
 
+	public static <T> ApiResponse<T> success(String message, T data) {
+		return new ApiResponse<>(true, message, data, null, LocalDateTime.now());
+	}
+
 	// 실패 응답용
 	public static <T> ApiResponse<T> fail(ErrorCode errorCode) {
 		return new ApiResponse<>(false, errorCode.getMessage(), null, errorCode.name(), LocalDateTime.now());
