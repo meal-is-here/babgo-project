@@ -1,0 +1,89 @@
+package com.babgo.domain.order;
+
+import com.babgo.global.entity.BaseTimeEntity;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import java.util.UUID;
+
+@Entity
+@Getter
+@Table(name = "p_orders")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Order extends BaseTimeEntity {
+
+    @Id
+    @Column(name = "order_id", nullable = false, updatable = false)
+    private UUID orderId;
+
+    @Column(name = "store_id", nullable = false)
+    private String store;
+
+    @Column(name = "user_id", nullable = false)
+    private String user;
+
+    @Column(name = "total_price", nullable = false)
+    private Long totalPrice;
+
+    private String deliveryRequest;
+
+    private String deliveryAddress;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
+    private OrderStatus orderStatus;
+
+
+    private Order(
+            UUID orderId,
+            String store,
+            String user,
+            String deliveryRequest,
+            String deliveryAddress,
+            Long totalPrice
+    ){
+
+        if (orderId == null) {
+            throw new CustomException(ErrorCode.INVALID, "주문 아이디가 올바르지 않습니다.");
+        }
+
+        if (totalPrice == null || totalPrice < 0) {
+            throw new CustomException(ErrorCode.INVALID, "총 가격은 0원 이상이어야 합니다.");
+        }
+
+        if (user == null){
+            throw new CustomException(ErrorCode.INVALID, "사용자의 정보가 올바르지 않습니다.");
+        }
+
+        if (store == null){
+            throw new CustomException(ErrorCode.INVALID, "음식점의 정보가 올바르지 않습니다.");
+        }
+
+        if (deliveryAddress == null || deliveryAddress.isBlank()){
+            throw new CustomException(ErrorCode.INVALID, "주소는 반드시 입력되어야 합니다.");
+        }
+
+        this.orderId = orderId;
+        this.store = store;
+        this.user = user;
+        this.deliveryRequest = deliveryRequest;
+        this.deliveryAddress = deliveryAddress;
+        this.totalPrice = totalPrice;
+        this.orderStatus = OrderStatus.PENDING;
+    }
+
+    public static Order of(
+            UUID orderId,
+            String store,
+            String user,
+            String deliveryRequest,
+            String deliveryAddress,
+            Long totalPrice
+    ){
+        return new Order(orderId, store, user, deliveryRequest, deliveryAddress,totalPrice);
+    }
+
+}
