@@ -1,6 +1,8 @@
 package com.babgo.domain.order;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +39,9 @@ public class OrderService {
     }
 
     //TODO 주문 목록 조회
+    public Page<Order> findOrders(UUID userId, OrderStatus status,Pageable pageable) {
+        return orderRepository.findOrders(userId, status,pageable);
+    }
 
     //TODO 주문 단건 조회
 }

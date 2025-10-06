@@ -1,4 +1,4 @@
-package com.babgo.controller.oreder;
+package com.babgo.controller.order;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
