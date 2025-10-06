@@ -12,8 +12,8 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 
 @Getter
-@MappedSuperclass // 테이블 생성 X, 상속 시 컬럼으로 포함
-@EntityListeners(AuditingEntityListener.class) // JPA 이벤트 리스너 등록(수정시간, 생성시간 자동화)
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseTimeEntity {
 
 	@CreatedDate
@@ -24,4 +24,16 @@ public abstract class BaseTimeEntity {
 	protected LocalDateTime updatedAt;
 
 	protected LocalDateTime deletedAt;
+
+	public void markAsDeleted() {
+		if (deletedAt == null) {
+			deletedAt = LocalDateTime.now();
+		}
+	}
+
+	public void restore(){
+		if(deletedAt != null){
+			this.deletedAt = null;
+		}
+	}
 }
