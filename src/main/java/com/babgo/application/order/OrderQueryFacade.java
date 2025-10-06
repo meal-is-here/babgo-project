@@ -3,7 +3,6 @@ package com.babgo.application.order;
 import com.babgo.application.order.mapper.OrderMapper;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderService;
-import com.babgo.domain.order.OrderSortType;
 import com.babgo.domain.order.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

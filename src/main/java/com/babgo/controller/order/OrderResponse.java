@@ -3,8 +3,6 @@ package com.babgo.controller.order;
 import com.babgo.application.order.OrderInfo;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;

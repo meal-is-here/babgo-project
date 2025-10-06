@@ -15,7 +15,6 @@ import java.util.UUID;
 public class OrderRepositoryImpl implements OrderRepository {
 
     private final OrderJpaRepository orderJpaRepository;
-    private final OrderItemJpaRepository orderItemJpaRepository;
 
     @Override
     public UUID findNextOrderId() {
