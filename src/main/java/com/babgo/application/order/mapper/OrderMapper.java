@@ -23,7 +23,7 @@ public class OrderMapper {
         try {
             return OrderStatus.valueOf(normalized);
         } catch (IllegalArgumentException e) {
-            throw new CustomException(ErrorCode.INVALID,"올바르지 않은 주문 상태입니다.");
+            throw new CustomException(ErrorCode.INVALID, "올바르지 않은 주문 상태입니다.");
         }
     }
 }
