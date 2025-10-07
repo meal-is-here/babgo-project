@@ -48,4 +48,41 @@ public class StoreInfo {
             );
         }
     }
+
+    @Getter
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Update {
+        private final String storeName;
+        private final String addressLine;
+        private final Double latitude;
+        private final Double longitude;
+        private final String phoneNumber;
+        private final Integer minOrderAmount;
+        private final LocalTime openingHours;
+        private final LocalTime closingHours;
+        private final UUID categoryId;
+
+        public static Update of(
+                String storeName,
+                String addressLine,
+                Double latitude,
+                Double longitude,
+                String phoneNumber,
+                Integer minOrderAmount,
+                LocalTime openingHours,
+                LocalTime closingHours,
+                UUID categoryId) {
+            return new Update(
+                    storeName,
+                    addressLine,
+                    latitude,
+                    longitude,
+                    phoneNumber,
+                    minOrderAmount,
+                    openingHours,
+                    closingHours,
+                    categoryId
+            );
+        }
+    }
 }

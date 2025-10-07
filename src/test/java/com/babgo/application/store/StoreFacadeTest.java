@@ -4,6 +4,8 @@ import com.babgo.domain.store.Category;
 import com.babgo.domain.store.CategoryService;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +18,7 @@ import java.time.LocalTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,17 +36,11 @@ class StoreFacadeTest {
     @Test
     void createStore_success() {
         // given
-        UUID categoryId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        UUID categoryId = UUID.randomUUID();
         StoreInfo.Create input = StoreInfo.Create.of(
-                "홍대 김치찌개",
-                "서울시 마포구 양화로 123",
-                37.5665,
-                126.9780,
-                "02-1234-5678",
-                15000,
-                LocalTime.of(9, 0),
-                LocalTime.of(21, 0),
-                categoryId
+                "홍대 김치찌개", "서울시 마포구 양화로 123",
+                37.5665, 126.9780, "02-1234-5678", 15000,
+                LocalTime.of(9, 0), LocalTime.of(21, 0), categoryId
         );
         Category category = mock(Category.class);
         when(categoryService.findByCategoryId(categoryId)).thenReturn(category);
@@ -51,20 +48,84 @@ class StoreFacadeTest {
         storeFacade.createStore(input);
         // then
         verify(categoryService, times(1)).findByCategoryId(categoryId);
-
         ArgumentCaptor<Store> captor = ArgumentCaptor.forClass(Store.class);
         verify(storeService, times(1)).create(captor.capture());
         Store store = captor.getValue();
-
-        assertThat(store.getStoreName()).isEqualTo("홍대 김치찌개");
-        assertThat(store.getAddressLine()).isEqualTo("서울시 마포구 양화로 123");
-        assertThat(store.getPhoneNumber()).isEqualTo("02-1234-5678");
-        assertThat(store.getLatitude()).isEqualTo(37.5665);
-        assertThat(store.getLongitude()).isEqualTo(126.9780);
-        assertThat(store.getPhoneNumber()).isEqualTo("02-1234-5678");
-        assertThat(store.getMinOrderAmount()).isEqualTo(15000);
-        assertThat(store.getOpeningHours()).isEqualTo(LocalTime.of(9, 0));
-        assertThat(store.getClosingHours()).isEqualTo(LocalTime.of(21, 0));
         assertThat(store.getCategory()).isSameAs(category);
+        assertThat(store.getCreatedBy()).isEqualTo("ownerName");
+    }
+
+    @DisplayName("가게 수정시, 수정할 필드 값들이 오면 해당가게의 필드값들을 수정한다.")
+    @Test
+    void updateStore_success() {
+        // given
+        UUID storeId = UUID.randomUUID();
+        UUID newCategoryId = UUID.randomUUID();
+
+        Store store = mock(Store.class);
+        when(storeService.findByStoreId(storeId)).thenReturn(store);
+
+        Category newCategory = mock(Category.class);
+        when(categoryService.findByCategoryId(newCategoryId)).thenReturn(newCategory);
+
+        StoreInfo.Update input = StoreInfo.Update.of(
+                "새로운 가게명", "서울시 어딘가 123",
+                37.5, 129.0,
+                null, 20000,
+                LocalTime.of(9,0), LocalTime.of(22,0),
+                newCategoryId
+        );
+
+        // when
+        storeFacade.updateStore(storeId, input);
+
+        // then
+        verify(storeService).findByStoreId(storeId);
+        verify(store).changeStoreName("새로운 가게명");
+        verify(store).changeAddressLine("서울시 어딘가 123");
+        verify(store).changeLocation(37.5, 129.0);
+        verify(store, never()).changePhoneNumber(any());
+        verify(store).changeMinOrderAmount(20000);
+        verify(store).changeBusinessHours(LocalTime.of(9,0), LocalTime.of(22,0));
+        verify(categoryService).findByCategoryId(newCategoryId);
+        verify(store).changeCategory(newCategory);
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(store).markUpdatedBy(captor.capture());
+        assertThat(captor.getValue()).isEqualTo("ownerName");
+    }
+
+    @DisplayName("해당 가게를 삭제할 수 있다.")
+    @Test
+    void deleteStore_success() {
+        // given
+        UUID storeId = UUID.randomUUID();
+        Store store = mock(Store.class);
+        when(storeService.findByStoreId(storeId)).thenReturn(store);
+        when(store.isDeleted()).thenReturn(false);
+
+        // when
+        storeFacade.deleteStore(storeId);
+
+        // then
+        verify(storeService, times(1)).findByStoreId(storeId);
+        verify(store, times(1)).isDeleted();
+        verify(store, times(1)).markDeletedBy("ownerName");
         }
+
+    @DisplayName("이미 삭제된 가게는 삭제 시 예외가 발생한다")
+    @Test
+    void deleteStore_alreadyDeleted_throws() {
+        UUID storeId = UUID.randomUUID();
+        Store store = mock(Store.class);
+        when(storeService.findByStoreId(storeId)).thenReturn(store);
+        when(store.isDeleted()).thenReturn(true);
+
+        CustomException ex = assertThrows(CustomException.class,
+                () -> storeFacade.deleteStore(storeId));
+        assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.VALIDATION_ERROR);
+
+        verify(storeService).findByStoreId(storeId);
+        verify(store).isDeleted();
+    }
+
 }

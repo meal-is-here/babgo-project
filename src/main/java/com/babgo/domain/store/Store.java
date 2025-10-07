@@ -121,10 +121,64 @@ public class Store extends BaseTimeEntity {
         );
     }
 
-    public void markOwnerName(String ownerName) {
+    public void markCreateBy(String ownerName) {
         if (createdBy == null || createdBy.isBlank()) {
-            this.createdBy = "가게 사장님 이름";
+            this.createdBy = "ownerName";
         }
+    }
+
+    public void markUpdatedBy(String ownerName) {
+        if (updatedBy == null || updatedBy.isBlank()) {
+            this.updatedBy = "ownerName";
+        }
+    }
+
+    public void markDeletedBy(String ownerName) {
+        if (this.getDeletedAt() == null) {
+            markAsDeleted();
+            this.deletedBy = "ownerName";
+        }
+    }
+
+    public boolean isDeleted() {
+        return getDeletedAt() != null;
+    }
+
+    public void changeStoreName(String storeName) {
+        validateLength(storeName);
+        this.storeName = storeName;
+    }
+
+    public void changeAddressLine(String addressLine) {
+        validateLength(addressLine);
+        this.addressLine = addressLine;
+    }
+
+    public void changeLocation(double lat, double lon) {
+        validateLatAndLon(lat, lon);
+        this.latitude = lat;
+        this.longitude = lon;
+    }
+
+    public void changePhoneNumber(String phoneNumber) {
+        validatePhoneNumber(phoneNumber);
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void changeMinOrderAmount(Integer minOrderAmount) {
+        validateMinOrderAmount(minOrderAmount);
+        this.minOrderAmount = minOrderAmount;
+    }
+
+    public void changeBusinessHours(LocalTime open, LocalTime close) {
+        validateBusinessHours(open, close);
+        this.openingHours = open;
+        this.closingHours = close;
+    }
+
+    public void changeCategory(Category category) {
+        validateCategory(category);
+        this.category = category;
     }
 
     private static void validateLength(String value) {
@@ -194,5 +248,4 @@ public class Store extends BaseTimeEntity {
             throw new CustomException(ErrorCode.VALIDATION_ERROR);
         }
     }
-
 }

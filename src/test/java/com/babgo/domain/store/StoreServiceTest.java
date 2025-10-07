@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.*;
 
@@ -34,4 +36,22 @@ class StoreServiceTest {
         Assertions.assertThat(store).isEqualTo(persisted);
         verify(storeRepository, times(1)).save(same(input));
     }
+
+    @DisplayName("storeId로 가게를 조회하고, 리포지토리의 반환값을 그대로 돌려준다.")
+    @Test
+    void findByStoreId_success() {
+        // given
+        UUID storeId = UUID.randomUUID();
+        Store found = mock(Store.class);
+        when(storeRepository.findByStoreId(same(storeId))).thenReturn(found);
+
+        // when
+        Store result = storeService.findByStoreId(storeId);
+
+        // then
+        Assertions.assertThat(result).isSameAs(found);
+        verify(storeRepository, times(1)).findByStoreId(same(storeId));
+        verifyNoMoreInteractions(storeRepository);
+    }
+
 }
