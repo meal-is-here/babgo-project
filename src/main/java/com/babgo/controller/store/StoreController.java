@@ -30,4 +30,10 @@ public class StoreController {
         storeFacade.updateStore(storeId, storeRequest.toUpdateInfo());
         return ApiResponse.success("가게 수정을 성공했습니다.");
     }
+
+    @DeleteMapping("/{storeId}")
+    public ApiResponse<Void> deleteStore(@PathVariable UUID storeId) {
+        storeFacade.deleteStore(storeId);
+        return ApiResponse.success("가게 삭제를 성공했습니다");
+    }
 }
