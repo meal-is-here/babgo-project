@@ -17,7 +17,7 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @GetMapping("/me")
-    public ApiResponse<ProfileResponse> getMyProfile(@AuthenticationPrincipal String userId) {
+    public ApiResponse<ProfileResponse> getMyProfile(@AuthenticationPrincipal(expression = "username") String userId) {
         ProfileResponse response = profileService.getMyProfile(userId);
         return ApiResponse.success("프로필 조회를 성공했습니다.", response);
     }
