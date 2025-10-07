@@ -1,5 +1,7 @@
 .env
 
+venv/
+
 # Local environment
 src/main/resources/application-local.yml
 

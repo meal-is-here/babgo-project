@@ -129,69 +129,69 @@ public class Store extends BaseTimeEntity {
 
     private static void validateLength(String value) {
         if (value == null || value.isBlank() || value.trim().length() > 100) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
     }
 
     private static void validateLatAndLon(double latitude, double longitude) {
         if (latitude < -90.0 || latitude > 90.0) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
 
         if (longitude < -180.0 || longitude > 180.0) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
 
     }
 
     private static void validatePhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.isBlank()) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
 
         if (!phoneNumber.matches("^[0-9-]+$")) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
 
         // 2) 하이픈 사용 여부에 따라 정확한 형식 검증
         if (phoneNumber.contains("-")) {
             // 예: 02-123-4567 / 031-1234-5678 / 010-1234-5678
             if (!phoneNumber.matches("^0\\d{1,2}-\\d{3,4}-\\d{4}$")) {
-                throw new CustomException(ErrorCode.VALIDATION_ERROR);
+                throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
             }
         } else {
             // 하이픈 미사용: 총 9~11자리(0으로 시작)
             if (!phoneNumber.matches("^0\\d{8,10}$")) {
-                throw new CustomException(ErrorCode.VALIDATION_ERROR);
+                throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
             }
         }
 
         // 3) 보조 안전망: 하이픈 제거 후 자리수 재확인(9~11)
         String digits = phoneNumber.replaceAll("-", "");
         if (digits.length() < 9 || digits.length() > 11) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
     }
 
     private static void validateMinOrderAmount(int minOrderAmount) {
         if (minOrderAmount < 0) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
     }
 
     private static void validateBusinessHours(LocalTime openingHours, LocalTime closingHours) {
         if (openingHours == null || closingHours == null) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
 
         if (openingHours.equals(closingHours)) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
     }
 
     private static void validateCategory(Category category) {
         if (category == null) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
         }
     }
 
