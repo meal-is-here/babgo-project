@@ -34,7 +34,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByIdAndDeletedAtIsNull(Long userId) {
-        return userJpaRepository.findByIdAndDeletedAtIsNull(userId);
+    public Optional<User> findByUserIdAndDeletedAtIsNull(String userId) {
+        return userJpaRepository.findByUserIdAndDeletedAtIsNull(userId);
     }
 }

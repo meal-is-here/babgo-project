@@ -16,8 +16,8 @@ public class ProfileService {
 
     private final UserRepository userRepository;
 
-    public ProfileResponse getMyProfile(Long userId) {
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+    public ProfileResponse getMyProfile(String userId) {
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return ProfileResponse.builder()
