@@ -29,7 +29,7 @@ class CategoryServiceTest {
     @Test
     void findByCategoryId_success() {
         // given
-        UUID id = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        UUID id = UUID.randomUUID();
         Category category = mock(Category.class);
         when(categoryRepository.findByCategoryId(same(id))).thenReturn(category);
 
@@ -45,7 +45,7 @@ class CategoryServiceTest {
     @Test
     void findByCategoryId_notFound() {
         // given
-        UUID id = UUID.fromString("22222222-2222-2222-2222-222222222222");
+        UUID id = UUID.randomUUID();
         when(categoryRepository.findByCategoryId(same(id)))
                 .thenThrow(new CustomException(ErrorCode.NOT_FOUND));
 
@@ -57,5 +57,4 @@ class CategoryServiceTest {
         verify(categoryRepository, times(1)).findByCategoryId(same(id));
         verifyNoMoreInteractions(categoryRepository);
     }
-
 }
