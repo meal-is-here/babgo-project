@@ -10,5 +10,5 @@ public class ProfileResponse {
     private final String name;
     private final String nickname;
     private final String phoneNumber;
-    private final Boolean inProfilePublic;
+    private final Boolean isProfilePublic;
 }

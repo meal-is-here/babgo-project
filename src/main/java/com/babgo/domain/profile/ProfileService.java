@@ -1,0 +1,30 @@
+package com.babgo.domain.profile;
+
+import com.babgo.controller.profile.dto.ProfileResponse;
+import com.babgo.domain.user.User;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
+import com.babgo.repository.user.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class ProfileService {
+
+    private final UserRepository userRepository;
+
+    public ProfileResponse getMyProfile(Long userId) {
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return ProfileResponse.builder()
+                .name(user.getName())
+                .nickname(user.getNickname())
+                .phoneNumber(user.getPhoneNumber())
+                .isProfilePublic(user.getIsProfilePublic())
+                .build();
+    }
+}
