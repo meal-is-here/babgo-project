@@ -1,7 +1,6 @@
 package com.babgo.controller.user;
 
 import com.babgo.domain.user.User;
-import com.babgo.domain.user.UserRole;
 import com.babgo.repository.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
