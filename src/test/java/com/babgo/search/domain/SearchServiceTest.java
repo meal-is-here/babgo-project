@@ -165,7 +165,7 @@ public class SearchServiceTest extends MockTest {
         // then: 결과 검증
         Assertions.assertNotNull(result);
         Assertions.assertSame(expected, result);
-        Mockito.verify(searchRepository, Mockito.times(1)).getCategoryStores(command, SearchService.DEFAULT_RADIUS_METER);
+        Mockito.verify(searchRepository, Mockito.times(1)).getStores(command, SearchService.DEFAULT_RADIUS_METER);
     }
 
 
