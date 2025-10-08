@@ -1,6 +1,7 @@
 package com.babgo.application.profile;
 
 import com.babgo.controller.profile.dto.ProfileResponse;
+import com.babgo.controller.profile.dto.ProfileUpdateRequest;
 import com.babgo.domain.profile.ProfileService;
 import com.babgo.domain.user.User;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +18,11 @@ public class ProfileFacade {
     // read profile
     public ProfileResponse getMyProfile(Long userId) {
         return profileService.getMyProfile(userId);
+    }
+
+    // update profile
+    @Transactional
+    public ProfileResponse updateProfile(Long userId, ProfileUpdateRequest request) {
+        return profileService.updateProfile(userId, request);
     }
 }
