@@ -3,6 +3,7 @@ package com.babgo.application.profile;
 import com.babgo.controller.profile.dto.ProfileResponse;
 import com.babgo.domain.profile.ProfileService;
 import com.babgo.domain.user.User;
+import com.babgo.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,16 +13,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProfileFacade {
 
+    private final UserService userService;
     private final ProfileService profileService;
 
-    // get profile
-    public ProfileResponse getMyProfile(String userId) {
-        User user = profileService.getMyProfile(userId);
-        return ProfileResponse.builder()
-                .name(user.getName())
-                .nickname(user.getNickname())
-                .phoneNumber(user.getPhoneNumber())
-                .isProfilePublic(user.getIsProfilePublic())
-                .build();
+    /**
+     * 내 프로필 조회
+     */
+    public ProfileResponse getMyProfile(Long userId) {
+        User user = userService.findByUserId(userId);
+        return ProfileResponse.from(user);
+    }
+
+    /**
+     * 프로필 수정
+     */
+    @Transactional
+    public void updateProfile(Long userId, String nickname, String phoneNumber, Boolean isProfilePublic) {
+        User user = userService.findByUserId(userId);
+        profileService.updateProfile(user, nickname, phoneNumber, isProfilePublic);
     }
 }

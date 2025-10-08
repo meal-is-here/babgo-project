@@ -1,14 +1,15 @@
 package com.babgo.domain.profile;
 
-import com.babgo.controller.profile.dto.ProfileResponse;
 import com.babgo.domain.user.User;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import com.babgo.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -16,15 +17,33 @@ public class ProfileService {
 
     private final UserRepository userRepository;
 
-    public ProfileResponse getMyProfile(Long userId) {
-        User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    /**
+     * 프로필 정보 업데이트
+     */
+    @Transactional
+    public void updateProfile(User user, String nickname, String phoneNumber, Boolean isProfilePublic) {
+        // 닉네임 변경 시 중복 체크
+        if (!user.getNickname().equals(nickname)) {
+            validateNicknameDuplication(nickname);
+        }
 
-        return ProfileResponse.builder()
-                .name(user.getName())
-                .nickname(user.getNickname())
-                .phoneNumber(user.getPhoneNumber())
-                .isProfilePublic(user.getIsProfilePublic())
-                .build();
+        // 프로필 업데이트
+        user.updateUserInfo(nickname, phoneNumber);
+        user.updateProfilePublic(isProfilePublic);
+
+        log.info("프로필 업데이트 완료: userId={}, nickname={}", user.getUserId(), nickname);
     }
+
+    /**
+     * 닉네임 중복 검증
+     */
+    private void validateNicknameDuplication(String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
+    }
+
+    // TODO: 추가 프로필 관련 비즈니스 로직
+    // - 프로필 이미지 업데이트
+    // - 프로필 공개/비공개 설정
 }
