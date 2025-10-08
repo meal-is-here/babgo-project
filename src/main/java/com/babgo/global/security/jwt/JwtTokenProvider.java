@@ -36,11 +36,11 @@ public class JwtTokenProvider {
         log.info("JWT Secret Key init complete");
     }
 
-    public String generateAccessToken(String userId, String email, UserRole role) {
+    public String generateAccessToken(Long userId, String email, UserRole role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getAccessTokenExpiration());
         return Jwts.builder()
-                .subject(userId)
+                .subject(String.valueOf(userId))
                 .claim("email", email)
                 .claim("role", role.getKey())
                 .issuedAt(now)
