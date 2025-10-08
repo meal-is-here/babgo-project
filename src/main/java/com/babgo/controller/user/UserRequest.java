@@ -16,9 +16,6 @@ public class UserRequest {
     @AllArgsConstructor
     public static class CustomerSignUpRequest {
 
-        @NotBlank(message = "사용자 ID는 필수입니다")
-        private String userId;
-
         @NotBlank(message = "이메일은 필수입니다")
         @Email(message = "올바른 이메일 형식이 아닙니다")
         private String email;
@@ -43,9 +40,6 @@ public class UserRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OwnerSignUpRequest {
-
-        @NotBlank(message = "사용자 ID는 필수입니다")
-        private String userId;
 
         @NotBlank(message = "이메일은 필수입니다")
         @Email(message = "올바른 이메일 형식이 아닙니다")

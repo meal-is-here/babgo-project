@@ -17,8 +17,9 @@ import lombok.*;
 public class User extends BaseTimeEntity {
 
     @Id
-    @Column(name = "user_id", length = 50)
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
@@ -54,10 +55,10 @@ public class User extends BaseTimeEntity {
     /**
      * 고객 사용자 생성 팩토리 메서드
      */
-    public static User ofCustomer(String userId, String email, String encodedPassword,
+    public static User ofCustomer(String email, String encodedPassword,
                                    String name, String nickname, String phoneNumber) {
         return new User(
-                userId,
+                null,
                 email,
                 encodedPassword,
                 name,
@@ -74,10 +75,10 @@ public class User extends BaseTimeEntity {
     /**
      * 사장 사용자 생성 팩토리 메서드
      */
-    public static User ofOwner(String userId, String email, String encodedPassword,
+    public static User ofOwner(String email, String encodedPassword,
                                String name, String nickname, String phoneNumber) {
         return new User(
-                userId,
+                null,
                 email,
                 encodedPassword,
                 name,

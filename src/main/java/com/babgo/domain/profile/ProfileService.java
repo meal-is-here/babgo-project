@@ -1,5 +1,6 @@
 package com.babgo.domain.profile;
 
+import com.babgo.controller.profile.dto.ProfileResponse;
 import com.babgo.domain.user.User;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
@@ -15,9 +16,15 @@ public class ProfileService {
 
     private final UserRepository userRepository;
 
-    // get profile
-    public User getMyProfile(String userId) {
-        return userRepository.findByUserIdAndDeletedAtIsNull(userId)
+    public ProfileResponse getMyProfile(Long userId) {
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return ProfileResponse.builder()
+                .name(user.getName())
+                .nickname(user.getNickname())
+                .phoneNumber(user.getPhoneNumber())
+                .isProfilePublic(user.getIsProfilePublic())
+                .build();
     }
 }
