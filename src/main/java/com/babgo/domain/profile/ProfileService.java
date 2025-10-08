@@ -49,5 +49,4 @@ public class ProfileService {
 
         return ProfileResponse.from(user);
     }
-
 }

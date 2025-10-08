@@ -18,6 +18,7 @@ import java.util.Map;
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
+    // 접근 권한이 없을 때 403 에러 반환
     @Override
     public void handle(
             HttpServletRequest request,

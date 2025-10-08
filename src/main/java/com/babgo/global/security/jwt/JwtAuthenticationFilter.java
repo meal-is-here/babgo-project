@@ -23,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    // 요청마다 JWT 토큰 검증 및 인증 처리
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -44,6 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // 요청에서 JWT 토큰 추출 (Header 또는 Cookie에서)
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
 

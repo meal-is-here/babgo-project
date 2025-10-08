@@ -4,6 +4,7 @@ import com.babgo.controller.profile.dto.ProfileResponse;
 import com.babgo.controller.profile.dto.ProfileUpdateRequest;
 import com.babgo.domain.profile.ProfileService;
 import com.babgo.domain.user.User;
+import com.babgo.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProfileFacade {
 
+    private final UserService userService;
     private final ProfileService profileService;
 
     // read profile
