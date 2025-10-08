@@ -1,7 +1,7 @@
 package com.babgo.controller.profile;
 
+import com.babgo.application.profile.ProfileFacade;
 import com.babgo.controller.profile.dto.ProfileResponse;
-import com.babgo.domain.profile.ProfileService;
 import com.babgo.global.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/profile")
 public class ProfileController {
 
-    private final ProfileService profileService;
+    private final ProfileFacade profileFacade;
 
+    // get profile
     @GetMapping("/me")
-    public ApiResponse<ProfileResponse> getMyProfile(@AuthenticationPrincipal(expression = "username") String userId) {
-        ProfileResponse response = profileService.getMyProfile(userId);
-        return ApiResponse.success("프로필 조회를 성공했습니다.", response);
+    public ApiResponse<ProfileResponse> getMyProfile(@AuthenticationPrincipal String userId) {
+        return ApiResponse.success(profileFacade.getMyProfile(userId));
     }
 }
