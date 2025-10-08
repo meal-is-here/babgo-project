@@ -20,7 +20,7 @@ public class OrderController {
     @PostMapping()
     public ApiResponse<OrderResponse.Create> createOrder(
             @RequestHeader String idempotencyKey,
-            @RequestBody OrderRequest.createOrder request
+            @RequestBody OrderRequest.CreateOrder request
     ){
         OrderInfo.Create input = OrderInfo.Create.from(request);
         OrderInfo.CreateResult output = orderFacade.createOrder(idempotencyKey, input);

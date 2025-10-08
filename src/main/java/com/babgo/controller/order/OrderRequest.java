@@ -10,7 +10,7 @@ public class OrderRequest {
 
     @Getter
     @RequiredArgsConstructor
-    public static class createOrder{
+    public static class CreateOrder{
         private final String storeId;
         private final String userId;
         private final String deliveryRequest;

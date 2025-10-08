@@ -23,7 +23,7 @@ public class OrderInfo {
         private final String deliveryAddress;
         private final List<OrderItemDetail> items;
 
-        public static Create from(OrderRequest.createOrder request){
+        public static Create from(OrderRequest.CreateOrder request){
             List<OrderItemDetail> items =
                     List.copyOf(
                             request.getItems().stream()
