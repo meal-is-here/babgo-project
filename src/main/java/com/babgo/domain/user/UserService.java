@@ -2,6 +2,8 @@ package com.babgo.domain.user;
 
 import com.babgo.controller.user.UserRequest;
 import com.babgo.controller.user.UserResponse;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import com.babgo.global.security.jwt.JwtProperties;
 import com.babgo.global.security.jwt.JwtTokenProvider;
 import com.babgo.repository.user.UserRepository;
@@ -30,12 +32,11 @@ public class UserService {
     public UserResponse.SignUpResponse signUpCustomer(UserRequest.CustomerSignUpRequest request) {
         // 1. 이메일 중복 체크
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다");
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         // 2. User 엔티티 생성
         User user = User.ofCustomer(
-                request.getUserId(),
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()),
                 request.getName(),
@@ -49,7 +50,7 @@ public class UserService {
 
         // 4. 응답 반환
         return UserResponse.SignUpResponse.of(
-                savedUser.getUserId(),
+                String.valueOf(savedUser.getUserId()),
                 savedUser.getEmail(),
                 savedUser.getName(),
                 savedUser.getNickname(),
@@ -66,12 +67,11 @@ public class UserService {
     public UserResponse.SignUpResponse signUpOwner(UserRequest.OwnerSignUpRequest request) {
         // 1. 이메일 중복 체크
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다");
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         // 2. User 엔티티 생성 (OWNER 권한)
         User user = User.ofOwner(
-                request.getUserId(),
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()),
                 request.getName(),
@@ -85,7 +85,7 @@ public class UserService {
 
         // 4. 응답 반환
         return UserResponse.SignUpResponse.of(
-                savedUser.getUserId(),
+                String.valueOf(savedUser.getUserId()),
                 savedUser.getEmail(),
                 savedUser.getName(),
                 savedUser.getNickname(),
@@ -102,11 +102,11 @@ public class UserService {
     public UserResponse.LoginResponse login(UserRequest.LoginRequest request) {
         // 1. 이메일로 사용자 조회
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 잘못되었습니다"));
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
 
         // 2. 비밀번호 검증
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 잘못되었습니다");
+            throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
         // 3. JWT Access Token 생성
@@ -120,7 +120,7 @@ public class UserService {
 
         return UserResponse.LoginResponse.of(
                 accessToken,
-                user.getUserId(),
+                String.valueOf(user.getUserId()),
                 user.getEmail(),
                 user.getName(),
                 user.getRole()
