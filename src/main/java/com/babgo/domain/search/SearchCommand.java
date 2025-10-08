@@ -12,12 +12,19 @@ public class SearchCommand {
     @Getter
     @NoArgsConstructor
     public static class  Create{
+
         private double latitude;
+
         private double longitude;
+
         private String searchType;
+
         private String keyword;
+
         private String sort;
+
         private int page;
+
         private int size;
 
         private Create(double latitude, double longitude, String searchType, String keyword, String sort, int page, int size) {
