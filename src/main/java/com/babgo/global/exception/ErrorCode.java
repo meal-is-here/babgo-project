@@ -32,6 +32,10 @@ public enum ErrorCode {
 	DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
 	DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
 	INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 잘못되었습니다."),
+	USER_DELETED(HttpStatus.FORBIDDEN, "탈퇴한 사용자입니다."),
+	USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 탈퇴한 사용자입니다."),
+	USER_NOT_DELETED(HttpStatus.BAD_REQUEST, "탈퇴하지 않은 사용자입니다."),
+	UNAUTHORIZED_ACTION(HttpStatus.FORBIDDEN, "해당 작업을 수행할 권한이 없습니다."),
 
 	;
 

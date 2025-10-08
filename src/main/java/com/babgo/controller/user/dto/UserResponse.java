@@ -1,4 +1,4 @@
-package com.babgo.controller.user;
+package com.babgo.controller.user.dto;
 
 import com.babgo.domain.user.UserRole;
 import lombok.AllArgsConstructor;
@@ -47,32 +47,6 @@ public class UserResponse {
         }
     }
 
-    // 사용자 정보 조회 응답 DTO
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserInfoResponse {
-
-        private String userId;
-        private String email;
-        private String name;
-        private String nickname;
-        private String phoneNumber;
-        private UserRole role;
-        private Boolean isProfilePublic;
-        private LocalDateTime createdAt;
-        private LocalDateTime updatedAt;
-
-        public static UserInfoResponse of(String userId, String email, String name,
-                                          String nickname, String phoneNumber,
-                                          UserRole role, Boolean isProfilePublic,
-                                          LocalDateTime createdAt, LocalDateTime updatedAt) {
-            return new UserInfoResponse(userId, email, name, nickname, phoneNumber,
-                                       role, isProfilePublic, createdAt, updatedAt);
-        }
-    }
-
     // TODO: 필요한 추가 응답 DTO를 작성하세요
     // - 토큰 갱신 응답 (Refresh Token 구현시)
-    // - 사용자 목록 조회 응답
 }
