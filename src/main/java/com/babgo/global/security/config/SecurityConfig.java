@@ -87,7 +87,7 @@ public class SecurityConfig {
                 // HTTP 요청 인가 규칙 설정
                 .authorizeHttpRequests(authorize -> authorize
                         // 인증 없이 접근 가능한 경로 (회원가입, 로그인)
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**","v1/orders/**").permitAll()
                         // 나머지 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )

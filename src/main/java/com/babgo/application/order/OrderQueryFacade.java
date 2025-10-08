@@ -18,7 +18,6 @@ import java.util.UUID;
 public class OrderQueryFacade {
 
     private final OrderService orderService;
-    private final OrderItemService orderItemService;
 
     @Transactional(readOnly = true)
     public OrderInfo.Orders getAllOrders(

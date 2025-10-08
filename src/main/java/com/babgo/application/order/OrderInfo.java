@@ -3,13 +3,10 @@ package com.babgo.application.order;
 import com.babgo.controller.order.OrderRequest;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderItem;
-import com.babgo.domain.order.OrderStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
