@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 public class ProfileResponse {
 
+    private final String email;
     private final String name;
     private final String nickname;
     private final String phoneNumber;
@@ -15,6 +16,7 @@ public class ProfileResponse {
 
     public static ProfileResponse from(User user) {
         return ProfileResponse.builder()
+                              .email(user.getEmail())
                               .name(user.getName())
                               .nickname(user.getNickname())
                               .phoneNumber(user.getPhoneNumber())
