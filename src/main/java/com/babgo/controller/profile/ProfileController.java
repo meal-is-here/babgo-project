@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/profile")
+@RequestMapping("/v1/profile")
 public class ProfileController {
 
     private final ProfileFacade profileFacade;
