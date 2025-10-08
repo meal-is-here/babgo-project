@@ -7,6 +7,8 @@ ISSUE_JWT_TOKEN_PROVIDER.md
 AUTH_API_ROADMAP.md
 CLONE_CODING_GUIDE.md
 
+venv/
+
 # Local environment
 src/main/resources/application-local.yml
 

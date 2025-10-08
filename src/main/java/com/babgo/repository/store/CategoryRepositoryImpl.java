@@ -18,7 +18,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     @Override
     public Category findByCategoryId(UUID categoryId) {
         return categoryJpaRepository.findById(categoryId).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_FOUND)
+                () -> new CustomException(ErrorCode.NOT_FOUND, "에러 메시지를 수정해주세요.")
         );
     }
 }
