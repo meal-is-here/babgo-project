@@ -14,14 +14,8 @@ public class ProfileFacade {
 
     private final ProfileService profileService;
 
-    // get profile
-    public ProfileResponse getMyProfile(String userId) {
-        User user = profileService.getMyProfile(userId);
-        return ProfileResponse.builder()
-                .name(user.getName())
-                .nickname(user.getNickname())
-                .phoneNumber(user.getPhoneNumber())
-                .isProfilePublic(user.getIsProfilePublic())
-                .build();
+    // read profile
+    public ProfileResponse getMyProfile(Long userId) {
+        return profileService.getMyProfile(userId);
     }
 }

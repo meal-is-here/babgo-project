@@ -16,15 +16,14 @@ public class ProfileService {
 
     private final UserRepository userRepository;
 
+    // read profile
     public ProfileResponse getMyProfile(Long userId) {
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                                  .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return ProfileResponse.builder()
-                .name(user.getName())
-                .nickname(user.getNickname())
-                .phoneNumber(user.getPhoneNumber())
-                .isProfilePublic(user.getIsProfilePublic())
-                .build();
+        return ProfileResponse.from(user);
     }
+
+    // update profile
+
 }
