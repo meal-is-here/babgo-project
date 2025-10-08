@@ -1,7 +1,7 @@
 package com.babgo.application.search;
 
 import com.babgo.domain.search.SearchCommand;
-import java.math.BigDecimal;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +14,17 @@ public class SearchInfo {
     public static class Create{
 
         private double latitude;
+
         private double longitude;
+
         private String searchType;
+
         private String keyword;
+
         private String sort;
+
         private int page;
+
         private int size;
 
         private Create(double latitude, double longitude, String searchType, String keyword, String sort, int page, int size) {
@@ -45,7 +51,42 @@ public class SearchInfo {
     }
 
 
+    @Getter
+    @NoArgsConstructor
+    public static class CreateResult{
 
+        private UUID storeId;
+
+        private String storeName;
+
+        private UUID categoryId;
+
+        private String categoryName;
+
+        private double avgRating;
+
+        private int likes;
+
+        private String storeStatus;
+
+
+        private CreateResult(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus){
+            this.storeId = storeId;
+            this.storeName = storeName;
+            this.categoryId = categoryId;
+            this.categoryName = categoryName;
+            this.avgRating = avgRating;
+            this.likes = likes;
+            this.storeStatus = storeStatus;
+        }
+
+        public static CreateResult of(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus) {
+            return new CreateResult(storeId, storeName, categoryId, categoryName, avgRating, likes, storeStatus);
+        }
+
+
+
+    }
 
 
 }
