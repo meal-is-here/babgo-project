@@ -4,6 +4,8 @@ import com.babgo.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 /**
  * 사용자 엔티티
  * p_users 테이블과 매핑
@@ -56,7 +58,7 @@ public class User extends BaseTimeEntity {
      * 고객 사용자 생성 팩토리 메서드
      */
     public static User ofCustomer(String email, String encodedPassword,
-                                   String name, String nickname, String phoneNumber) {
+                                  String name, String nickname, String phoneNumber) {
         return new User(
                 null,
                 email,
@@ -127,9 +129,28 @@ public class User extends BaseTimeEntity {
         // 구현 필요
     }
 
-    // TODO: 사용자 정보 수정 메소드를 작성해야 합니다
-    // - nickname, phoneNumber 등 변경 가능한 정보 업데이트
-    public void updateUserInfo(String nickname, String phoneNumber) {
-        // 구현 필요
+    public void updateProfile(String email, String encodedPassword, String name, String nickname,
+                              String phoneNumber, Boolean isProfilePublic) {
+
+        if (email != null && !email.isBlank()) {
+            this.email = email;
+        }
+        if (encodedPassword != null && !encodedPassword.isBlank()) {
+            this.password = encodedPassword;
+        }
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (nickname != null && !nickname.isBlank()) {
+            this.nickname = nickname;
+        }
+        if (phoneNumber != null && !phoneNumber.isBlank()) {
+            this.phoneNumber = phoneNumber;
+        }
+
+        if (isProfilePublic != null && !isProfilePublic.equals(this.isProfilePublic)) {
+            this.isProfilePublic = isProfilePublic;
+            this.profilePublicAt = isProfilePublic ? LocalDateTime.now() : null;
+        }
     }
 }
