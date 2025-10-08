@@ -44,7 +44,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         Map<String, Object> errorDetails = new HashMap<>();
         errorDetails.put("status", 401);
         errorDetails.put("error", "Unauthorized");
-        errorDetails.put("message", "인증이 필요합니다");
+        errorDetails.put("message", "인증이 필요합니다.");
         errorDetails.put("path", request.getRequestURI());
 
         ObjectMapper objectMapper = new ObjectMapper();

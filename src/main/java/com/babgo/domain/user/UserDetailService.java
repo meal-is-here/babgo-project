@@ -25,7 +25,14 @@ public class UserDetailService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findById(username)
+        Long userId;
+        try {
+            userId = Long.parseLong(username);
+        } catch (NumberFormatException e) {
+            throw new UsernameNotFoundException("잘못된 사용자 ID 형식입니다: " + username);
+        }
+
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
 
         if (user.getIsUserDeleted()) {
