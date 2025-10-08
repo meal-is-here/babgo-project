@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Getter
-@Table(name = "store_searches")
+@Table(name = "p_store_searches")
 public class Search extends BaseTimeEntity {
 
     @Id
