@@ -9,10 +9,11 @@ import lombok.*;
  * p_users 테이블과 매핑
  */
 @Entity
-@Table(name = "p_users")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @AllArgsConstructor
+@Table(name = "p_users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
     @Id
