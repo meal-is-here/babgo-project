@@ -3,7 +3,6 @@ package com.babgo.application.profile;
 import com.babgo.controller.profile.dto.ProfileResponse;
 import com.babgo.controller.profile.dto.ProfileUpdateRequest;
 import com.babgo.domain.profile.ProfileService;
-import com.babgo.domain.user.User;
 import com.babgo.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
