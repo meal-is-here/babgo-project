@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(classes = com.babgo.BabgoApplication.class)
 @AutoConfigureMockMvc
 @Transactional
 class UserControllerTest {
@@ -119,7 +119,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.error.message").value("이미 존재하는 이메일입니다."));
+                .andExpect(jsonPath("$.message").value("이미 존재하는 이메일입니다."));
     }
 
     @Test
@@ -219,7 +219,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.error.message").value("이메일 또는 비밀번호가 잘못되었습니다."));
+                .andExpect(jsonPath("$.message").value("이메일 또는 비밀번호가 잘못되었습니다."));
     }
 
     @Test
@@ -237,7 +237,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.error.message").value("이메일 또는 비밀번호가 잘못되었습니다."));
+                .andExpect(jsonPath("$.message").value("이메일 또는 비밀번호가 잘못되었습니다."));
     }
 
     @Test

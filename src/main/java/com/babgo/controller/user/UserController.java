@@ -75,7 +75,7 @@ public class UserController {
      * 고객 로그아웃 API
      * POST /v1/auth/user/logout
      */
-    @PostMapping("/user/logout")
+    @PostMapping( "/user/logout")
     public ResponseEntity<ApiResponse<String>> userLogout() {
         log.info("고객 로그아웃 요청");
 
