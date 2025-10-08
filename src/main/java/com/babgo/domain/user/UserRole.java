@@ -14,14 +14,12 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum UserRole {
-    CUSTOMER("ROLE_CUSTOMER", "고객"),
-    OWNER("ROLE_OWNER", "사장"),
-    MANAGER("ROLE_MANAGER", "매니저"),
-    MASTER("ROLE_MASTER", "관리자");
+    CUSTOMER("ROLE_CUSTOMER", "고객", 1),
+    OWNER("ROLE_OWNER", "사장", 2),
+    MANAGER("ROLE_MANAGER", "매니저", 3),
+    MASTER("ROLE_MASTER", "관리자", 4);
 
     private final String key;        // Spring Security에서 사용하는 권한 키 (ROLE_ 접두사 필수)
     private final String description; // 권한 설명
-
-    // TODO: 필요시 권한 계층을 정의하는 메소드 추가
-    // 예: MASTER > MANAGER > OWNER > CUSTOMER
+    private final int level;         // 권한 레벨 (높을수록 상위 권한) - MASTER(4) > MANAGER(3) > OWNER(2) > CUSTOMER(1)
 }

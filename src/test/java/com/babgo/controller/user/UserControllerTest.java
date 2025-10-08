@@ -1,5 +1,6 @@
 package com.babgo.controller.user;
 
+import com.babgo.controller.user.dto.UserRequest;
 import com.babgo.domain.user.User;
 import com.babgo.repository.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

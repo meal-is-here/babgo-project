@@ -84,20 +84,23 @@ public class User extends BaseTimeEntity {
         return user;
     }
 
-    // TODO: 소프트 딜리트 처리 메소드를 작성해야 합니다
-    // - isUserDeleted를 true로 설정
-    // - deletedAt 시간 설정 (BaseTimeEntity의 markAsDeleted 호출)
-    // - deletedBy에 삭제한 사용자 ID 설정
+    /**
+     * 소프트 딜리트 처리
+     * @param deletedBy 삭제한 사용자 식별자
+     */
     public void delete(String deletedBy) {
-        // 구현 필요
+        this.isUserDeleted = true;
+        this.deletedBy = deletedBy;
+        this.markAsDeleted();
     }
 
-    // TODO: 복구 메소드를 작성해야 합니다
-    // - isUserDeleted를 false로 설정
-    // - deletedAt을 null로 설정 (BaseTimeEntity의 restore 호출)
-    // - deletedBy를 null로 설정
+    /**
+     * 소프트 딜리트된 사용자 복구
+     */
     public void restore() {
-        // 구현 필요
+        this.isUserDeleted = false;
+        this.deletedBy = null;
+        super.restore();
     }
 
     /**
@@ -118,15 +121,19 @@ public class User extends BaseTimeEntity {
         }
     }
 
-    // TODO: 비밀번호 변경 메소드를 작성해야 합니다
-    // - BCryptPasswordEncoder로 암호화된 비밀번호를 받아서 설정
+    /**
+     * 비밀번호 변경
+     * @param encodedPassword BCryptPasswordEncoder로 암호화된 비밀번호
+     */
     public void updatePassword(String encodedPassword) {
-        // 구현 필요
+        this.password = encodedPassword;
     }
 
-    // TODO: 권한 변경 메소드를 작성해야 합니다
-    // - 관리자가 사용자의 권한을 변경할 때 사용
+    /**
+     * 권한 변경 (관리자용)
+     * @param newRole 새로운 권한
+     */
     public void updateRole(UserRole newRole) {
-        // 구현 필요
+        this.role = newRole;
     }
 }

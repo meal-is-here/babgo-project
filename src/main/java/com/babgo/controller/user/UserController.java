@@ -1,6 +1,8 @@
 package com.babgo.controller.user;
 
-import com.babgo.domain.user.UserService;
+import com.babgo.application.user.UserFacade;
+import com.babgo.controller.user.dto.UserRequest;
+import com.babgo.controller.user.dto.UserResponse;
 import com.babgo.global.api.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserFacade userFacade;
 
     /**
      * 고객 회원가입 API
@@ -26,7 +28,7 @@ public class UserController {
             @Valid @RequestBody UserRequest.CustomerSignUpRequest request) {
         log.info("고객 회원가입 요청: email={}", request.getEmail());
 
-        UserResponse.SignUpResponse response = userService.signUpCustomer(request);
+        UserResponse.SignUpResponse response = userFacade.signUpCustomer(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -42,7 +44,7 @@ public class UserController {
             @Valid @RequestBody UserRequest.OwnerSignUpRequest request) {
         log.info("사장 회원가입 요청: email={}", request.getEmail());
 
-        UserResponse.SignUpResponse response = userService.signUpOwner(request);
+        UserResponse.SignUpResponse response = userFacade.signUpOwner(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -58,7 +60,7 @@ public class UserController {
             @Valid @RequestBody UserRequest.LoginRequest request) {
         log.info("고객 로그인 요청: email={}", request.getEmail());
 
-        UserResponse.LoginResponse response = userService.login(request);
+        UserResponse.LoginResponse response = userFacade.login(request);
 
         String cookieValue = String.format(
                 "accessToken=%s; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=900",
@@ -96,7 +98,7 @@ public class UserController {
             @Valid @RequestBody UserRequest.LoginRequest request) {
         log.info("사장 로그인 요청: email={}", request.getEmail());
 
-        UserResponse.LoginResponse response = userService.login(request);
+        UserResponse.LoginResponse response = userFacade.login(request);
 
         String cookieValue = String.format(
                 "accessToken=%s; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=900",

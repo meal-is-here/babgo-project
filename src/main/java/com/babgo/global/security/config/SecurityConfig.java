@@ -1,6 +1,5 @@
 package com.babgo.global.security.config;
 
-import com.babgo.domain.user.UserDetailService;
 import com.babgo.global.security.jwt.JwtAccessDeniedHandler;
 import com.babgo.global.security.jwt.JwtAuthenticationEntryPoint;
 import com.babgo.global.security.jwt.JwtAuthenticationFilter;
@@ -29,7 +28,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final UserDetailService userDetailService;
 
     /**
      * 비밀번호 암호화를 위한 PasswordEncoder Bean
@@ -50,7 +48,7 @@ public class SecurityConfig {
      *
      * @param authenticationConfiguration AuthenticationConfiguration
      * @return AuthenticationManager
-     * @throws Exception
+     * 발생 Exception
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -59,7 +57,6 @@ public class SecurityConfig {
 
     /**
      * SecurityFilterChain Bean - Spring Security의 핵심 설정
-     *
      * 설정 내용:
      * 1. CSRF 비활성화 (JWT 사용으로 불필요)
      * 2. 세션 사용 안함 (STATELESS)
@@ -74,7 +71,7 @@ public class SecurityConfig {
      *
      * @param http HttpSecurity
      * @return SecurityFilterChain
-     * @throws Exception
+     * 발생 Exception
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

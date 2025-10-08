@@ -53,16 +53,6 @@ public class JwtTokenProvider {
         return getClaims(token).getSubject();
     }
 
-    // 토큰에서 이메일 추출
-    public String getEmail(String token) {
-        return getClaims(token).get("email", String.class);
-    }
-
-    // 토큰에서 권한 추출
-    public String getRole(String token) {
-        return getClaims(token).get("role", String.class);
-    }
-
     // 토큰에서 Claims 파싱
     private Claims getClaims(String token) {
         return Jwts.parser()

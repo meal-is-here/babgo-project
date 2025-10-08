@@ -17,8 +17,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
- * @RequireRole 어노테이션을 처리하는 AOP Aspect
- *
+ * RequireRole 어노테이션을 처리하는 AOP Aspect
  * 메소드 실행 전에 사용자의 권한을 체크합니다.
  * 권한이 없으면 CustomException을 발생시킵니다.
  */
@@ -28,7 +27,7 @@ import java.util.Arrays;
 public class RoleCheckAspect {
 
     /**
-     * @RequireRole 어노테이션이 붙은 메소드의 권한을 체크합니다
+     * RequireRole 어노테이션이 붙은 메소드의 권한을 체크합니다
      */
     @Around("@annotation(com.babgo.global.security.annotation.RequireRole)")
     public Object checkRole(ProceedingJoinPoint joinPoint) throws Throwable {

@@ -14,8 +14,4 @@ public class JwtProperties {
     private String secret;
     private Long accessTokenExpiration;
     private Long refreshTokenExpiration;
-
-    // TODO: 필요시 추가 설정
-    // - private String issuer;  // 토큰 발행자
-    // - private String audience; // 토큰 대상
 }

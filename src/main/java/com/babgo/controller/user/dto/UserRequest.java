@@ -1,6 +1,5 @@
-package com.babgo.controller.user;
+package com.babgo.controller.user.dto;
 
-import com.babgo.domain.user.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -77,7 +76,5 @@ public class UserRequest {
     }
 
     // TODO: 필요한 추가 요청 DTO를 작성하세요
-    // - 비밀번호 변경 요청
-    // - 사용자 정보 수정 요청
     // - 토큰 갱신 요청 (Refresh Token 구현시)
 }
