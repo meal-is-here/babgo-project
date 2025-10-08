@@ -13,7 +13,7 @@ public class OrderResponse {
     @Getter
     @RequiredArgsConstructor
     public static class Orders{
-        private final List<OrderDetail> content;
+        private final List<OrderView> content;
         private final int page;
         private final int size;
         private final long totalElements;
@@ -21,8 +21,8 @@ public class OrderResponse {
         private final boolean hasNext;
 
         public static Orders from(OrderInfo.Orders output) {
-            List<OrderDetail> summaries = output.getContent().stream()
-                    .map(OrderDetail::from)
+            List<OrderView> summaries = output.getContent().stream()
+                    .map(OrderView::from)
                     .toList();
 
             return new Orders(
@@ -38,15 +38,15 @@ public class OrderResponse {
 
         @Getter
         @RequiredArgsConstructor
-        public static class OrderDetail {
+        public static class OrderView {
             private final String orderId;
             private final String storeName;
             private final Long totalPrice;
             private final String status;
             private final LocalDateTime createdAt;
 
-            public static OrderDetail from(OrderInfo.OrderDetail detail) {
-                return new OrderDetail(
+            public static OrderView from(OrderInfo.OrderDetail detail) {
+                return new OrderView(
                         detail.getOrderId(),
                         detail.getStoreName(),
                         detail.getTotalPrice(),
@@ -70,6 +70,57 @@ public class OrderResponse {
                     output.getTotalPrice(),
                     output.getCancelUntil(),
                     output.getStatus()
+            );
+        }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class OrderDetail {
+
+        private final UUID orderId;
+        private final Long totalPrice;
+        private final String deliveryAddress;
+        private final String deliveryRequest;
+        private final LocalDateTime createdAt;
+        private final List<ItemView> items;
+
+        @Getter
+        @RequiredArgsConstructor
+        public static class ItemView {
+            private final UUID menuId;
+            private final String menuName;
+            private final UUID optionId;
+            private final String optionName;
+            private final Long price;
+            private final Long totalPrice;
+            private final Integer quantity;
+
+            public static ItemView from(OrderInfo.Item item) {
+                return new ItemView(
+                        item.getMenuId(),
+                        item.getMenuName(),
+                        item.getOptionId(),
+                        item.getOptionName(),
+                        item.getPrice(),
+                        item.getLineTotal(),
+                        item.getQuantity()
+                );
+            }
+        }
+
+        public static OrderDetail from(OrderInfo.OrderAndItems output) {
+            List<ItemView> itemDetails = output.getItems().stream()
+                    .map(ItemView::from)
+                    .toList();
+
+            return new OrderDetail(
+                    output.getOrderId(),
+                    output.getTotalPrice(),
+                    output.getDeliveryAddress(),
+                    output.getDeliveryRequest(),
+                    output.getCreatedAt(),
+                    itemDetails
             );
         }
     }

@@ -38,10 +38,16 @@ public class OrderController {
         // TODO: 실제 구현에선 인증 사용자에서 userId 가져오기
         UUID userId = UUID.fromString("11111111-2222-3333-4444-555555555555");
         OrderInfo.Orders output = orderQueryFacade.getAllOrders(userId, status, page, size, sortType);
-        return ApiResponse.success(OrderResponse.Orders.from(output));
+        OrderResponse.Orders response = OrderResponse.Orders.from(output);
+        return ApiResponse.success(response);
     }
 
-    /**
-     * 단건 주문 상세 조회
-     */
+    @GetMapping("{orderId}")
+    public ApiResponse<OrderResponse.OrderDetail> getOrder(
+            @PathVariable("orderId") UUID orderId
+    ){
+        OrderInfo.OrderAndItems output = orderQueryFacade.getOrderAndItems(orderId);
+        OrderResponse.OrderDetail response = OrderResponse.OrderDetail.from(output);
+        return ApiResponse.success(response);
+    }
 }

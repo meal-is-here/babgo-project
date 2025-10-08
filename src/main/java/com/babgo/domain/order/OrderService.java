@@ -1,5 +1,7 @@
 package com.babgo.domain.order;
 
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +14,7 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
     public UUID createOrderId() {
         return orderRepository.findNextOrderId();
@@ -31,7 +34,7 @@ public class OrderService {
 
         long sum = 0L;
         for (OrderItem i : items) {
-            long line = Math.multiplyExact(i.getPrice(), i.getQuantity());
+            long line = Math.multiplyExact(i.getUnitPrice(), i.getQuantity());
             sum = Math.addExact(sum, line);
         }
 
@@ -41,6 +44,15 @@ public class OrderService {
     //TODO 주문 목록 조회
     public Page<Order> findOrders(UUID userId, OrderStatus status,Pageable pageable) {
         return orderRepository.findOrders(userId, status,pageable);
+    }
+
+    public List<OrderItem> findAllOrderItem(UUID orderId) {
+        return orderItemRepository.orderItemRepository(orderId);
+    }
+
+    public Order findOrder(UUID orderId) {
+        return orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
     }
 
     //TODO 주문 단건 조회

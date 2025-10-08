@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -29,6 +31,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Page<Order> findOrders(UUID userId, OrderStatus status, Pageable pageable) {
         return orderJpaRepository.findAllByUserIdAndOrderStatus(userId, status, pageable);
+    }
+
+    @Override
+    public Optional<Order> findByOrderId(UUID orderId) {
+        return orderJpaRepository.findById(orderId);
     }
 
 }

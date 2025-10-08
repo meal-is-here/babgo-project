@@ -2,11 +2,14 @@ package com.babgo.application.order;
 
 import com.babgo.controller.order.OrderRequest;
 import com.babgo.domain.order.Order;
+import com.babgo.domain.order.OrderItem;
+import com.babgo.domain.order.OrderStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -114,6 +117,55 @@ public class OrderInfo {
                     page.getTotalElements(),
                     page.getTotalPages(),
                     page.hasNext()
+            );
+        }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class OrderAndItems {
+        private final UUID orderId;
+        private final long totalPrice;
+        private final String deliveryAddress;
+        private final String deliveryRequest;
+        private final LocalDateTime createdAt;
+        private final List<Item> items;
+        //private final Payment payment;
+
+        public static OrderAndItems from(Order order, List<Item> items){
+            return new OrderAndItems(
+                    order.getOrderId(),
+                    order.getTotalPrice(),
+                    order.getDeliveryAddress(),
+                    order.getDeliveryRequest(),
+                    order.getCreatedAt(),
+                    items
+            );
+        }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class Item {
+        private final UUID orderItemId;
+        private final UUID menuId;
+        private final String menuName;
+        private final UUID optionId;
+        private final String optionName;
+        private final Long price;
+        private final int quantity;
+        private final Long lineTotal;
+
+        public static Item from(OrderItem item){
+            return new Item(
+                    item.getOrderItemId(),
+                    item.getMenuId(),
+                    "메뉴이름",
+                    item.getMenuOptionId(),
+                    "옵션 이름",
+                    item.getUnitPrice(),
+                    item.getQuantity(),
+                    item.getTotalPrice()
             );
         }
     }
