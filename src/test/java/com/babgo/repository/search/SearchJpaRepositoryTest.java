@@ -1,11 +1,10 @@
-package com.babgo.search.repository;
+package com.babgo.repository.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 import com.babgo.domain.search.Search;
-import com.babgo.repository.search.SearchJpaRepository;
-import com.babgo.search.MockTest;
+import com.babgo.MockTest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

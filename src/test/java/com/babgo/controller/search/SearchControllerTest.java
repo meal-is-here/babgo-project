@@ -1,4 +1,4 @@
-package com.babgo.search.controller;
+package com.babgo.controller.search;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -6,11 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.babgo.application.search.SearchFasade;
 import com.babgo.application.search.SearchInfo;
-import com.babgo.controller.search.SearchController;
-import com.babgo.controller.search.SearchSort;
-import com.babgo.controller.search.SearchType;
 import com.babgo.global.security.jwt.JwtTokenProvider;
-import com.babgo.search.MockTest;
+import com.babgo.MockTest;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

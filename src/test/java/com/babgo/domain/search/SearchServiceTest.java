@@ -1,10 +1,6 @@
-package com.babgo.search.domain;
+package com.babgo.domain.search;
 
-import com.babgo.domain.search.Search;
-import com.babgo.domain.search.SearchCommand;
-import com.babgo.domain.search.SearchRepository;
-import com.babgo.domain.search.SearchService;
-import com.babgo.search.MockTest;
+import com.babgo.MockTest;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
