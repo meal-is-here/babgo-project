@@ -10,8 +10,6 @@ import lombok.*;
  */
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
 @Table(name = "p_users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
@@ -57,19 +55,16 @@ public class User extends BaseTimeEntity {
      */
     public static User ofCustomer(String email, String encodedPassword,
                                    String name, String nickname, String phoneNumber) {
-        return new User(
-                null,
-                email,
-                encodedPassword,
-                name,
-                nickname,
-                phoneNumber,
-                UserRole.CUSTOMER,
-                false,
-                null,
-                true,
-                null
-        );
+        User user = new User();
+        user.email = email;
+        user.password = encodedPassword;
+        user.name = name;
+        user.nickname = nickname;
+        user.phoneNumber = phoneNumber;
+        user.role = UserRole.CUSTOMER;
+        user.isUserDeleted = false;
+        user.isProfilePublic = true;
+        return user;
     }
 
     /**
@@ -77,19 +72,16 @@ public class User extends BaseTimeEntity {
      */
     public static User ofOwner(String email, String encodedPassword,
                                String name, String nickname, String phoneNumber) {
-        return new User(
-                null,
-                email,
-                encodedPassword,
-                name,
-                nickname,
-                phoneNumber,
-                UserRole.OWNER,
-                false,
-                null,
-                true,
-                null
-        );
+        User user = new User();
+        user.email = email;
+        user.password = encodedPassword;
+        user.name = name;
+        user.nickname = nickname;
+        user.phoneNumber = phoneNumber;
+        user.role = UserRole.OWNER;
+        user.isUserDeleted = false;
+        user.isProfilePublic = true;
+        return user;
     }
 
     // TODO: 소프트 딜리트 처리 메소드를 작성해야 합니다
@@ -108,11 +100,22 @@ public class User extends BaseTimeEntity {
         // 구현 필요
     }
 
-    // TODO: 프로필 공개 설정 변경 메소드를 작성해야 합니다
-    // - isProfilePublic 값을 변경
-    // - 공개로 변경시 profilePublicAt에 현재 시간 설정
-    public void updateProfilePublic(boolean isPublic) {
-        // 구현 필요
+    /**
+     * 사용자 정보 수정
+     */
+    public void updateUserInfo(String nickname, String phoneNumber) {
+        this.nickname = nickname;
+        this.phoneNumber = phoneNumber;
+    }
+
+    /**
+     * 프로필 공개 설정 변경
+     */
+    public void updateProfilePublic(Boolean isPublic) {
+        this.isProfilePublic = isPublic;
+        if (isPublic) {
+            this.profilePublicAt = java.time.LocalDateTime.now();
+        }
     }
 
     // TODO: 비밀번호 변경 메소드를 작성해야 합니다
@@ -124,12 +127,6 @@ public class User extends BaseTimeEntity {
     // TODO: 권한 변경 메소드를 작성해야 합니다
     // - 관리자가 사용자의 권한을 변경할 때 사용
     public void updateRole(UserRole newRole) {
-        // 구현 필요
-    }
-
-    // TODO: 사용자 정보 수정 메소드를 작성해야 합니다
-    // - nickname, phoneNumber 등 변경 가능한 정보 업데이트
-    public void updateUserInfo(String nickname, String phoneNumber) {
         // 구현 필요
     }
 }

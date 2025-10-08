@@ -127,8 +127,16 @@ public class UserService {
         );
     }
 
+    /**
+     * userId로 사용자 조회
+     */
+    @Transactional(readOnly = true)
+    public User findByUserId(Long userId) {
+        return userRepository.findByUserIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
     // TODO: 필요한 추가 메소드를 작성하세요
-    // - 사용자 정보 조회
     // - 사용자 정보 수정
     // - 비밀번호 변경
     // - 토큰 갱신 (Refresh Token 구현시)

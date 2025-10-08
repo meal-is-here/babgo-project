@@ -21,7 +21,7 @@ public class UserDetailService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    //userId로 사용자를 조회하는 메소드
+    // userId로 사용자 정보를 조회하여 UserDetails 반환
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
