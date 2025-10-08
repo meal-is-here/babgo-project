@@ -8,16 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 
  //JWT 토큰 생성 및 검증 클래스
@@ -27,6 +23,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
+    private final UserDetailsService userDetailsService;
     private SecretKey secretKey;
 
     @PostConstruct
@@ -36,11 +33,11 @@ public class JwtTokenProvider {
         log.info("JWT Secret Key init complete");
     }
 
-    public String generateAccessToken(String userId, String email, UserRole role) {
+    public String generateAccessToken(Long userId, String email, UserRole role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getAccessTokenExpiration());
         return Jwts.builder()
-                .subject(userId)
+                .subject(String.valueOf(userId))
                 .claim("email", email)
                 .claim("role", role.getKey())
                 .issuedAt(now)
@@ -89,19 +86,10 @@ public class JwtTokenProvider {
     }
     public Authentication getAuthentication(String token) {
         String userId = getUserId(token);
-        String email = getEmail(token);
-        String role = getRole(token);
 
-        Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority(role)
-        );
+        // UserDetailsService를 통해 실제 UserDetailInfo 객체를 로드
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
 
-        UserDetails principal = User.builder()
-                .username(userId)
-                .password("")
-                .authorities(authorities)
-                .build();
-
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }
 }

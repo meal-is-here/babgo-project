@@ -38,7 +38,7 @@ public class UserDetailInfo implements UserDetails {
     //사용자의 username을 반환하는 메소드
     @Override
     public String getUsername() {
-        return user.getUserId();
+        return String.valueOf(user.getUserId());
     }
 
     //계정 만료 여부를 반환하는 메소드 (새로운 아이디어?랄까나)
@@ -67,7 +67,7 @@ public class UserDetailInfo implements UserDetails {
 
     //사용자 ID를 반환메소드
     public String getUserId() {
-        return user.getUserId();
+        return String.valueOf(user.getUserId());
     }
 
     //편의 메소드 - 사용자 이메일을 반환
