@@ -1,6 +1,5 @@
 package com.babgo.order;
 
-import com.babgo.application.order.OrderFacade;
 import com.babgo.application.order.OrderInfo;
 import com.babgo.application.order.OrderQueryFacade;
 import com.babgo.controller.order.OrderController;
