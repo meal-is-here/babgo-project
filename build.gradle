@@ -61,6 +61,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // Embedded Redis - 테스트용
+    testImplementation 'it.ozimov:embedded-redis:0.7.3'
+
     // UUIDv7
     implementation 'com.github.f4b6a3:uuid-creator:5.3.6'
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
