@@ -14,4 +14,13 @@ public class JwtProperties {
     private String secret;
     private Long accessTokenExpiration;
     private Long refreshTokenExpiration;
+    private Cookie cookie = new Cookie();  // 쿠키 관련 설정
+
+    @Getter
+    @Setter
+    public static class Cookie {
+        private boolean secure = false;  // HTTPS 전용 여부
+        private String domain = "localhost";  // 쿠키 도메인
+        private String sameSite = "Lax";  // SameSite 정책 (Strict, Lax, None)
+    }
 }

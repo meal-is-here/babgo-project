@@ -19,13 +19,18 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
 jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+  cookie:
+    secure: ${JWT_COOKIE_SECURE:false}  # 개발환경: false, 운영환경: true
+    domain: ${JWT_COOKIE_DOMAIN:localhost}  # 운영환경에서는 실제 도메인으로 설정
+    same-site: ${JWT_COOKIE_SAME_SITE:Lax}  # Strict, Lax, None 중 선택
 
 logging:
   level:
