@@ -1,6 +1,8 @@
 package com.babgo.application.search;
 
+import com.babgo.domain.search.Search;
 import com.babgo.domain.search.SearchCommand;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -82,6 +84,23 @@ public class SearchInfo {
 
         public static CreateResult of(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus) {
             return new CreateResult(storeId, storeName, categoryId, categoryName, avgRating, likes, storeStatus);
+        }
+
+
+        public static List<CreateResult> from(List<Search> searchList){
+
+            return searchList.stream()
+                .map(search -> CreateResult.of(
+                    search.getStoreId(),
+                    search.getStoreName(),
+                    search.getCategoryId(),
+                    search.getCategoryName(),
+                    search.getAvgRating(),
+                    search.getLikes(),
+                    search.getStoreStatus()
+                ))
+                .toList();
+
         }
 
 

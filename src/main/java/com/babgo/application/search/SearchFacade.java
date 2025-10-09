@@ -19,18 +19,6 @@ public class SearchFacade {
 
         List<Search> searchList = searchService.getSearch(searchInfo.toCommand());
 
-        List<CreateResult> results = searchList.stream()
-            .map(search -> CreateResult.of(
-                search.getStoreId(),
-                search.getStoreName(),
-                search.getCategoryId(),
-                search.getCategoryName(),
-                search.getAvgRating(),
-                search.getLikes(),
-                search.getStoreStatus()
-            ))
-            .toList();
-
-        return results;
+        return CreateResult.from(searchList);
     }
 }
