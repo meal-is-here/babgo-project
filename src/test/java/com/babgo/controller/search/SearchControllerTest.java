@@ -63,7 +63,7 @@ public class SearchControllerTest extends MockTest {
 
         // when & then
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/search/stores")
+                MockMvcRequestBuilders.get("/v1/search/stores")
                     .param("latitude", "37.5665")
                     .param("longitude", "126.9780")
                     .param("searchType", SearchType.KATEGORIE.name())
@@ -74,7 +74,7 @@ public class SearchControllerTest extends MockTest {
                     .accept(String.valueOf(MediaType.APPLICATION_JSON))
             )
             .andExpect(status().isOk())
-            .andDo(print()) //
+            .andDo(print())
             .andExpect(jsonPath("$.success").value(true))
             .andExpect(jsonPath("$.message").value("성공"))
             .andExpect(jsonPath("$.data").isArray());

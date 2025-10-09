@@ -3,7 +3,6 @@ package com.babgo.controller.search;
 import com.babgo.application.search.SearchFacade;
 import com.babgo.application.search.SearchInfo.CreateResult;
 import com.babgo.global.api.ApiResponse;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,19 +18,19 @@ public class SearchController {
     private final SearchFacade searchFacade;
 
     @GetMapping("/stores")
-    public ApiResponse<List<SearchResponse>> getSearch( @RequestParam @NotNull double latitude,
-        @RequestParam @NotNull double longitude,
-        @RequestParam @NotNull SearchType searchType,
-        @RequestParam @NotNull String keyword,
-        @RequestParam @NotNull SearchSort sort,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
+    public ApiResponse<List<SearchResponse>> getSearch( @RequestParam double latitude,
+        @RequestParam  double longitude,
+        @RequestParam  SearchType searchType,
+        @RequestParam  String keyword,
+        @RequestParam  SearchSort sort,
+        @RequestParam int page,
+        @RequestParam int size
     ) {
 
 
-        SearchRequest.Create searchRequest = SearchRequest.Create.of(latitude, longitude, searchType, keyword, sort, page, size);
+        SearchRequest.Create request = SearchRequest.Create.of(latitude, longitude, searchType, keyword, sort, page, size);
 
-        List<CreateResult> result = searchFacade.getSearch(searchRequest.toSearchInfo());
+        List<CreateResult> result = searchFacade.getSearch(request.toSearchInfo());
 
         return ApiResponse.success("성공", SearchResponse.from(result));
     }
