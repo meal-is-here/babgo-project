@@ -25,7 +25,8 @@ public interface SearchJpaRepository extends CrudRepository<Search, UUID> {
               geography(ST_SetSRID(ST_Point(:longitude, :latitude), 4326))
           ) END ASC,
           CASE WHEN :sort = 'RATING' THEN s.avg_rating END DESC,
-          CASE WHEN :sort = 'LIKES' THEN s.likes END DESC
+          CASE WHEN :sort = 'LIKES' THEN s.likes END DESC,
+          CASE WHEN :sort = 'CREATED' THEN s.created_at END DESC
         LIMIT :size OFFSET (:page * :size)
         """, nativeQuery = true)
     List<Search> getStoreSearch(
@@ -54,7 +55,8 @@ public interface SearchJpaRepository extends CrudRepository<Search, UUID> {
               geography(ST_SetSRID(ST_Point(:longitude, :latitude), 4326))
           ) END ASC,
           CASE WHEN :sort = 'RATING' THEN s.avg_rating END DESC,
-          CASE WHEN :sort = 'LIKES' THEN s.likes END DESC
+          CASE WHEN :sort = 'LIKES' THEN s.likes END DESC,
+         CASE WHEN :sort = 'CREATED' THEN s.created_at END DESC
         LIMIT :size OFFSET (:page * :size)
         """, nativeQuery = true)
     List<Search> getCategorySearch(

@@ -2,10 +2,10 @@ package com.babgo.repository.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-import com.babgo.domain.search.Search;
 import com.babgo.MockTest;
+import com.babgo.domain.search.Search;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -206,6 +206,36 @@ public class SearchJpaRepositoryTest extends MockTest {
         assertThat(results.get(1).getLikes()).isEqualTo(150);
         assertThat(results.get(2).getLikes()).isEqualTo(50);
     }
+
+    @Test
+    void 가게_최신_생성순_정렬_검증() {
+        // given: 가게 생성순으 검색
+        UUID categoryId = UUID.randomUUID();
+
+        List<Search> searches = List.of(
+            Search.of(UUID.randomUUID(), "11110", "가게좋아요적음", categoryId, "치킨", 4.8, 50,
+                "DELIVERY_AVAILABLE", "OPEN", 37.5665, 126.9780),
+            Search.of(UUID.randomUUID(), "11110", "가게좋아요중간", categoryId, "치킨", 4.6, 150,
+                "DELIVERY_AVAILABLE", "OPEN", 37.5665, 126.9780),
+            Search.of(UUID.randomUUID(), "11110", "가게좋아요많음", categoryId, "치킨", 4.5, 300,
+                "DELIVERY_AVAILABLE", "OPEN", 37.5665, 126.9780)
+        );
+
+        searchJpaRepository.saveAll(searches);
+
+        // when: 가게 최신 생성순 정렬하여 검색
+        List<Search> results = searchJpaRepository.getStoreSearch(
+            37.5665, 126.9780, "가게", "CREATED", 0, 10, radiusMeters
+        );
+
+        // then: 가게 생성 최신순으로 검증
+        assertThat(results).hasSize(3);
+        assertThat(results).isNotEmpty();
+        assertThat(results).isSortedAccordingTo(Comparator.comparing(Search::getCreatedAt).reversed());
+        assertThat(results.get(0).getCreatedAt()).isAfterOrEqualTo(results.get(1).getCreatedAt());
+        assertThat(results.get(1).getCreatedAt()).isAfterOrEqualTo(results.get(2).getCreatedAt());
+    }
+
 
     @Test
     void 반경_제한_검증() {
