@@ -25,11 +25,11 @@ public class SearchService {
     }
 
 
-    private List<Search> searchByStore(SearchCommand.Create searchCommand) {
+    public List<Search> searchByStore(SearchCommand.Create searchCommand) {
         return searchRepository.getStores(searchCommand, DEFAULT_RADIUS_METER);
     }
 
-    private List<Search> searchByCategory(SearchCommand.Create searchCommand) {
+    public List<Search> searchByCategory(SearchCommand.Create searchCommand) {
         return searchRepository.getCategoryStores(searchCommand, DEFAULT_RADIUS_METER);
     }
 }

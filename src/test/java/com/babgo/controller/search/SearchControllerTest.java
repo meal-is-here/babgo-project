@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.babgo.application.search.SearchFasade;
+import com.babgo.application.search.SearchFacade;
 import com.babgo.application.search.SearchInfo;
 import com.babgo.global.security.jwt.JwtTokenProvider;
 import com.babgo.MockTest;
@@ -33,7 +33,7 @@ public class SearchControllerTest extends MockTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private SearchFasade searchFacade;
+    private SearchFacade searchFacade;
 
     @MockitoBean
     JpaMetamodelMappingContext jpaMetamodelMappingContext;

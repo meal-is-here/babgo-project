@@ -12,7 +12,7 @@ public interface SearchJpaRepository extends CrudRepository<Search, UUID> {
 
     @Query(value = """
         SELECT *
-        FROM store_searches s
+        FROM p_store_searches s
         WHERE ST_DWithin(
                 geography(ST_SetSRID(ST_Point(s.longitude, s.latitude), 4326)),
                 geography(ST_SetSRID(ST_Point(:longitude, :latitude), 4326)),
@@ -41,7 +41,7 @@ public interface SearchJpaRepository extends CrudRepository<Search, UUID> {
 
     @Query(value = """
         SELECT *
-        FROM store_searches s
+        FROM p_store_searches s
         WHERE ST_DWithin(
                 geography(ST_SetSRID(ST_Point(s.longitude, s.latitude), 4326)),
                 geography(ST_SetSRID(ST_Point(:longitude, :latitude), 4326)),

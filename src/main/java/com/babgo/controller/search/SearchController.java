@@ -1,6 +1,6 @@
 package com.babgo.controller.search;
 
-import com.babgo.application.search.SearchFasade;
+import com.babgo.application.search.SearchFacade;
 import com.babgo.application.search.SearchInfo.CreateResult;
 import com.babgo.global.api.ApiResponse;
 import jakarta.validation.constraints.NotNull;
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/search")
+@RequestMapping("/v1/search")
 public class SearchController {
 
-    private final SearchFasade searchFasade;
+    private final SearchFacade searchFacade;
 
     @GetMapping("/stores")
     public ApiResponse<List<SearchResponse>> getSearch( @RequestParam @NotNull double latitude,
@@ -31,7 +31,7 @@ public class SearchController {
 
         SearchRequest.Create searchRequest = SearchRequest.Create.of(latitude, longitude, searchType, keyword, sort, page, size);
 
-        List<CreateResult> result = searchFasade.getSearch(searchRequest.toSearchInfo());
+        List<CreateResult> result = searchFacade.getSearch(searchRequest.toSearchInfo());
 
         return ApiResponse.success("성공", SearchResponse.from(result));
     }
