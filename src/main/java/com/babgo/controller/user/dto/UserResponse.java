@@ -36,17 +36,28 @@ public class UserResponse {
     @AllArgsConstructor
     public static class LoginResponse {
         private String accessToken;
+        private String refreshToken;
         private String userId;
         private String email;
         private String name;
         private UserRole role;
 
-        public static LoginResponse of(String accessToken, String userId,
+        public static LoginResponse of(String accessToken, String refreshToken, String userId,
                                        String email, String name, UserRole role) {
-            return new LoginResponse(accessToken, userId, email, name, role);
+            return new LoginResponse(accessToken, refreshToken, userId, email, name, role);
         }
     }
 
-    // TODO: 필요한 추가 응답 DTO를 작성하세요
-    // - 토큰 갱신 응답 (Refresh Token 구현시)
+    // 토큰 갱신 응답 DTO
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RefreshTokenResponse {
+        private String accessToken;
+        private String refreshToken;
+
+        public static RefreshTokenResponse of(String accessToken, String refreshToken) {
+            return new RefreshTokenResponse(accessToken, refreshToken);
+        }
+    }
 }

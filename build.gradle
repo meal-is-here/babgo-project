@@ -41,8 +41,8 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
-    // Redis - Refresh Token 저장소 (현재 미사용)
-    // implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // Redis - Refresh Token 저장소
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // AOP - @RequireRole 어노테이션 처리
     implementation 'org.springframework.boot:spring-boot-starter-aop'

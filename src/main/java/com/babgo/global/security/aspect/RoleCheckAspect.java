@@ -26,9 +26,8 @@ import java.util.Arrays;
 @Component
 public class RoleCheckAspect {
 
-    /**
-     * RequireRole 어노테이션이 붙은 메소드의 권한을 체크합니다
-     */
+
+    // RequireRole 어노테이션이 붙은 메소드의 권한을 체크합니다
     @Around("@annotation(com.babgo.global.security.annotation.RequireRole)")
     public Object checkRole(ProceedingJoinPoint joinPoint) throws Throwable {
         // 1. SecurityContextHolder에서 현재 인증 정보 가져오기
@@ -71,9 +70,8 @@ public class RoleCheckAspect {
         return joinPoint.proceed();
     }
 
-    /**
-     * 클래스 레벨의 @RequireRole 어노테이션을 처리합니다
-     */
+
+    // 클래스 레벨의 @RequireRole 어노테이션을 처리합니다
     @Around("@within(com.babgo.global.security.annotation.RequireRole)")
     public Object checkRoleOnClass(ProceedingJoinPoint joinPoint) throws Throwable {
         // 1. SecurityContextHolder에서 현재 인증 정보 가져오기

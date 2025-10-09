@@ -5,6 +5,8 @@ import com.babgo.controller.user.dto.UserResponse;
 import com.babgo.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,5 +34,22 @@ public class UserFacade {
     @Transactional(readOnly = true)
     public UserResponse.LoginResponse login(UserRequest.LoginRequest request) {
         return userService.login(request);
+    }
+
+    // 리프레시 토큰을 통한 액세스 토큰 갱신
+    @Transactional(readOnly = true)
+    public UserResponse.RefreshTokenResponse refreshToken(String refreshToken) {
+        return userService.refreshToken(refreshToken);
+    }
+
+    // 로그아웃 (Redis에서 리프레시 토큰 삭제)
+    public void logout() {
+        // SecurityContext에서 인증된 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetailInfo) {
+            UserDetailInfo userDetailInfo = (UserDetailInfo) authentication.getPrincipal();
+            Long userId = Long.parseLong(userDetailInfo.getUserId());
+            userService.logout(userId);
+        }
     }
 }
