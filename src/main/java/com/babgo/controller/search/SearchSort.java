@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SearchSort {
 
-    ORDER_COUNT("주문많은순"), // 주문많은순
-    DISTANCE("거리순"),    // 거리순
-    RATING("평점순"),      // 평점순
+    ORDER_COUNT("주문많은순"),
+    DISTANCE("거리순"),
+    RATING("평점순"),
     LIKES("좋아요순"),
-    ;
+    CREATED("최신순");
 
     private final String description;
 

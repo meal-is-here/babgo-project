@@ -14,8 +14,8 @@ public class SearchRepositoryImpl implements SearchRepository {
     private final SearchJpaRepository searchJpaRepository;
 
     @Override
-    public List<Search> getStores(SearchCommand.Create searchCommand, double radiusMeters) {
-        return searchJpaRepository.getStoresByName(
+    public List<Search> getStoreSearch(SearchCommand.Create searchCommand, double radiusMeters) {
+        return searchJpaRepository.getStoreSearch(
             searchCommand.getLatitude(),
             searchCommand.getLongitude(),
             searchCommand.getKeyword(),
@@ -27,8 +27,8 @@ public class SearchRepositoryImpl implements SearchRepository {
     }
 
     @Override
-    public List<Search> getCategoryStores(SearchCommand.Create searchCommand, double radiusMeters) {
-        return searchJpaRepository.getStoresByCategory(
+    public List<Search> getCategorySearch(SearchCommand.Create searchCommand, double radiusMeters) {
+        return searchJpaRepository.getCategorySearch(
             searchCommand.getLatitude(),
             searchCommand.getLongitude(),
             searchCommand.getKeyword(),

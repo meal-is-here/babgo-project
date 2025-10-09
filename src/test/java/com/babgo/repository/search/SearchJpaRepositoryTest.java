@@ -49,7 +49,7 @@ public class SearchJpaRepositoryTest extends MockTest {
         searchJpaRepository.saveAll(searches);
 
         // when: 치킨 카테고리로 검색
-        List<Search> results = searchJpaRepository.getStoresByCategory(
+        List<Search> results = searchJpaRepository.getCategorySearch(
             37.5665, 126.9780, chickenCategoryId.toString(), "DISTANCE", 0, 10, radiusMeters);
 
         // then: 결과 검증
@@ -81,7 +81,7 @@ public class SearchJpaRepositoryTest extends MockTest {
         searchJpaRepository.saveAll(searches);
 
         // when: "치킨"으로 검색 (LIKE 검색)
-        List<Search> results = searchJpaRepository.getStoresByName(
+        List<Search> results = searchJpaRepository.getStoreSearch(
             37.5665, 126.9780, "치킨", "DISTANCE", 0, 10, radiusMeters
         );
 
@@ -110,7 +110,7 @@ public class SearchJpaRepositoryTest extends MockTest {
         searchJpaRepository.saveAll(searches);
 
         // when: 거리순으로 정렬하여 검색
-        List<Search> results = searchJpaRepository.getStoresByCategory(
+        List<Search> results = searchJpaRepository.getCategorySearch(
             37.5665, 126.9780, categoryId.toString(), "DISTANCE", 0, 10, radiusMeters
         );
 
@@ -139,7 +139,7 @@ public class SearchJpaRepositoryTest extends MockTest {
         searchJpaRepository.saveAll(searches);
 
         // when: 거리순으로 정렬하여 검색
-        List<Search> results = searchJpaRepository.getStoresByCategory(
+        List<Search> results = searchJpaRepository.getCategorySearch(
             37.5665, 126.9780, categoryId.toString(), "DISTANCE", 0, 10, radiusMeters
         );
 
@@ -168,7 +168,7 @@ public class SearchJpaRepositoryTest extends MockTest {
         searchJpaRepository.saveAll(searches);
 
         // when: 평점순으로 정렬하여 검색
-        List<Search> results = searchJpaRepository.getStoresByName(
+        List<Search> results = searchJpaRepository.getStoreSearch(
             37.5665, 126.9780, "가게", "RATING", 0, 10, radiusMeters
         );
 
@@ -196,7 +196,7 @@ public class SearchJpaRepositoryTest extends MockTest {
         searchJpaRepository.saveAll(searches);
 
         // when: 좋아요순으로 정렬하여 검색
-        List<Search> results = searchJpaRepository.getStoresByName(
+        List<Search> results = searchJpaRepository.getStoreSearch(
             37.5665, 126.9780, "가게", "LIKES", 0, 10, radiusMeters
         );
 
@@ -224,7 +224,7 @@ public class SearchJpaRepositoryTest extends MockTest {
         searchJpaRepository.saveAll(searches);
 
         // when: 2km 반경으로 검색
-        List<Search> results = searchJpaRepository.getStoresByName(
+        List<Search> results = searchJpaRepository.getStoreSearch(
             centerLat, centerLng, "반경", "DISTANCE", 0, 10, radiusMeters);
 
         // then: 반경 내 가게만 반환되는지 검증
@@ -261,12 +261,12 @@ public class SearchJpaRepositoryTest extends MockTest {
 
 
         // when: 첫 번째 페이지 (page=0, size=10)
-        List<Search> firstPage = searchJpaRepository.getStoresByName(
+        List<Search> firstPage = searchJpaRepository.getStoreSearch(
             37.5665, 126.9780, "가게", "DISTANCE", 0, 10, radiusMeters
         );
 
         // when: 두 번째 페이지 (page=1, size=10)
-        List<Search> secondPage = searchJpaRepository.getStoresByName(
+        List<Search> secondPage = searchJpaRepository.getStoreSearch(
             37.5665, 126.9780, "가게", "DISTANCE", 1, 10, radiusMeters
         );
 

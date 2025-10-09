@@ -17,7 +17,14 @@ public class SearchFacade {
     @Transactional(readOnly = true)
     public List<CreateResult> getSearch(SearchInfo.Create searchInfo) {
 
-        List<Search> searchList = searchService.getSearch(searchInfo.toCommand());
+        List<Search> searchList;
+
+        // 검색 타입에 따라 분기
+         switch (searchInfo.getSearchType()) {
+             case KATEGORIE -> searchList = searchService.getCategorySearch(searchInfo.toCommand());
+             case STORE -> searchList = searchService.getStoreSearch(searchInfo.toCommand());
+             default -> throw new IllegalArgumentException("지원하지 않는 검색 타입입니다: " + searchInfo.getSearchType());
+         }
 
         return CreateResult.from(searchList);
     }

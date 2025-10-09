@@ -28,7 +28,7 @@ public interface SearchJpaRepository extends CrudRepository<Search, UUID> {
           CASE WHEN :sort = 'LIKES' THEN s.likes END DESC
         LIMIT :size OFFSET (:page * :size)
         """, nativeQuery = true)
-    List<Search> getStoresByName(
+    List<Search> getStoreSearch(
         @Param("latitude") double latitude,
         @Param("longitude") double longitude,
         @Param("keyword") String keyword,
@@ -57,7 +57,7 @@ public interface SearchJpaRepository extends CrudRepository<Search, UUID> {
           CASE WHEN :sort = 'LIKES' THEN s.likes END DESC
         LIMIT :size OFFSET (:page * :size)
         """, nativeQuery = true)
-    List<Search> getStoresByCategory(
+    List<Search> getCategorySearch(
         @Param("latitude") double latitude,
         @Param("longitude") double longitude,
         @Param("categoryId") String categoryId,

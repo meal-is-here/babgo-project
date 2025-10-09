@@ -13,23 +13,12 @@ public class SearchService {
 
     private final SearchRepository searchRepository;
 
-    public List<Search> getSearch(SearchCommand.Create searchCommand) {
-        // 검색 타입에 따른 분기 처리
-        String searchType = searchCommand.getSearchType();
-        
-        return switch (searchType) {
-            case "STORE" -> searchByStore(searchCommand);
-            case "KATEGORIE" -> searchByCategory(searchCommand);
-            default -> throw new IllegalArgumentException("지원하지 않는 검색 타입입니다: " + searchType);
-        };
+
+    public List<Search> getStoreSearch(SearchCommand.Create searchCommand) {
+        return searchRepository.getStoreSearch(searchCommand, DEFAULT_RADIUS_METER);
     }
 
-
-    public List<Search> searchByStore(SearchCommand.Create searchCommand) {
-        return searchRepository.getStores(searchCommand, DEFAULT_RADIUS_METER);
-    }
-
-    public List<Search> searchByCategory(SearchCommand.Create searchCommand) {
-        return searchRepository.getCategoryStores(searchCommand, DEFAULT_RADIUS_METER);
+    public List<Search> getCategorySearch(SearchCommand.Create searchCommand) {
+        return searchRepository.getCategorySearch(searchCommand, DEFAULT_RADIUS_METER);
     }
 }

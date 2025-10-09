@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface SearchRepository {
 
-    List<Search> getStores(Create searchCommand, double radiusMeters);
+    List<Search> getStoreSearch(Create searchCommand, double radiusMeters);
 
-    List<Search> getCategoryStores(Create searchCommand, double radiusMeters);
+    List<Search> getCategorySearch(Create searchCommand, double radiusMeters);
 }

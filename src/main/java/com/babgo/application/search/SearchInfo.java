@@ -1,5 +1,6 @@
 package com.babgo.application.search;
 
+import com.babgo.controller.search.SearchType;
 import com.babgo.domain.search.Search;
 import com.babgo.domain.search.SearchCommand;
 import java.util.List;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SearchInfo {
 
+    @Getter
     @NoArgsConstructor
     public static class Create{
 
@@ -19,7 +21,7 @@ public class SearchInfo {
 
         private double longitude;
 
-        private String searchType;
+        private SearchType searchType;
 
         private String keyword;
 
@@ -29,7 +31,7 @@ public class SearchInfo {
 
         private int size;
 
-        private Create(double latitude, double longitude, String searchType, String keyword, String sort, int page, int size) {
+        private Create(double latitude, double longitude, SearchType searchType, String keyword, String sort, int page, int size) {
             this.latitude = latitude;
             this.longitude = longitude;
             this.searchType = searchType;
@@ -39,13 +41,13 @@ public class SearchInfo {
             this.size = size;
         }
 
-        public static Create of(double latitude, double longitude, String searchType, String keyword, String sort, int page, int size) {
+        public static Create of(double latitude, double longitude, SearchType searchType, String keyword, String sort, int page, int size) {
             return new Create(latitude, longitude, searchType, keyword, sort, page, size);
         }
 
         public SearchCommand.Create toCommand(){
 
-            return SearchCommand.Create.of(latitude, longitude, searchType, keyword, sort, page, size);
+            return SearchCommand.Create.of(latitude, longitude, searchType.name(), keyword, sort, page, size);
 
         }
 
