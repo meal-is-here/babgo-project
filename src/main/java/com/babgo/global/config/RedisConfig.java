@@ -23,12 +23,19 @@ public class RedisConfig {
     @Value("${spring.data.redis.port:6379}")
     private int port;
 
+    @Value("${spring.data.redis.password:}")
+    private String password;
+
     // Redis 연결 팩토리 (Lettuce 사용)
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(host);
         config.setPort(port);
+        // 빈 값이 아닐 때만 password 설정
+        if (password != null && !password.isEmpty()) {
+            config.setPassword(password);
+        }
         return new LettuceConnectionFactory(config);
     }
 

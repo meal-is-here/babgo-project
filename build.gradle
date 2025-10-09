@@ -61,8 +61,11 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Embedded Redis - 테스트용
-    testImplementation 'it.ozimov:embedded-redis:0.7.3'
+    // Embedded Redis - 테스트용 (Java 17 호환)
+    testImplementation 'com.github.kstyrc:embedded-redis:0.6'
+
+    // H2 Database - 테스트용 인메모리 데이터베이스
+    testRuntimeOnly 'com.h2database:h2'
 
     // UUIDv7
     implementation 'com.github.f4b6a3:uuid-creator:5.3.6'

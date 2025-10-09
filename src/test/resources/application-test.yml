@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb  # 인메모리 H2 데이터베이스
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 테스트 시작 시 스키마 생성, 종료 시 삭제
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+        dialect: org.hibernate.dialect.H2Dialect  # H2 방언 사용
+
+  h2:
+    console:
+      enabled: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6370  # 운영과 다른 포트 사용 (embedded redis)
+      password:
+
+jwt:
+  secret: test-secret-key-for-jwt-token-generation-minimum-256-bits-required-for-HS256-algorithm
+  access-token-expiration: 900000  # 15분 (밀리초)
+  refresh-token-expiration: 86400000  # 1일 (밀리초)
+  cookie:
+    secure: false  # 테스트 환경에서는 false
+    domain: localhost
+    same-site: Lax
+
+logging:
+  level:
+    com.babgo: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
