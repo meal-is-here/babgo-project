@@ -25,4 +25,10 @@ public class ProfileFacade {
         ProfileInfo info = ProfileInfo.from(request);
         return profileService.updateProfile(userId, info);
     }
+
+    // delete profile
+    @Transactional
+    public void deleteProfile(Long userId) {
+        profileService.deleteProfile(userId);
+    }
 }
