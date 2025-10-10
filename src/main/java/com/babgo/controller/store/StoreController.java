@@ -34,6 +34,6 @@ public class StoreController {
     @DeleteMapping("/{storeId}")
     public ApiResponse<Void> deleteStore(@PathVariable UUID storeId) {
         storeFacade.deleteStore(storeId);
-        return ApiResponse.success("가게 삭제를 성공했습니다");
+        return ApiResponse.success("가게 삭제를 성공했습니다.");
     }
 }

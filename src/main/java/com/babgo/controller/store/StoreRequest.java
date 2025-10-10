@@ -30,12 +30,12 @@ public class StoreRequest {
 
         @NotNull(groups = OnCreate.class, message = "위도 값은 필수입니다.")
         @DecimalMin(value = "-90.0", message = "위도는 -90 이상이어야 합니다.")
-        @DecimalMax(value = "90.0", message = "위도는 90 이하이어야 합니다.")
+        @DecimalMax(value = "90.0", message = "위도는 90 이하여야 합니다.")
         private Double latitude;
 
         @NotNull(groups = OnCreate.class, message = "경도 값은 필수입니다.")
         @DecimalMin(value = "-180.0", message = "경도는 -180 이상이어야 합니다.")
-        @DecimalMax(value = "180.0", message = "경도는 180 이하이어야 합니다.")
+        @DecimalMax(value = "180.0", message = "경도는 180 이하여야 합니다.")
         private Double longitude;
 
         @NotBlank(groups = OnCreate.class, message = "전화번호는 필수 값입니다.")

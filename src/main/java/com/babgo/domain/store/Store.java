@@ -134,10 +134,11 @@ public class Store extends BaseTimeEntity {
     }
 
     public void markDeletedBy(String ownerName) {
-        if (this.getDeletedAt() == null) {
-            markAsDeleted();
-            this.deletedBy = "ownerName";
+        if (isDeleted()) {
+            throw new CustomException(ErrorCode.BAD_REQUEST, "이미 삭제된 가게입니다.");
         }
+        markAsDeleted();
+        this.deletedBy = "ownerName";
     }
 
     public boolean isDeleted() {
@@ -183,69 +184,69 @@ public class Store extends BaseTimeEntity {
 
     private static void validateLength(String value) {
         if (value == null || value.isBlank() || value.trim().length() > 100) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "1~100자여야 합니다.");
         }
     }
 
     private static void validateLatAndLon(double latitude, double longitude) {
         if (latitude < -90.0 || latitude > 90.0) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "위도는 -90 이상 90 이하여야 합니다.");
         }
 
         if (longitude < -180.0 || longitude > 180.0) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "경도는 -180 이상 180 이하여야 합니다.");
         }
 
     }
 
     private static void validatePhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.isBlank()) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "전화번호는 필수입니다.");
         }
 
         if (!phoneNumber.matches("^[0-9-]+$")) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "전화번호는 숫자와 하이픈(-)만 사용할 수 있습니다.");
         }
 
         // 2) 하이픈 사용 여부에 따라 정확한 형식 검증
         if (phoneNumber.contains("-")) {
             // 예: 02-123-4567 / 031-1234-5678 / 010-1234-5678
             if (!phoneNumber.matches("^0\\d{1,2}-\\d{3,4}-\\d{4}$")) {
-                throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+                throw new CustomException(ErrorCode.INVALID, "전화번호 형식이 올바르지 않습니다. 예) 02-123-4567, 031-1234-5678, 010-1234-5678");
             }
         } else {
             // 하이픈 미사용: 총 9~11자리(0으로 시작)
             if (!phoneNumber.matches("^0\\d{8,10}$")) {
-                throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+                throw new CustomException(ErrorCode.INVALID, "하이픈 없이 입력 시 0으로 시작하는 9~11자리여야 합니다. 예) 01012345678");
             }
         }
 
         // 3) 보조 안전망: 하이픈 제거 후 자리수 재확인(9~11)
         String digits = phoneNumber.replaceAll("-", "");
         if (digits.length() < 9 || digits.length() > 11) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "전화번호 숫자 길이는 9~11자리여야 합니다.");
         }
     }
 
     private static void validateMinOrderAmount(int minOrderAmount) {
         if (minOrderAmount < 0) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "최소 주문 금액은 0 이상이어야 합니다.");
         }
     }
 
     private static void validateBusinessHours(LocalTime openingHours, LocalTime closingHours) {
         if (openingHours == null || closingHours == null) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "영업 시작/종료 시간은 필수입니다.");
         }
 
         if (openingHours.equals(closingHours)) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "영업 시작 시간과 종료 시간이 같을 수 없습니다.");
         }
     }
 
     private static void validateCategory(Category category) {
         if (category == null) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR, "에러 메시지 수정해주세요");
+            throw new CustomException(ErrorCode.INVALID, "카테고리는 필수입니다.");
         }
     }
 }

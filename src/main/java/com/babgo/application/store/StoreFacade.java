@@ -5,8 +5,6 @@ import com.babgo.domain.store.Category;
 import com.babgo.domain.store.CategoryService;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
-import com.babgo.global.exception.CustomException;
-import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,9 +81,6 @@ public class StoreFacade {
     @Transactional
     public void deleteStore(UUID storeId) {
         Store store = storeService.findByStoreId(storeId);
-        if (store.isDeleted()) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR); // 나중에 변경할 예정
-        }
         store.markDeletedBy("ownerName");
     }
 }
