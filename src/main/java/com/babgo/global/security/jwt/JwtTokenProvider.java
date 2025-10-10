@@ -26,6 +26,7 @@ public class JwtTokenProvider {
     private final UserDetailsService userDetailsService;
     private SecretKey secretKey;
 
+    // JWT 비밀키 초기화
     @PostConstruct
     public void init() {
         byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
@@ -33,6 +34,7 @@ public class JwtTokenProvider {
         log.info("JWT Secret Key init complete");
     }
 
+    // 액세스 토큰 생성
     public String generateAccessToken(Long userId, String email, UserRole role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getAccessTokenExpiration());
@@ -45,18 +47,23 @@ public class JwtTokenProvider {
                 .signWith(this.secretKey)
                 .compact();
     }
+
+    // 토큰에서 사용자 ID 추출
     public String getUserId(String token) {
         return getClaims(token).getSubject();
     }
 
+    // 토큰에서 이메일 추출
     public String getEmail(String token) {
         return getClaims(token).get("email", String.class);
     }
 
+    // 토큰에서 권한 추출
     public String getRole(String token) {
         return getClaims(token).get("role", String.class);
     }
 
+    // 토큰에서 Claims 파싱
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
@@ -64,6 +71,8 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+    // 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
@@ -84,6 +93,8 @@ public class JwtTokenProvider {
         }
         return false;
     }
+
+    // 토큰으로 인증 객체 생성
     public Authentication getAuthentication(String token) {
         String userId = getUserId(token);
 

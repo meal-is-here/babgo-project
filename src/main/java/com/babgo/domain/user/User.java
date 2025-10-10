@@ -10,8 +10,6 @@ import lombok.*;
  */
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
 @Table(name = "p_users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
@@ -57,19 +55,16 @@ public class User extends BaseTimeEntity {
      */
     public static User ofCustomer(String email, String encodedPassword,
                                    String name, String nickname, String phoneNumber) {
-        return new User(
-                null,
-                email,
-                encodedPassword,
-                name,
-                nickname,
-                phoneNumber,
-                UserRole.CUSTOMER,
-                false,
-                null,
-                true,
-                null
-        );
+        User user = new User();
+        user.email = email;
+        user.password = encodedPassword;
+        user.name = name;
+        user.nickname = nickname;
+        user.phoneNumber = phoneNumber;
+        user.role = UserRole.CUSTOMER;
+        user.isUserDeleted = false;
+        user.isProfilePublic = true;
+        return user;
     }
 
     /**
@@ -77,19 +72,16 @@ public class User extends BaseTimeEntity {
      */
     public static User ofOwner(String email, String encodedPassword,
                                String name, String nickname, String phoneNumber) {
-        return new User(
-                null,
-                email,
-                encodedPassword,
-                name,
-                nickname,
-                phoneNumber,
-                UserRole.OWNER,
-                false,
-                null,
-                true,
-                null
-        );
+        User user = new User();
+        user.email = email;
+        user.password = encodedPassword;
+        user.name = name;
+        user.nickname = nickname;
+        user.phoneNumber = phoneNumber;
+        user.role = UserRole.OWNER;
+        user.isUserDeleted = false;
+        user.isProfilePublic = true;
+        return user;
     }
 
     // TODO: 소프트 딜리트 처리 메소드를 작성해야 합니다
