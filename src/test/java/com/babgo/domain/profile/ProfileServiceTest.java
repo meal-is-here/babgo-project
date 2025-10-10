@@ -21,7 +21,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ProfileServiceTest {
@@ -48,6 +49,7 @@ class ProfileServiceTest {
         );
     }
 
+    // 프로필 조회
     @Test
     @DisplayName("프로필 조회 - 성공")
     void getMyProfile_success() {
@@ -74,6 +76,8 @@ class ProfileServiceTest {
                 .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
     }
 
+
+    // 프로필 수정
     @Test
     @DisplayName("프로필 수정 - 성공 (비밀번호 포함)")
     void updateProfile_success() {
@@ -119,5 +123,46 @@ class ProfileServiceTest {
         assertThatThrownBy(() -> profileService.updateProfile(999L, info))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+
+    // 프로필 삭제
+    @Test
+    @DisplayName("프로필 삭제 - 성공")
+    void deleteProfile_success() {
+        // given
+        given(userRepository.findByUserIdAndDeletedAtIsNull(1L)).willReturn(Optional.of(user));
+
+        // when
+        profileService.deleteProfile(1L);
+
+        // then
+        verify(userRepository, times(1)).findByUserIdAndDeletedAtIsNull(1L);
+        assertThat(user.getDeletedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("프로필 삭제 - 실패 (존재하지 않는 유저)")
+    void deleteProfile_fail_userNotFound() {
+        // given
+        given(userRepository.findByUserIdAndDeletedAtIsNull(999L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> profileService.deleteProfile(999L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("프로필 삭제 - 실패 (이미 삭제된 계정)")
+    void deleteProfile_fail_alreadyDeleted() {
+        // given
+        user.markAsDeleted();
+        given(userRepository.findByUserIdAndDeletedAtIsNull(1L)).willReturn(Optional.of(user));
+
+        // when & then
+        assertThatThrownBy(() -> profileService.deleteProfile(1L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(ErrorCode.ALREADY_DELETE_USER.getMessage());
     }
 }

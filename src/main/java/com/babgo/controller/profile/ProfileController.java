@@ -32,4 +32,11 @@ public class ProfileController {
         ProfileResponse response = profileFacade.updateProfile(userId, request);
         return ApiResponse.success("프로필 정보가 수정되었습니다.", response);
     }
+
+    // delete profile
+    @DeleteMapping
+    public ApiResponse<Void> deleteProfile(@AuthenticationPrincipal Long userId) {
+        profileFacade.deleteProfile(userId);
+        return ApiResponse.success("계정이 삭제되었습니다.");
+    }
 }

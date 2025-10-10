@@ -9,9 +9,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = com.babgo.BabgoApplication.class)
 @AutoConfigureMockMvc
@@ -60,7 +60,7 @@ class ProfileControllerTest {
         // given
         User user = User.ofCustomer(
                 "update@example.com",
-                "encodedPw",
+                "newPassword123!",
                 "이다인",
                 "다인",
                 "010-1234-5678"
@@ -99,6 +99,36 @@ class ProfileControllerTest {
         mockMvc.perform(patch("/api/profile")
                         .contentType("application/json")
                         .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Unauthorized"))
+                .andExpect(jsonPath("$.message").value("인증이 필요합니다."));
+    }
+
+
+    // 프로필 삭제
+    @Test
+    @DisplayName("프로필 삭제 - 성공 (인증된 사용자)")
+    void deleteProfile_success() throws Exception {
+        // given
+        User user = User.ofCustomer(
+                "delete@example.com",
+                "password123!",
+                "이다인",
+                "다인",
+                "010-1234-5678"
+        );
+        userRepository.save(user);
+
+        // when & then
+        mockMvc.perform(delete("/v1/profile")
+                        .header("Authorization", "Bearer mock-token"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("프로필 삭제 - 비로그인 사용자 (401 Unauthorized)")
+    void deleteProfile_unauthorized() throws Exception {
+        mockMvc.perform(delete("/v1/profile"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error").value("Unauthorized"))
                 .andExpect(jsonPath("$.message").value("인증이 필요합니다."));
