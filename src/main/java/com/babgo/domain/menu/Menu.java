@@ -1,10 +1,13 @@
 package com.babgo.domain.menu;
 
+import com.babgo.domain.store.Store;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -52,13 +55,13 @@ public class Menu {
     @Column(name = "deleted_by")
     private String deletedBy;
 
-    @Column(name = "store_id")
-    private UUID storeId;
+//    @Column(name = "store_id")
+//    private UUID storeId;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "store_id", nullable = false)
-//    @OnDelete(action = OnDeleteAction.CASCADE) 만약 부모에서 OneToMany로 케스케이드 설정시 없애는것 권장
-//    private Store store;  // FK 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) // 만약 부모에서 OneToMany로 케스케이드 설정시 없애는것 권장
+    private Store store;  // FK 매핑
 
 //    JPA수준에서 관리하려면 아래 코드를 Store엔티티에 추가. 그리하면 Store엔티티가 JoinColumn가 붙어있는
 //    store 필드를 인식하고(mappedBy = "store") 자식으로 인식하게 된다.
@@ -70,8 +73,8 @@ public class Menu {
 //    private List<Menu> menus = new ArrayList<>();
 
     public Menu(String name, Long price, String description, String category,
-                MenuStatus menuStatus, String createdBy, UUID storeId) {
-//                                                      Store store
+                MenuStatus menuStatus, String createdBy, Store store) {
+//                                                      UUID storeId
         this.menuId = UUID.randomUUID();
         this.name = name;
         this.price = price;
@@ -80,8 +83,8 @@ public class Menu {
         this.menuStatus = menuStatus;
         this.createdAt = LocalDateTime.now();
         this.createdBy = createdBy;
-        this.storeId = storeId;
-//        this.store = store;
+//        this.storeId = storeId;
+        this.store = store;
     }
 
     // 메뉴 상태 변경을 위한 세터 메서드 (세터 최소화를 위함)

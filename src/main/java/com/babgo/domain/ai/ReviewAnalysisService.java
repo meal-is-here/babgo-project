@@ -1,10 +1,11 @@
-package com.babgo.application.ai;
+package com.babgo.domain.ai;
 
 import com.babgo.domain.review.Review;
 import com.babgo.domain.ai.review_analysis.ReviewAnalysis;
-import com.babgo.repository.ai.review_analysis.JpaReviewAnalysisRepository;
+import com.babgo.repository.ai.review_analysis.ReviewAnalysisRepositoryImpl;
 import com.babgo.repository.review.ReviewRepositoryImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +19,11 @@ import java.util.UUID;
 public class ReviewAnalysisService {
 
     private final ReviewRepositoryImpl reviewRepository;
-    private final JpaReviewAnalysisRepository reviewAnalysisRepository;
+    private final ReviewAnalysisRepositoryImpl reviewAnalysisRepository;
     private final FakeReviewMLService fakeReviewMLService;
 
-    private final String fastApiBaseUrl = "http://localhost:8001";
+    @Value("${fastapi.REVIEW_ANALYSIS_FASTAPI_URL}")
+    private String fastApiBaseUrl;
 
     /**
      * 비동기 분석: API 응답 시간을 빠르게 하기 위해 @Async로 별도 스레드에서 실행

@@ -1,7 +1,7 @@
-package com.babgo.domain.ai;
+package com.babgo.domain.ai.recommendation;
 
-import com.babgo.domain.ai.dto_recommendationService_with_python.RecomRequest;
-import com.babgo.domain.ai.dto_recommendationService_with_python.RecomResponse;
+import com.babgo.domain.ai.recommendation.dto_recommendationService_with_python.RecomRequest;
+import com.babgo.domain.ai.recommendation.dto_recommendationService_with_python.RecomResponse;
 import com.babgo.controller.ai.RecommendationResponse;
 import com.babgo.domain.store.StoreRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,11 @@
-package com.babgo.domain.ai.review_analysis;
+package com.babgo.domain.review;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ReviewRepository {
-    List<Review> findByStoreId(UUID storeId);
+    List<Review> findByStore_StoreId(UUID storeId);
+
+    Review save(Review review);
+    Review findById(UUID id);
 }

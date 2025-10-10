@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -20,8 +21,8 @@ public class StoreRepositoryImpl implements StoreRepository {
     }
 
     @Override
-    public List<Store> saveAll(List<Store> stores) {
-        return storeJpaRepository.saveAll(stores);
+    public Optional<Store> findById(UUID storeId) {
+        return storeJpaRepository.findById(storeId);
     }
 
     @Override

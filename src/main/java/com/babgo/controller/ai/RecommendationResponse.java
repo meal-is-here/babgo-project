@@ -1,4 +1,4 @@
-package com.babgo.controller.ai.dto_recommend;
+package com.babgo.controller.ai;
 
 import com.babgo.domain.store.Store;
 
@@ -6,7 +6,7 @@ import java.util.List;
 
 public record RecommendationResponse(List<StoreInfo> stores) {
 
-    public static RecommendationResponse from(List<Store> storeEntities) {
+    public static RecommendationResponse fromStores(List<Store> storeEntities) {
         List<StoreInfo> storeInfos = storeEntities.stream()
                 .map(store -> new StoreInfo(store.getStoreId().toString(), store.getStoreName()))
                 .toList();

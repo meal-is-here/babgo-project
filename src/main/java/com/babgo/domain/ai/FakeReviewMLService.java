@@ -1,4 +1,4 @@
-package com.babgo.application.ai;
+package com.babgo.domain.ai;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

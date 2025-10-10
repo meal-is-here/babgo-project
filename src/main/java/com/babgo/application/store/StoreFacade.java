@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -33,5 +36,13 @@ public class StoreFacade {
         );
         store.markOwnerName("ownerName");
         storeService.create(store);
+    }
+
+    public Optional<Store> getStoreById(UUID id) {
+        return storeService.getStoreById(id);
+    }
+
+    public String getStoreSummary(UUID id) {
+        return storeService.getStoreSummary(id);
     }
 }

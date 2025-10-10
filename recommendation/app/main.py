@@ -181,3 +181,12 @@ def get_ml_recommendations(user_id: str) -> List[str]:
 def recommend_stores(request: RecommendRequest):
     recommended_ids = get_ml_recommendations(request.userId)
     return RecommendResponse(storeIds=recommended_ids)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",   # 파일명이 main.py라면
+        host="0.0.0.0",
+        port=8000,
+        reload=True   # 개발 중 코드 변경시 자동 재시작
+    )

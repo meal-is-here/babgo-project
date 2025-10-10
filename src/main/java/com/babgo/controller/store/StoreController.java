@@ -1,13 +1,16 @@
 package com.babgo.controller.store;
 
+import com.babgo.domain.ai.StoreSummaryService;
 import com.babgo.application.store.StoreFacade;
+import com.babgo.domain.store.Store;
 import com.babgo.global.api.ApiResponse;
+import com.babgo.repository.store.StoreRepositoryImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,4 +25,18 @@ public class StoreController {
         return ApiResponse.success("가게 등록을 성공했습니다.");
     }
 
+    // 세준
+    @GetMapping("/{id}")
+    public ResponseEntity<Store> getStore(@PathVariable UUID id) {
+        return storeFacade.getStoreById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // 세준
+    @GetMapping("/{id}/summary")
+    public ResponseEntity<String> getSummary(@PathVariable UUID id) {
+        String summary = storeFacade.getStoreSummary(id);
+        return ResponseEntity.ok(summary);
+    }
 }

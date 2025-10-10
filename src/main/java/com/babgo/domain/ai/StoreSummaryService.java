@@ -1,13 +1,14 @@
-package com.babgo.application.ai;
+package com.babgo.domain.ai;
 
 import com.babgo.domain.ai.review_analysis.ReviewAnalysis;
 import com.babgo.domain.ai.store_summary.StoreSummary;
 import com.babgo.domain.store.Store;
 import com.babgo.repository.ai.review_analysis.ReviewAnalysisRepositoryImpl;
-import com.babgo.repository.ai.store_summary.JpaStoreSummaryRepository;
+import com.babgo.repository.ai.store_summary.StoreSummaryRepositoryImpl;
 import com.babgo.repository.store.StoreRepositoryImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,10 +25,11 @@ public class StoreSummaryService {
 
     private final StoreRepositoryImpl storeRepository;
     private final ReviewAnalysisRepositoryImpl reviewAnalysisRepository;
-    private final JpaStoreSummaryRepository storeSummaryRepository;
+    private final StoreSummaryRepositoryImpl storeSummaryRepository;
     private final FakeReviewMLService fakeReviewMLService;
 
-    private final String fastApiBaseUrl = "http://localhost:8001";
+    @Value("${fastapi.REVIEW_ANALYSIS_FASTAPI_URL}")
+    private String fastApiBaseUrl;
 
     /**
      * WebClient 기반 비동기 요약 생성

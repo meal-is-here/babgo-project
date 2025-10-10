@@ -1,10 +1,8 @@
-package com.babgo.application.review;
+package com.babgo.domain.review;
 
-import com.babgo.application.ai.ReviewAnalysisService;
-import com.babgo.domain.review.Review;
+import com.babgo.domain.ai.ReviewAnalysisService;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.user.User;
-import com.babgo.repository.ai.review_analysis.JpaReviewAnalysisRepository;
 import com.babgo.repository.review.ReviewRepositoryImpl;
 import com.babgo.repository.store.StoreRepositoryImpl;
 import com.babgo.repository.user.impl.UserRepositoryImpl;
@@ -26,7 +24,7 @@ public class ReviewService {
     private final ReviewAnalysisService reviewAnalysisService;
 
     @Transactional
-    public Review saveReview(UUID storeId, Long userId, String content, int rating) {
+    public Review createReview(UUID storeId, Long userId, String content, int rating) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다: " + storeId));
 

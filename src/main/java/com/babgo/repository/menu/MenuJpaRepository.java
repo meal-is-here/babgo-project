@@ -7,7 +7,6 @@ import com.babgo.domain.menu.MenuRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface JpaMenuRepository extends JpaRepository<Menu, UUID>, MenuRepository {
-    @Override
+public interface MenuJpaRepository extends JpaRepository<Menu, UUID> {
     List<Menu> findByStore_StoreId(UUID storeId);
 }

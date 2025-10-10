@@ -1,12 +1,9 @@
-package com.babgo.application.menu;
+package com.babgo.domain.menu;
 
-import com.babgo.domain.menu.Menu;
-import com.babgo.domain.menu.MenuRepository;
-import com.babgo.domain.menu.MenuStatus;
 import com.babgo.domain.store.Store;
-import com.babgo.domain.store.StoreRepository;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
+import com.babgo.repository.menu.MenuRepositoryImpl;
 import com.babgo.repository.store.StoreRepositoryImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +16,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class MenuService {
-    private final MenuRepository menuRepository;
+    private final MenuRepositoryImpl menuRepository;
     private final StoreRepositoryImpl storeRepository;
 
     @Transactional
