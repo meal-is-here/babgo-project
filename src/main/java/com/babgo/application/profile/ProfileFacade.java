@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ProfileFacade {
 
     private final ProfileService profileService;
@@ -20,14 +19,12 @@ public class ProfileFacade {
     }
 
     // update profile
-    @Transactional
     public ProfileResponse updateProfile(Long userId, ProfileUpdateRequest request) {
         ProfileInfo info = ProfileInfo.from(request);
         return profileService.updateProfile(userId, info);
     }
 
     // delete profile
-    @Transactional
     public void deleteProfile(Long userId) {
         profileService.deleteProfile(userId);
     }
