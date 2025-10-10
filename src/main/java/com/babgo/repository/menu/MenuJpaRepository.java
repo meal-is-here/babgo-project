@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface JpaMenuRepository extends JpaRepository<Menu, UUID>, MenuRepository {
     @Override
-    List<Menu> findByStoreId(UUID storeId);
+    List<Menu> findByStore_StoreId(UUID storeId);
 }

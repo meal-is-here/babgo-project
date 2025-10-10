@@ -1,8 +1,8 @@
-package com.babgo.application.ai;
+package com.babgo.domain.ai;
 
-import com.babgo.application.ai.dto_recommend_with_python.RecomRequest;
-import com.babgo.application.ai.dto_recommend_with_python.RecomResponse;
-import com.babgo.controller.ai.dto_recommend.RecommendationResponse;
+import com.babgo.domain.ai.dto_recommendationService_with_python.RecomRequest;
+import com.babgo.domain.ai.dto_recommendationService_with_python.RecomResponse;
+import com.babgo.controller.ai.RecommendationResponse;
 import com.babgo.domain.store.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,9 +22,12 @@ public class RecommendationService {
 //    private record recomRequest(String userId) {}
 //    private record recomResponse(List<String> storeIds) {}
 
-    public Mono<RecommendationResponse> getPersonalizedRecommendations(String userId) {
+    public Mono<RecommendationResponse> getPersonalizedRecommendations(String userId, String baseUrl) {
+        // baseUrl + 엔드포인트
+        String url = baseUrl + "/recommendations";
+
         return webClient.post()
-                .uri("/recommendations")
+                .uri(url)
                 .bodyValue(new RecomRequest(userId))
                 .retrieve() // 응답을 받아
                 .bodyToMono(RecomResponse.class) // ApiResponse DTO로 변환하고
@@ -35,6 +38,6 @@ public class RecommendationService {
                     // 우리 DB에서 가게 정보를 조회
                     return storeRepository.findByStoreIdIn(storeUuids);
                 })
-                .map(RecommendationResponse::from); // 최종 응답 DTO로 변환
+                .map(RecommendationResponse::fromStores); // 최종 응답 DTO로 변환
     }
 }

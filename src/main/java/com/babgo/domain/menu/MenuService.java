@@ -3,26 +3,32 @@ package com.babgo.application.menu;
 import com.babgo.domain.menu.Menu;
 import com.babgo.domain.menu.MenuRepository;
 import com.babgo.domain.menu.MenuStatus;
+import com.babgo.domain.store.Store;
+import com.babgo.domain.store.StoreRepository;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
+import com.babgo.repository.store.StoreRepositoryImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class MenuService {
     private final MenuRepository menuRepository;
-//    private final StoreRepository storeRepository;
+    private final StoreRepositoryImpl storeRepository;
 
     @Transactional
     public Menu addMenu(UUID storeId, String name, Long price, String description,
                         String category, String createBy) {
 
         // 스토어 조회 및, storeId 유효성 체크
-//        Store store = storeRepository.findById(storeId)
-//                .orElseThrow(() -> new IllegalArgumentException("해당 스토어가 존재하지 않습니다."));
+        Optional<Store> storeOpt = storeRepository.findById(storeId);
+        Store store = storeOpt.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "해당 스토어가 존재하지 않습니다."));
 
         Menu menu = new Menu(
                 name,
@@ -31,15 +37,15 @@ public class MenuService {
                 category,
                 MenuStatus.AVAILABLE,
                 createBy,
-//                store
-                storeId // store가 활성화 되면 비활성화 되어야 함
+                store
+//                storeId // store가 활성화 되면 비활성화 되어야 함
         );
 
         return menuRepository.save(menu);
     }
 
     public List<Menu> getMenus(UUID storeId) {
-        return menuRepository.findByStoreId(storeId);
+        return menuRepository.findByStore_StoreId(storeId);
     }
 
     public Menu getMenu(UUID menuId) {

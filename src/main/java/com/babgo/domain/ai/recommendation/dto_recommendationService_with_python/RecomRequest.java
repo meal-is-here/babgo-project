@@ -1,4 +1,4 @@
-package com.babgo.application.ai.dto_recommend_with_python;
+package com.babgo.domain.ai.dto_recommendationService_with_python;
 
 import lombok.Getter;
 
