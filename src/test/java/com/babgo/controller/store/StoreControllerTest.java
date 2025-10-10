@@ -2,10 +2,12 @@ package com.babgo.controller.store;
 
 import com.babgo.application.store.StoreFacade;
 import com.babgo.application.store.StoreInfo;
+import com.babgo.global.security.jwt.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
@@ -24,7 +26,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = StoreController.class)
+
+@WebMvcTest(StoreController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class StoreControllerTest {
 
     @Autowired
@@ -41,6 +45,9 @@ class StoreControllerTest {
 
     @MockitoBean
     AuditorAware<String> auditorAware;
+
+    @MockitoBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @DisplayName("POST /v1/stores - 가게등록 성공")
     @Test
@@ -99,7 +106,7 @@ class StoreControllerTest {
                         delete("/v1/stores/{storeId}", storeId)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("가게 삭제를 성공했습니다"));
+                .andExpect(jsonPath("$.message").value("가게 삭제를 성공했습니다."));
 
             verify(storeFacade, times(1)).deleteStore(eq(storeId));
     }

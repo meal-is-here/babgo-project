@@ -104,7 +104,7 @@ class StoreTest {
         assertThat(store.getLongitude()).isEqualTo(56.78);
     }
 
-    @DisplayName("changePhoneNumber: 유효한 번호로 변경된다")
+    @DisplayName("changePhoneNumber: 유효한 번호로 변경된다.")
     @Test
     void changePhoneNumber_success() {
         Store store = Store.of(VALID_NAME, VALID_ADDR, VALID_LAT, VALID_LON,
@@ -141,7 +141,7 @@ class StoreTest {
         assertThat(store.getClosingHours()).isEqualTo(LocalTime.of(20,0));
     }
 
-    @DisplayName("changeCategory: 새 카테고리로 변경된다")
+    @DisplayName("changeCategory: 새 카테고리로 변경된다.")
     @Test
     void changeCategory_success() {
         Store store = Store.of(VALID_NAME, VALID_ADDR, VALID_LAT, VALID_LON,

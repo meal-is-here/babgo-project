@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.*;
 
@@ -53,26 +52,11 @@ class StoreRepositoryImplTest {
         when(storeJpaRepository.findById(same(storeId))).thenReturn(Optional.of(found));
 
         // when
-        Store result = storeRepositoryImpl.findByStoreId(storeId);
+        Store result = storeRepositoryImpl.findByStoreId(storeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
         // then
         assertThat(result).isSameAs(found);
-        verify(storeJpaRepository, times(1)).findById(same(storeId));
-    }
-
-    @DisplayName("findByStoreId: 없으면 CustomException(NOT_FOUND)을 던진다")
-    @Test
-    void findByStoreId_notFound_throws() {
-        // given
-        UUID storeId = UUID.randomUUID();
-        when(storeJpaRepository.findById(same(storeId))).thenReturn(Optional.empty());
-
-        // when
-        CustomException ex = assertThrows(CustomException.class,
-                () -> storeRepositoryImpl.findByStoreId(storeId));
-
-        // then
-        assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         verify(storeJpaRepository, times(1)).findById(same(storeId));
     }
 }

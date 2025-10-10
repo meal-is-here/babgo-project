@@ -101,31 +101,35 @@ class StoreFacadeTest {
         UUID storeId = UUID.randomUUID();
         Store store = mock(Store.class);
         when(storeService.findByStoreId(storeId)).thenReturn(store);
-        when(store.isDeleted()).thenReturn(false);
 
         // when
         storeFacade.deleteStore(storeId);
 
         // then
         verify(storeService, times(1)).findByStoreId(storeId);
-        verify(store, times(1)).isDeleted();
         verify(store, times(1)).markDeletedBy("ownerName");
-        }
+        verifyNoMoreInteractions(storeService, store);
+    }
 
     @DisplayName("이미 삭제된 가게는 삭제 시 예외가 발생한다")
     @Test
     void deleteStore_alreadyDeleted_throws() {
+        // given
         UUID storeId = UUID.randomUUID();
         Store store = mock(Store.class);
         when(storeService.findByStoreId(storeId)).thenReturn(store);
-        when(store.isDeleted()).thenReturn(true);
+        doThrow(new CustomException(ErrorCode.BAD_REQUEST, "이미 삭제된 가게입니다."))
+                .when(store).markDeletedBy("ownerName");
 
+        // when & then
         CustomException ex = assertThrows(CustomException.class,
                 () -> storeFacade.deleteStore(storeId));
-        assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.VALIDATION_ERROR);
+        assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.BAD_REQUEST);
+        assertThat(ex.getCustomMessage()).isEqualTo("이미 삭제된 가게입니다.");
 
-        verify(storeService).findByStoreId(storeId);
-        verify(store).isDeleted();
+        verify(storeService, times(1)).findByStoreId(storeId);
+        verify(store, times(1)).markDeletedBy("ownerName");
+        verifyNoMoreInteractions(storeService, store);
     }
 
 }

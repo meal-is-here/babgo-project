@@ -1,5 +1,7 @@
 package com.babgo.domain.store;
 
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,8 +10,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.*;
 
@@ -43,7 +47,7 @@ class StoreServiceTest {
         // given
         UUID storeId = UUID.randomUUID();
         Store found = mock(Store.class);
-        when(storeRepository.findByStoreId(same(storeId))).thenReturn(found);
+        when(storeRepository.findByStoreId(same(storeId))).thenReturn(Optional.of(found));
 
         // when
         Store result = storeService.findByStoreId(storeId);
@@ -54,4 +58,21 @@ class StoreServiceTest {
         verifyNoMoreInteractions(storeRepository);
     }
 
+    @DisplayName("storeId로 가게 조회 시 존재하지 않으면 CustomException(NOT_FOUND)을 던진다.")
+    @Test
+    void findByStoreId_throw_notFound() {
+        // given
+        UUID storeId = UUID.randomUUID();
+        when(storeRepository.findByStoreId(eq(storeId))).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> storeService.findByStoreId(storeId))
+                .isInstanceOf(CustomException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND)
+                .extracting("customMessage")
+                .isEqualTo("해당 가게를 찾을 수 없습니다.");
+
+        verify(storeRepository, times(1)).findByStoreId(eq(storeId));
+        verifyNoMoreInteractions(storeRepository);
+    }
 }

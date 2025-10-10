@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +32,7 @@ class CategoryServiceTest {
         // given
         UUID id = UUID.randomUUID();
         Category category = mock(Category.class);
-        when(categoryRepository.findByCategoryId(same(id))).thenReturn(category);
+        when(categoryRepository.findByCategoryId(same(id))).thenReturn(Optional.of(category));
 
         // when
         Category result = categoryService.findByCategoryId(id);
@@ -41,20 +42,21 @@ class CategoryServiceTest {
         verify(categoryRepository, times(1)).findByCategoryId(same(id));
     }
 
-    @DisplayName("카테고리ID 조회 실패 시, CustomException(NOT_FOUND)을 그대로 전파한다")
+    @DisplayName("카테고리ID로 조회 시 존재하지 않으면 CustomException(NOT_FOUND)을 던진다.")
     @Test
-    void findByCategoryId_notFound() {
+    void findByCategoryId_throw_notFound() {
         // given
         UUID id = UUID.randomUUID();
-        when(categoryRepository.findByCategoryId(same(id)))
-                .thenThrow(new CustomException(ErrorCode.NOT_FOUND));
+        when(categoryRepository.findByCategoryId(eq(id))).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> categoryService.findByCategoryId(id))
                 .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND);
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND)
+                .extracting("customMessage")
+                .isEqualTo("해당 카테고리를 찾을 수 없습니다.");
 
-        verify(categoryRepository, times(1)).findByCategoryId(same(id));
+        verify(categoryRepository, times(1)).findByCategoryId(eq(id));
         verifyNoMoreInteractions(categoryRepository);
     }
 }
