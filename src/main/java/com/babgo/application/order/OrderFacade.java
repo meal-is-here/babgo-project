@@ -2,13 +2,13 @@ package com.babgo.application.order;
 
 import com.babgo.domain.order.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class OrderFacade {
 
@@ -19,7 +19,7 @@ public class OrderFacade {
     public OrderInfo.CreateResult createOrder(String idempotencyKey, OrderInfo.Create input){
         //1. 사용자 검증
         //User user = "userService.getUser(info.userId)";
-
+        UUID user = UUID.randomUUID();
         //2.idempotencyKey 검증
         // checkIdempotency(idempotencyKey);
 
@@ -28,6 +28,7 @@ public class OrderFacade {
 
         // 가게 존재하고 오픈 상태, 배달 다능 지역 확인
         // Store store = "storeService.getStore(info.storeId)";
+        UUID store = UUID.randomUUID();
 
         //4. 요청 아이템 → 엔티티 변환 오더 아이템 재고 있는지 검증 후 검증된 객체 리스트 반환
         List<OrderItem> items = orderItemService.verifyOrderItemsAvailability(input.getItems(), orderId);
@@ -38,8 +39,8 @@ public class OrderFacade {
         //오더 임시 객체 생성
         Order order = Order.of(
                 orderId,
-                "store1",
-                "user1",
+                store,
+                user,
                 input.getDeliveryRequest(),
                 input.getDeliveryAddress(),
                 totalPrice

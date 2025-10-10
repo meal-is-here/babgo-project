@@ -24,13 +24,16 @@ public class OrderItem{
     private Order order;
 
     @Column(name = "menu_id", nullable = false)
-    private String menuId;
+    private UUID menuId;
 
     @Column(name = "menu_option_id", nullable = false)
-    private String menuOptionId;
+    private UUID menuOptionId;
 
-    @Column(name = "price", nullable = false)
-    private Long price;
+    @Column(name = "unit_price", nullable = false)
+    private Long unitPrice;
+
+    @Column(name = "total_price", nullable = false)
+    private Long totalPrice;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
@@ -38,13 +41,14 @@ public class OrderItem{
     private OrderItem(
             UUID orderItemId,
             Order order,
-            String menuId,
-            String menuOptionId,
-            Long price,
+            UUID menuId,
+            UUID menuOptionId,
+            Long unitPrice,
+            Long totalPrice,
             Integer quantity
     ) {
 
-        if(price == null || price < 0){
+        if(unitPrice == null || unitPrice < 0){
             throw new CustomException(ErrorCode.INVALID,"주문 시점 메뉴의 가격은 0원 이상이어야합니다.");
         }
 
@@ -64,18 +68,20 @@ public class OrderItem{
         this.order = order;
         this.menuId = menuId;
         this.menuOptionId = menuOptionId;
-        this.price = price;
+        this.unitPrice = unitPrice;
+        this.totalPrice = totalPrice;
         this.quantity = quantity;
     }
 
     public static OrderItem of(
             UUID orderItemId,
             Order order,
-            String menuId,
-            String menuOptionId,
-            Long price,
+            UUID menuId,
+            UUID menuOptionId,
+            Long unitPrice,
+            Long totalPrice,
             Integer quantity
     ) {
-        return new OrderItem(orderItemId, order, menuId, menuOptionId, price, quantity);
+        return new OrderItem(orderItemId, order, menuId, menuOptionId, unitPrice, totalPrice , quantity);
     }
 }
