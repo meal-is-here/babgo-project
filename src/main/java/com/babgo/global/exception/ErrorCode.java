@@ -33,6 +33,9 @@ public enum ErrorCode {
 	DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
 	INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 잘못되었습니다."),
 
+	// Profile
+	ALREADY_DELETE_USER(HttpStatus.BAD_REQUEST, "이미 삭제된 계정입니다."),
+
 	;
 
 	private final HttpStatus httpStatus;

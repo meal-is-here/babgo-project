@@ -64,7 +64,7 @@ public class SecurityConfig {
      * 1. CSRF 비활성화 (JWT 사용으로 불필요)
      * 2. 세션 사용 안함 (STATELESS)
      * 3. HTTP 요청 인가 규칙 설정
-     *    - /v1/auth/** : 인증 없이 접근 가능 (회원가입, 로그인 등)
+     *    - /api/auth/** : 인증 없이 접근 가능 (회원가입, 로그인 등)
      *    - 나머지 요청 : 인증 필요
      * 4. 예외 처리 설정
      *    - authenticationEntryPoint: 인증 실패시
@@ -87,7 +87,7 @@ public class SecurityConfig {
                 // HTTP 요청 인가 규칙 설정
                 .authorizeHttpRequests(authorize -> authorize
                         // 인증 없이 접근 가능한 경로 (회원가입, 로그인)
-                        .requestMatchers("/v1/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**","v1/orders/**").permitAll()
                         // 나머지 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
