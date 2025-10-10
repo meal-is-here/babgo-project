@@ -1,5 +1,6 @@
 package com.babgo.domain.profile;
 
+import com.babgo.application.profile.ProfileInfo;
 import com.babgo.controller.profile.dto.ProfileResponse;
 import com.babgo.controller.profile.dto.ProfileUpdateRequest;
 import com.babgo.domain.user.User;
@@ -40,7 +41,7 @@ class ProfileServiceTest {
     void setUp() {
         user = User.ofCustomer(
                 "test@example.com",
-                "encodedPw",
+                "password123!",
                 "이다인",
                 "다인",
                 "010-1234-5678"
@@ -77,28 +78,45 @@ class ProfileServiceTest {
     @DisplayName("프로필 수정 - 성공 (비밀번호 포함)")
     void updateProfile_success() {
         // given
-        ProfileUpdateRequest request = new ProfileUpdateRequest();
-        String newPassword = "newPassword123";
+        ProfileUpdateRequest request = new ProfileUpdateRequest(
+                "update@example.com",
+                "newPassword123!",
+                "이다인",
+                "수정된닉네임",
+                "010-1234-5678",
+                true
+        );
+        ProfileInfo info = ProfileInfo.from(request);
 
         given(userRepository.findByUserIdAndDeletedAtIsNull(1L)).willReturn(Optional.of(user));
 
         // when
-        ProfileResponse response = profileService.updateProfile(1L, request);
+        ProfileResponse response = profileService.updateProfile(1L, info);
 
         // then
         verify(userRepository, times(1)).findByUserIdAndDeletedAtIsNull(1L);
-        assertThat(response).isNotNull();
+        assertThat(response.getEmail()).isEqualTo("update@example.com");
+        assertThat(response.getNickname()).isEqualTo("수정된닉네임");
+        assertThat(response.getPhoneNumber()).isEqualTo("010-1234-5678");
     }
 
     @Test
     @DisplayName("프로필 수정 - 실패 (유저 없음)")
     void updateProfile_fail_userNotFound() {
         // given
-        ProfileUpdateRequest request = new ProfileUpdateRequest();
+        ProfileUpdateRequest request = new ProfileUpdateRequest(
+                "update@example.com",
+                "newPassword123!",
+                "이다인",
+                "수정된닉네임",
+                "010-1234-5678",
+                true
+        );
+        ProfileInfo info = ProfileInfo.from(request);
         given(userRepository.findByUserIdAndDeletedAtIsNull(999L)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> profileService.updateProfile(999L, request))
+        assertThatThrownBy(() -> profileService.updateProfile(999L, info))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
     }

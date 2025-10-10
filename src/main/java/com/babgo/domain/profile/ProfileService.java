@@ -1,7 +1,7 @@
 package com.babgo.domain.profile;
 
+import com.babgo.application.profile.ProfileInfo;
 import com.babgo.controller.profile.dto.ProfileResponse;
-import com.babgo.controller.profile.dto.ProfileUpdateRequest;
 import com.babgo.domain.user.User;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
@@ -29,22 +29,22 @@ public class ProfileService {
 
     // update profile
     @Transactional
-    public ProfileResponse updateProfile(Long userId, ProfileUpdateRequest request) {
+    public ProfileResponse updateProfile(Long userId, ProfileInfo info) {
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                                  .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String encodedPassword = null;
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            encodedPassword = passwordEncoder.encode(request.getPassword());
+        if (info.getPassword() != null && !info.getPassword().isBlank()) {
+            encodedPassword = passwordEncoder.encode(info.getPassword());
         }
 
         user.updateProfile(
-                request.getEmail(),
+                info.getEmail(),
                 encodedPassword,
-                request.getName(),
-                request.getNickname(),
-                request.getPhoneNumber(),
-                request.getIsProfilePublic()
+                info.getName(),
+                info.getNickname(),
+                info.getPhoneNumber(),
+                info.getIsProfilePublic()
         );
 
         return ProfileResponse.from(user);
