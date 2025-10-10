@@ -4,6 +4,8 @@ import com.babgo.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 /**
  * 사용자 엔티티
  * p_users 테이블과 매핑
@@ -128,5 +130,30 @@ public class User extends BaseTimeEntity {
     // - 관리자가 사용자의 권한을 변경할 때 사용
     public void updateRole(UserRole newRole) {
         // 구현 필요
+    }
+
+    public void updateProfile(String email, String encodedPassword, String name, String nickname,
+                              String phoneNumber, Boolean isProfilePublic) {
+
+        if (email != null && !email.isBlank()) {
+            this.email = email;
+        }
+        if (encodedPassword != null && !encodedPassword.isBlank()) {
+            this.password = encodedPassword;
+        }
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (nickname != null && !nickname.isBlank()) {
+            this.nickname = nickname;
+        }
+        if (phoneNumber != null && !phoneNumber.isBlank()) {
+            this.phoneNumber = phoneNumber;
+        }
+
+        if (isProfilePublic != null && !isProfilePublic.equals(this.isProfilePublic)) {
+            this.isProfilePublic = isProfilePublic;
+            this.profilePublicAt = isProfilePublic ? LocalDateTime.now() : null;
+        }
     }
 }
