@@ -49,4 +49,17 @@ public class ProfileService {
 
         return ProfileResponse.from(user);
     }
+
+    // delete profile
+    @Transactional
+    public void deleteProfile(Long userId) {
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
+                                  .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getDeletedAt() != null) {
+            throw new CustomException(ErrorCode.ALREADY_DELETE_USER);
+        }
+
+        user.markAsDeleted();
+    }
 }
