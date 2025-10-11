@@ -11,7 +11,7 @@ import java.util.UUID;
 
 //TODO version 추가
 @Entity
-@Table(name = "p_payment")
+@Table(name = "p_payments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment extends BaseTimeEntity {
 
