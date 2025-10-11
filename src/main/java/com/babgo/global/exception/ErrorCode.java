@@ -1,5 +1,6 @@
 package com.babgo.global.exception;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import lombok.AllArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ErrorCode {
+public enum ErrorCode implements ErrorType{
 
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 	INVALID(HttpStatus.BAD_REQUEST, "올바르지 않은 값입니다."),
@@ -40,4 +41,5 @@ public enum ErrorCode {
 
 	private final HttpStatus httpStatus;
 	private final String message;
+
 }

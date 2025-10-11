@@ -25,7 +25,7 @@ public class OrderController {
         OrderInfo.Create input = OrderInfo.Create.from(request);
         OrderInfo.CreateResult output = orderFacade.createOrder(idempotencyKey, input);
         OrderResponse.Create response = OrderResponse.Create.from(output);
-        return ApiResponse.success("주문이 접수되었습니다. 취소는 5초 이내 가능합니다.",response);
+        return ApiResponse.success("주문이 생성되었습니다. 결제 정보를 입력해주세요.",response);
     }
 
     @GetMapping()

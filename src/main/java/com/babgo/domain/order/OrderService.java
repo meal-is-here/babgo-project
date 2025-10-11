@@ -50,7 +50,7 @@ public class OrderService {
         return orderItemRepository.orderItemRepository(orderId);
     }
 
-    public Order findOrder(UUID orderId) {
+    public Order getOrder(UUID orderId) {
         return orderRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
     }
