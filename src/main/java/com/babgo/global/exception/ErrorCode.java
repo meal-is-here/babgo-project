@@ -37,6 +37,9 @@ public enum ErrorCode {
 	USER_NOT_DELETED(HttpStatus.BAD_REQUEST, "탈퇴하지 않은 사용자입니다."),
 	UNAUTHORIZED_ACTION(HttpStatus.FORBIDDEN, "해당 작업을 수행할 권한이 없습니다."),
 
+	// Profile
+	ALREADY_DELETE_USER(HttpStatus.BAD_REQUEST, "이미 삭제된 계정입니다."),
+
 	;
 
 	private final HttpStatus httpStatus;

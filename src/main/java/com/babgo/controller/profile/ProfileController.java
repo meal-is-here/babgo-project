@@ -2,24 +2,41 @@ package com.babgo.controller.profile;
 
 import com.babgo.application.profile.ProfileFacade;
 import com.babgo.controller.profile.dto.ProfileResponse;
+import com.babgo.controller.profile.dto.ProfileUpdateRequest;
 import com.babgo.global.api.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/profile")
+@RequestMapping("/v1/profile")
 public class ProfileController {
 
     private final ProfileFacade profileFacade;
 
-    @GetMapping("/me")
-    public ApiResponse<ProfileResponse> getMyProfile(@AuthenticationPrincipal(expression = "username") String userIdStr) {
-        Long userId = Long.parseLong(userIdStr);
+    // read profile
+    @GetMapping
+    public ApiResponse<ProfileResponse> getMyProfile(@AuthenticationPrincipal Long userId) {
         ProfileResponse response = profileFacade.getMyProfile(userId);
         return ApiResponse.success("프로필 조회를 성공했습니다.", response);
+    }
+
+    // update profile
+    @PatchMapping
+    public ApiResponse<ProfileResponse> updateProfile(
+            @AuthenticationPrincipal Long userId,
+            @Valid @RequestBody ProfileUpdateRequest request
+    ) {
+        ProfileResponse response = profileFacade.updateProfile(userId, request);
+        return ApiResponse.success("프로필 정보가 수정되었습니다.", response);
+    }
+
+    // delete profile
+    @DeleteMapping
+    public ApiResponse<Void> deleteProfile(@AuthenticationPrincipal Long userId) {
+        profileFacade.deleteProfile(userId);
+        return ApiResponse.success("계정이 삭제되었습니다.");
     }
 }

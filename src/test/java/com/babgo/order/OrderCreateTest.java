@@ -13,6 +13,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 public class OrderCreateTest {
 
     UUID orderId;
+    UUID storeId = UUID.randomUUID();
+    UUID userId =  UUID.randomUUID();
+
 
     @BeforeEach
     void setUp() {
@@ -28,8 +31,8 @@ public class OrderCreateTest {
         void initPending() {
             Order order = Order.of(
                     orderId,
-                    "가게 정보",
-                    "사용자 정보",
+                    storeId,
+                    userId,
                     "리뷰 이벤트 참가할게요",
                     "남문리",
                     1L
@@ -48,7 +51,7 @@ public class OrderCreateTest {
         @DisplayName("가게 정보")
         void store(){
             assertThatThrownBy(() ->
-                    Order.of(orderId, null, "user-1",
+                    Order.of(orderId, null, userId,
                             "요청", "서울", 1000L)
             ).isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID);
@@ -59,7 +62,7 @@ public class OrderCreateTest {
         @DisplayName("유저 정보")
         void user(){
             assertThatThrownBy(() ->
-                    Order.of(orderId, "store-1", null,
+                    Order.of(orderId, storeId, null,
                             "요청", "서울", 1000L)
             ).isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID);
@@ -69,7 +72,7 @@ public class OrderCreateTest {
         @DisplayName("가격 정보")
         void toralPrice(){
             assertThatThrownBy(() ->
-                    Order.of(orderId, "store-1", "user-1",
+                    Order.of(orderId, storeId, userId,
                             "요청", "서울", -10L)
             ).isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID);
@@ -79,7 +82,7 @@ public class OrderCreateTest {
         @DisplayName("배달 주소 빈 값")
         void addressEmpty (){
             assertThatThrownBy(() ->
-                    Order.of(orderId, "store-1", "user-1",
+                    Order.of(orderId, storeId, userId,
                             "요청", null, 1000L)
             ).isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID);
@@ -89,7 +92,7 @@ public class OrderCreateTest {
         @DisplayName("배달 주소 null")
         void address (){
             assertThatThrownBy(() ->
-                    Order.of(orderId, "store-1", "user-1",
+                    Order.of(orderId, storeId, userId,
                             "요청", "", 1000L)
             ).isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID);

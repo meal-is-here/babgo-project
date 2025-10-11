@@ -1,4 +1,4 @@
-package com.babgo.controller.oreder;
+package com.babgo.controller.order;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ public class OrderRequest {
 
     @Getter
     @RequiredArgsConstructor
-    public static class createOrder{
+    public static class CreateOrder{
         private final String storeId;
         private final String userId;
         private final String deliveryRequest;
