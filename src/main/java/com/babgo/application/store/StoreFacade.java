@@ -9,7 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -34,53 +35,30 @@ public class StoreFacade {
                 input.getClosingHours(),
                 category
         );
-        store.markCreateBy("ownerName");
-        storeService.create(store);
+        storeService.create(store,"userName");
     }
 
     @Transactional
     public void updateStore(UUID storeId, StoreInfo.Update input) {
         Store store = storeService.findByStoreId(storeId);
 
-        if (input.getStoreName() != null) {
-            store.changeStoreName(input.getStoreName());
-        }
+        Map<String, Object> changes = new HashMap<>();
+        if (input.getStoreName() != null)      changes.put("storeName", input.getStoreName());
+        if (input.getAddressLine() != null)    changes.put("addressLine", input.getAddressLine());
+        if (input.getLatitude() != null)       changes.put("latitude", input.getLatitude());
+        if (input.getLongitude() != null)      changes.put("longitude", input.getLongitude());
+        if (input.getPhoneNumber() != null)    changes.put("phoneNumber", input.getPhoneNumber());
+        if (input.getMinOrderAmount() != null) changes.put("minOrderAmount", input.getMinOrderAmount());
+        if (input.getOpeningHours() != null)   changes.put("openingHours", input.getOpeningHours());
+        if (input.getClosingHours() != null)   changes.put("closingHours", input.getClosingHours());
+        if (input.getCategoryId() != null)     changes.put("categoryId", input.getCategoryId());
 
-        if (input.getAddressLine() != null) {
-            store.changeAddressLine(input.getAddressLine());
-        }
-
-        if (input.getLatitude() != null || input.getLongitude() != null) {
-            double lat = (input.getLatitude()  != null) ? input.getLatitude()  : store.getLatitude();
-            double lon = (input.getLongitude() != null) ? input.getLongitude() : store.getLongitude();
-            store.changeLocation(lat, lon);
-        }
-
-        if (input.getPhoneNumber() != null) {
-            store.changePhoneNumber(input.getPhoneNumber());
-        }
-
-        if (input.getMinOrderAmount() != null) {
-            store.changeMinOrderAmount(input.getMinOrderAmount());
-        }
-
-        if (input.getOpeningHours() != null || input.getClosingHours() != null) {
-            LocalTime open  = (input.getOpeningHours()  != null) ? input.getOpeningHours()  : store.getOpeningHours();
-            LocalTime close = (input.getClosingHours() != null) ? input.getClosingHours() : store.getClosingHours();
-            store.changeBusinessHours(open, close);
-        }
-
-        if (input.getCategoryId() != null) {
-            Category category = categoryService.findByCategoryId(input.getCategoryId());
-            store.changeCategory(category);
-        }
-
-        store.markUpdatedBy("ownerName");
+        storeService.update(store, changes, "userName");
     }
 
     @Transactional
     public void deleteStore(UUID storeId) {
         Store store = storeService.findByStoreId(storeId);
-        store.markDeletedBy("ownerName");
+        storeService.delete(store, "userName");
     }
 }
