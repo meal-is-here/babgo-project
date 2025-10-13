@@ -40,6 +40,21 @@ public class User extends BaseTimeEntity {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
+    @Column(name = "address_line", length = 100)
+    private String addressLine = "서울특별시 종로구 세종대로 172";  // 기본값: 광화문
+
+    @Column(name = "latitude")
+    private double latitude = 37.5759;  // 광화문 위도
+
+    @Column(name = "longitude")
+    private double longitude = 126.9768;  // 광화문 경도
+
+    @Column(name = "administrative_code", length = 10)
+    private String administrativeCode = "1111054000";  // 행정코드: 서울특별시 종로구 사직동
+
+    @Column(name = "legal_code", length = 10)
+    private String legalCode = "1111010300";  // 법정코드: 서울특별시 종로구 사직동
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private UserRole role;
@@ -93,16 +108,6 @@ public class User extends BaseTimeEntity {
     }
 
     /**
-     * 소프트 딜리트 처리
-     * @param deletedBy 삭제한 사용자 식별자
-     */
-    public void delete(String deletedBy) {
-        this.isUserDeleted = true;
-        this.deletedBy = deletedBy;
-        this.markAsDeleted();
-    }
-
-    /**
      * 소프트 딜리트된 사용자 복구
      */
     public void restore() {
@@ -112,36 +117,30 @@ public class User extends BaseTimeEntity {
     }
 
     /**
-     * 사용자 정보 수정
+     * 프로필 전체 수정 (프로필 수정에서 따로 로직 설정 예정)
      */
-    public void updateUserInfo(String nickname, String phoneNumber) {
-        this.nickname = nickname;
-        this.phoneNumber = phoneNumber;
-    }
-
-    /**
-     * 프로필 공개 설정 변경
-     */
-    public void updateProfilePublic(Boolean isPublic) {
-        this.isProfilePublic = isPublic;
-        if (isPublic) {
-            this.profilePublicAt = java.time.LocalDateTime.now();
+    public void updateProfile(String email, String encodedPassword, String name,
+                              String nickname, String phoneNumber, Boolean isProfilePublic) {
+        if (email != null && !email.isBlank()) {
+            this.email = email;
         }
-    }
-
-    /**
-     * 비밀번호 변경
-     * @param encodedPassword BCryptPasswordEncoder로 암호화된 비밀번호
-     */
-    public void updatePassword(String encodedPassword) {
-        this.password = encodedPassword;
-    }
-
-    /**
-     * 권한 변경 (관리자용)
-     * @param newRole 새로운 권한
-     */
-    public void updateRole(UserRole newRole) {
-        this.role = newRole;
+        if (encodedPassword != null && !encodedPassword.isBlank()) {
+            this.password = encodedPassword;
+        }
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+        if (phoneNumber != null) {
+            this.phoneNumber = phoneNumber;
+        }
+        if (isProfilePublic != null) {
+            this.isProfilePublic = isProfilePublic;
+            if (isProfilePublic) {
+                this.profilePublicAt = java.time.LocalDateTime.now();
+            }
+        }
     }
 }
