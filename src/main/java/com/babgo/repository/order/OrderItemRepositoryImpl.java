@@ -4,8 +4,8 @@ import com.babgo.domain.order.OrderItem;
 import com.babgo.domain.order.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -16,5 +16,10 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     @Override
     public void saveAll(List<OrderItem> items) {
         orderItemJpaRepository.saveAll(items);
+    }
+
+    @Override
+    public List<OrderItem> orderItemRepository(UUID orderId) {
+        return orderItemJpaRepository.findAllByOrder_OrderId(orderId);
     }
 }

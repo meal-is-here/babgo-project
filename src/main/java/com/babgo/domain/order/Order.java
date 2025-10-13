@@ -20,10 +20,10 @@ public class Order extends BaseTimeEntity {
     private UUID orderId;
 
     @Column(name = "store_id", nullable = false)
-    private String store;
+    private UUID storeId;
 
     @Column(name = "user_id", nullable = false)
-    private String user;
+    private UUID userId;
 
     @Column(name = "total_price", nullable = false)
     private Long totalPrice;
@@ -39,8 +39,8 @@ public class Order extends BaseTimeEntity {
 
     private Order(
             UUID orderId,
-            String store,
-            String user,
+            UUID store,
+            UUID user,
             String deliveryRequest,
             String deliveryAddress,
             Long totalPrice
@@ -67,8 +67,8 @@ public class Order extends BaseTimeEntity {
         }
 
         this.orderId = orderId;
-        this.store = store;
-        this.user = user;
+        this.storeId = store;
+        this.userId = user;
         this.deliveryRequest = deliveryRequest;
         this.deliveryAddress = deliveryAddress;
         this.totalPrice = totalPrice;
@@ -77,8 +77,8 @@ public class Order extends BaseTimeEntity {
 
     public static Order of(
             UUID orderId,
-            String store,
-            String user,
+            UUID store,
+            UUID user,
             String deliveryRequest,
             String deliveryAddress,
             Long totalPrice
