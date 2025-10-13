@@ -1,8 +1,11 @@
 package com.babgo.domain.user;
 
 import com.babgo.global.entity.BaseTimeEntity;
+import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
 
 /**
  * 사용자 엔티티
@@ -18,6 +21,9 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
+
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false, columnDefinition = "uuid")
+    private UUID publicId;
 
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
@@ -56,6 +62,7 @@ public class User extends BaseTimeEntity {
     public static User ofCustomer(String email, String encodedPassword,
                                    String name, String nickname, String phoneNumber) {
         User user = new User();
+        user.publicId = UuidCreator.getTimeOrderedEpoch();
         user.email = email;
         user.password = encodedPassword;
         user.name = name;
@@ -73,6 +80,7 @@ public class User extends BaseTimeEntity {
     public static User ofOwner(String email, String encodedPassword,
                                String name, String nickname, String phoneNumber) {
         User user = new User();
+        user.publicId = UuidCreator.getTimeOrderedEpoch();
         user.email = email;
         user.password = encodedPassword;
         user.name = name;

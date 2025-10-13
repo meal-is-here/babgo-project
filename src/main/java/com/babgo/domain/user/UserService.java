@@ -41,7 +41,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
         log.info("고객 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
         return UserResponse.SignUpResponse.of(
-                String.valueOf(savedUser.getUserId()),
+                savedUser.getPublicId(),
                 savedUser.getEmail(),
                 savedUser.getName(),
                 savedUser.getNickname(),
@@ -67,7 +67,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
         log.info("사장 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
         return UserResponse.SignUpResponse.of(
-                String.valueOf(savedUser.getUserId()),
+                savedUser.getPublicId(),
                 savedUser.getEmail(),
                 savedUser.getName(),
                 savedUser.getNickname(),
@@ -99,7 +99,7 @@ public class UserService {
         return UserResponse.LoginResponse.of(
                 accessToken,
                 refreshToken,
-                String.valueOf(user.getUserId()),
+                user.getPublicId(),
                 user.getEmail(),
                 user.getName(),
                 user.getRole()

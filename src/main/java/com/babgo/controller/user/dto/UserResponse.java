@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class UserResponse {
 
@@ -15,7 +16,7 @@ public class UserResponse {
     @AllArgsConstructor
     public static class SignUpResponse {
 
-        private String userId;
+        private UUID publicId;
         private String email;
         private String name;
         private String nickname;
@@ -23,10 +24,10 @@ public class UserResponse {
         private LocalDateTime createdAt;
         private String message;  // 성공 메시지 (예: "회원가입이 완료되었습니다")
 
-        public static SignUpResponse of(String userId, String email, String name,
+        public static SignUpResponse of(UUID publicId, String email, String name,
                                         String nickname, UserRole role,
                                         LocalDateTime createdAt, String message) {
-            return new SignUpResponse(userId, email, name, nickname, role, createdAt, message);
+            return new SignUpResponse(publicId, email, name, nickname, role, createdAt, message);
         }
     }
 
@@ -37,14 +38,14 @@ public class UserResponse {
     public static class LoginResponse {
         private String accessToken;
         private String refreshToken;
-        private String userId;
+        private UUID publicId;
         private String email;
         private String name;
         private UserRole role;
 
-        public static LoginResponse of(String accessToken, String refreshToken, String userId,
+        public static LoginResponse of(String accessToken, String refreshToken, UUID publicId,
                                        String email, String name, UserRole role) {
-            return new LoginResponse(accessToken, refreshToken, userId, email, name, role);
+            return new LoginResponse(accessToken, refreshToken, publicId, email, name, role);
         }
     }
 
