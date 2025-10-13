@@ -75,7 +75,7 @@ public class User extends BaseTimeEntity {
      * 고객 사용자 생성 팩토리 메서드
      */
     public static User ofCustomer(String email, String encodedPassword,
-                                   String name, String nickname, String phoneNumber) {
+                                  String name, String nickname, String phoneNumber) {
         User user = new User();
         user.publicId = UuidCreator.getTimeOrderedEpoch();
         user.email = email;
@@ -116,9 +116,6 @@ public class User extends BaseTimeEntity {
         super.restore();
     }
 
-    /**
-     * 프로필 전체 수정 (프로필 수정에서 따로 로직 설정 예정)
-     */
     public void updateProfile(String email, String encodedPassword, String name,
                               String nickname, String phoneNumber, Boolean isProfilePublic) {
         if (email != null && !email.isBlank()) {
