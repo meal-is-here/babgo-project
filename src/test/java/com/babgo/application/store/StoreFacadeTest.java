@@ -38,7 +38,7 @@ class StoreFacadeTest {
         UUID categoryId = UUID.randomUUID();
         StoreInfo.Create input = StoreInfo.Create.of(
                 "홍대 김치찌개", "서울시 마포구 양화로 123",
-                37.5665, 126.9780, "02-1234-5678", 15000,
+                37.5665, 126.9780, "123456","02-1234-5678", 15000,
                 LocalTime.of(9, 0), LocalTime.of(21, 0), categoryId
         );
         Category category = mock(Category.class);
@@ -59,6 +59,7 @@ class StoreFacadeTest {
         assertThat(created.getAddressLine()).isEqualTo("서울시 마포구 양화로 123");
         assertThat(created.getLatitude()).isEqualTo(37.5665);
         assertThat(created.getLongitude()).isEqualTo(126.9780);
+        assertThat(created.getRegionCode()).isEqualTo("123456");
         assertThat(created.getPhoneNumber()).isEqualTo("02-1234-5678");
         assertThat(created.getMinOrderAmount()).isEqualTo(15000);
         assertThat(created.getOpeningHours()).isEqualTo(LocalTime.of(9, 0));
@@ -78,7 +79,7 @@ class StoreFacadeTest {
         UUID newCategoryId = UUID.randomUUID();
         StoreInfo.Update input = StoreInfo.Update.of(
                 "새로운 가게명", "서울시 어딘가 123",
-                37.5, 129.0,
+                37.5, 129.0,"123458",
                 null, 20000,
                 LocalTime.of(9, 0), LocalTime.of(22, 0),
                 newCategoryId
@@ -100,6 +101,7 @@ class StoreFacadeTest {
         assertThat(changes).containsEntry("addressLine", "서울시 어딘가 123");
         assertThat(changes).containsEntry("latitude", 37.5);
         assertThat(changes).containsEntry("longitude", 129.0);
+        assertThat(changes).containsEntry("regionCode", "123458");
         assertThat(changes).doesNotContainKey("phoneNumber");
         assertThat(changes).containsEntry("minOrderAmount", 20000);
         assertThat(changes).containsEntry("openingHours", LocalTime.of(9, 0));
