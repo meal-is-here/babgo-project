@@ -40,6 +40,21 @@ public class User extends BaseTimeEntity {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
+    @Column(name = "address_line", length = 100)
+    private String addressLine = "서울특별시 종로구 세종대로 172";  // 기본값: 광화문
+
+    @Column(name = "latitude")
+    private double latitude = 37.5759;  // 광화문 위도
+
+    @Column(name = "longitude")
+    private double longitude = 126.9768;  // 광화문 경도
+
+    @Column(name = "administrative_code", length = 10)
+    private String administrativeCode = "1111054000";  // 행정코드: 서울특별시 종로구 사직동
+
+    @Column(name = "legal_code", length = 10)
+    private String legalCode = "1111010300";  // 법정코드: 서울특별시 종로구 사직동
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private UserRole role;
@@ -117,6 +132,34 @@ public class User extends BaseTimeEntity {
     public void updateUserInfo(String nickname, String phoneNumber) {
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
+    }
+
+    /**
+     * 프로필 전체 수정 (프로필 수정에서 따로 로직 설정 예정)
+     */
+    public void updateProfile(String email, String encodedPassword, String name,
+                              String nickname, String phoneNumber, Boolean isProfilePublic) {
+        if (email != null && !email.isBlank()) {
+            this.email = email;
+        }
+        if (encodedPassword != null && !encodedPassword.isBlank()) {
+            this.password = encodedPassword;
+        }
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+        if (phoneNumber != null) {
+            this.phoneNumber = phoneNumber;
+        }
+        if (isProfilePublic != null) {
+            this.isProfilePublic = isProfilePublic;
+            if (isProfilePublic) {
+                this.profilePublicAt = java.time.LocalDateTime.now();
+            }
+        }
     }
 
     /**
