@@ -35,6 +35,9 @@ public class Store extends BaseTimeEntity {
     @Column(nullable = false)
     private double longitude;
 
+    @Column(nullable = false)
+    private String regionCode;
+
     @Column(nullable = false, length = 20)
     private String phoneNumber;
 
@@ -66,6 +69,7 @@ public class Store extends BaseTimeEntity {
             String addressLine,
             double latitude,
             double longitude,
+            String regionCode,
             String phoneNumber,
             int minOrderAmount,
             LocalTime openingHours,
@@ -76,6 +80,7 @@ public class Store extends BaseTimeEntity {
         validateLength(storeName);
         validateLength(addressLine);
         validateLatAndLon(latitude, longitude);
+        validateRegionCode(regionCode);
         validatePhoneNumber(phoneNumber);
         validateMinOrderAmount(minOrderAmount);
         validateBusinessHours(openingHours, closingHours);
@@ -85,6 +90,7 @@ public class Store extends BaseTimeEntity {
         this.addressLine = addressLine;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.regionCode = regionCode;
         this.phoneNumber = phoneNumber;
         this.minOrderAmount = minOrderAmount;
         this.openingHours = openingHours;
@@ -101,6 +107,7 @@ public class Store extends BaseTimeEntity {
             String addressLine,
             double latitude,
             double longitude,
+            String regionCode,
             String phoneNumber,
             int minOrderAmount,
             LocalTime openingHours,
@@ -112,6 +119,7 @@ public class Store extends BaseTimeEntity {
                 addressLine,
                 latitude,
                 longitude,
+                regionCode,
                 phoneNumber,
                 minOrderAmount,
                 openingHours,
@@ -161,6 +169,11 @@ public class Store extends BaseTimeEntity {
         this.longitude = lon;
     }
 
+    public void changeRegionCode(String regionCode) {
+        validateRegionCode(regionCode);
+        this.regionCode = regionCode;
+    }
+
     public void changePhoneNumber(String phoneNumber) {
         validatePhoneNumber(phoneNumber);
         this.phoneNumber = phoneNumber;
@@ -196,7 +209,12 @@ public class Store extends BaseTimeEntity {
         if (longitude < -180.0 || longitude > 180.0) {
             throw new CustomException(ErrorCode.INVALID, "경도는 -180 이상 180 이하여야 합니다.");
         }
+    }
 
+    private static void validateRegionCode(String regionCode) {
+        if (regionCode == null || regionCode.isBlank()) {
+            throw new CustomException(ErrorCode.INVALID, "행정코드값은 필수입니다.");
+        }
     }
 
     private static void validatePhoneNumber(String phoneNumber) {

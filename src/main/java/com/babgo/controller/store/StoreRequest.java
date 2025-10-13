@@ -38,6 +38,9 @@ public class StoreRequest {
         @DecimalMax(value = "180.0", message = "경도는 180 이하여야 합니다.")
         private Double longitude;
 
+        @NotNull(groups = OnCreate.class, message = "지역코드 값은 필수입니다.")
+        private String regionCode;
+
         @NotBlank(groups = OnCreate.class, message = "전화번호는 필수 값입니다.")
         @Size(max = 20, message = "전화번호는 최대 20자입니다.")
         @Pattern(
@@ -59,11 +62,12 @@ public class StoreRequest {
         @NotNull(groups = OnCreate.class, message = "카테고리 id은 필수 값입니다.")
         private UUID categoryId;
 
-        private Upsert(String storeName, String addressLine, double latitude, double longitude, String phoneNumber, int minOrderAmount, LocalTime openingHours, LocalTime closingHours, UUID categoryId) {
+        private Upsert(String storeName, String addressLine, double latitude, double longitude, String regionCode, String phoneNumber, int minOrderAmount, LocalTime openingHours, LocalTime closingHours, UUID categoryId) {
             this.storeName = storeName;
             this.addressLine = addressLine;
             this.latitude = latitude;
             this.longitude = longitude;
+            this.regionCode = regionCode;
             this.phoneNumber = phoneNumber;
             this.minOrderAmount = minOrderAmount;
             this.openingHours = openingHours;
@@ -71,16 +75,16 @@ public class StoreRequest {
             this.categoryId = categoryId;
         }
 
-        public static Upsert of(String storeName, String addressLine, double latitude, double longitude, String phoneNumber, int minOrderAmount, LocalTime openingHours, LocalTime closingHours, UUID categoryId) {
-            return new Upsert(storeName,addressLine, latitude, longitude, phoneNumber, minOrderAmount, openingHours, closingHours, categoryId);
+        public static Upsert of(String storeName, String addressLine, double latitude, double longitude, String regionCode, String phoneNumber, int minOrderAmount, LocalTime openingHours, LocalTime closingHours, UUID categoryId) {
+            return new Upsert(storeName,addressLine, latitude, longitude, regionCode, phoneNumber, minOrderAmount, openingHours, closingHours, categoryId);
         }
 
         public StoreInfo.Create toCreateInfo() {
-            return StoreInfo.Create.of(storeName, addressLine, latitude, longitude, phoneNumber, minOrderAmount, openingHours, closingHours, categoryId);
+            return StoreInfo.Create.of(storeName, addressLine, latitude, longitude, regionCode, phoneNumber, minOrderAmount, openingHours, closingHours, categoryId);
         }
 
         public StoreInfo.Update toUpdateInfo() {
-            return StoreInfo.Update.of(storeName, addressLine, latitude, longitude, phoneNumber, minOrderAmount, openingHours, closingHours, categoryId);
+            return StoreInfo.Update.of(storeName, addressLine, latitude, longitude, regionCode,phoneNumber, minOrderAmount, openingHours, closingHours, categoryId);
         }
     }
 }

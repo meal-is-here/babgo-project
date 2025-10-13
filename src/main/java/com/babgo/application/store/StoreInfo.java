@@ -19,6 +19,7 @@ public class StoreInfo {
         private final String addressLine;
         private final double latitude;
         private final double longitude;
+        private final String regionCode;
         private final String phoneNumber;
         private final int minOrderAmount;
         private final LocalTime openingHours;
@@ -30,6 +31,7 @@ public class StoreInfo {
                 String addressLine,
                 double latitude,
                 double longitude,
+                String regionCode,
                 String phoneNumber,
                 int minOrderAmount,
                 LocalTime openingHours,
@@ -40,6 +42,7 @@ public class StoreInfo {
                     addressLine,
                     latitude,
                     longitude,
+                    regionCode,
                     phoneNumber,
                     minOrderAmount,
                     openingHours,
@@ -56,6 +59,7 @@ public class StoreInfo {
         private final String addressLine;
         private final Double latitude;
         private final Double longitude;
+        private final String regionCode;
         private final String phoneNumber;
         private final Integer minOrderAmount;
         private final LocalTime openingHours;
@@ -67,6 +71,7 @@ public class StoreInfo {
                 String addressLine,
                 Double latitude,
                 Double longitude,
+                String regionCode,
                 String phoneNumber,
                 Integer minOrderAmount,
                 LocalTime openingHours,
@@ -77,6 +82,7 @@ public class StoreInfo {
                     addressLine,
                     latitude,
                     longitude,
+                    regionCode,
                     phoneNumber,
                     minOrderAmount,
                     openingHours,

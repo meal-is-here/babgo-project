@@ -42,6 +42,10 @@ public class StoreService {
             store.changeLocation(newLat, newLon);
         }
 
+        if (changes.containsKey("regionCode")) {
+            store.changeRegionCode((String) changes.get("regionCode"));
+        }
+
         if (changes.containsKey("phoneNumber")) {
             store.changePhoneNumber((String) changes.get("phoneNumber"));
         }

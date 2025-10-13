@@ -29,13 +29,14 @@ public class StoreFacade {
                 input.getAddressLine(),
                 input.getLatitude(),
                 input.getLongitude(),
+                input.getRegionCode(),
                 input.getPhoneNumber(),
                 input.getMinOrderAmount(),
                 input.getOpeningHours(),
                 input.getClosingHours(),
                 category
         );
-        storeService.create(store,"userName");
+        storeService.create(store, "userName");
     }
 
     @Transactional
@@ -43,15 +44,16 @@ public class StoreFacade {
         Store store = storeService.findByStoreId(storeId);
 
         Map<String, Object> changes = new HashMap<>();
-        if (input.getStoreName() != null)      changes.put("storeName", input.getStoreName());
-        if (input.getAddressLine() != null)    changes.put("addressLine", input.getAddressLine());
-        if (input.getLatitude() != null)       changes.put("latitude", input.getLatitude());
-        if (input.getLongitude() != null)      changes.put("longitude", input.getLongitude());
-        if (input.getPhoneNumber() != null)    changes.put("phoneNumber", input.getPhoneNumber());
+        if (input.getStoreName() != null) changes.put("storeName", input.getStoreName());
+        if (input.getAddressLine() != null) changes.put("addressLine", input.getAddressLine());
+        if (input.getLatitude() != null) changes.put("latitude", input.getLatitude());
+        if (input.getLongitude() != null) changes.put("longitude", input.getLongitude());
+        if (input.getRegionCode() != null) changes.put("regionCode", input.getRegionCode());
+        if (input.getPhoneNumber() != null) changes.put("phoneNumber", input.getPhoneNumber());
         if (input.getMinOrderAmount() != null) changes.put("minOrderAmount", input.getMinOrderAmount());
-        if (input.getOpeningHours() != null)   changes.put("openingHours", input.getOpeningHours());
-        if (input.getClosingHours() != null)   changes.put("closingHours", input.getClosingHours());
-        if (input.getCategoryId() != null)     changes.put("categoryId", input.getCategoryId());
+        if (input.getOpeningHours() != null) changes.put("openingHours", input.getOpeningHours());
+        if (input.getClosingHours() != null) changes.put("closingHours", input.getClosingHours());
+        if (input.getCategoryId() != null) changes.put("categoryId", input.getCategoryId());
 
         storeService.update(store, changes, "userName");
     }
