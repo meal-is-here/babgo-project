@@ -87,6 +87,6 @@ public class StoreService {
 
     // 세준
     public String getStoreSummary(UUID id) {
-        return String.valueOf(storeSummaryService.generateSummaryReactive(id));
+        return storeSummaryService.generateSummaryReactive(id).block();
     }
 }

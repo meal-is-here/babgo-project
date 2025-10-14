@@ -10,6 +10,16 @@ spring:
   sql:
     init:
       mode: always
+  ai:
+    openai:
+      api-key: ${GOOGLE_AI_API_KEY}
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completion-path: /v1beta/models
+        model: gemini-1.5-flash
+      embedding:
+        options:
+          model: text-embedding-ada-002
 
 jwt:
   secret: ${JWT_SECRET:1iwoidbaoibdoi2biosfioboiwwfnpadsopnofw}

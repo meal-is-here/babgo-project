@@ -9,9 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+<<<<<<< Updated upstream
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+=======
+>>>>>>> Stashed changes
 import java.util.UUID;
 
 @Service
@@ -65,11 +68,19 @@ public class StoreFacade {
         storeService.delete(store, "userName");
     }
 
-    public Optional<Store> getStoreById(UUID id) {
-        return storeService.getStoreById(id);
+    // 가게조회
+    public StoreInfo.Detail getStoreById(UUID id) {
+        Store store = storeService.getStoreById(id)
+                .orElseThrow(() -> new RuntimeException("STORE_NOT_FOUND"));
+        return StoreInfo.Detail.fromEntity(store);
     }
 
-    public String getStoreSummary(UUID id) {
-        return storeService.getStoreSummary(id);
+    // 가게요약
+    public StoreInfo.Summary getStoreSummary(UUID id) {
+        String summaryText = storeService.getStoreSummary(id);
+        if (summaryText == null || summaryText.isBlank()) {
+            summaryText = "요약이 존재하지 않습니다.";
+        }
+        return StoreInfo.Summary.of(summaryText);
     }
 }

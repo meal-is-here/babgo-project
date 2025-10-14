@@ -9,9 +9,6 @@ CLONE_CODING_GUIDE.md
 
 venv/
 
-# Local environment
-src/main/resources/application-local.yml
-
 http_ca.crt
 
 HELP.md

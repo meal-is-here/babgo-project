@@ -11,7 +11,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "p_store_summary")
+@Table(name = "p_store_summaries")
 public class StoreSummary {
 
     @Id
@@ -26,7 +26,7 @@ public class StoreSummary {
 
     @Setter
     @Lob
+    @Column(name = "summary_text")
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "summary_Text")
     private String summaryText;
 }

@@ -86,10 +86,11 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // HTTP 요청 인가 규칙 설정
                 .authorizeHttpRequests(authorize -> authorize
-                        // 인증 없이 접근 가능한 경로 (회원가입, 로그인)
-                        .requestMatchers("/api/auth/**","v1/orders/**").permitAll()
-                        // 나머지 모든 요청은 인증 필요
-                        .anyRequest().authenticated()
+//                        // 인증 없이 접근 가능한 경로 (회원가입, 로그인)
+//                        .requestMatchers("/api/auth/**","v1/orders/**").permitAll()
+//                        // 나머지 모든 요청은 인증 필요
+//                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 // 예외 처리 설정
                 .exceptionHandling(exception -> exception

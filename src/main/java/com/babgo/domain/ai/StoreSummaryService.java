@@ -43,7 +43,13 @@ public class StoreSummaryService {
         // 2) 리뷰 분석 조회
         List<ReviewAnalysis> analyses = reviewAnalysisRepository.findByReview_Store_StoreId(storeId);
 
-        // 3) 허위 가능성 높은 리뷰 제회
+        // 2-1) 리뷰 분석 자체가 없을 경우
+        if (analyses.isEmpty()) {
+            String msg = "해당 가게에 대한 리뷰 분석이 존재하지 않습니다.";
+            return saveSummaryReactive(store, msg).thenReturn(msg);
+        }
+
+        // 3) 허위 가능성 높은 리뷰 제외
         List<ReviewAnalysis> valid = analyses.stream()
                 .filter(a -> a.getFakeScore() < 0.5)
                 .collect(Collectors.toList());
@@ -83,7 +89,7 @@ public class StoreSummaryService {
 
                     String sentimentText = avgSent > 0 ? "긍정적인 리뷰가 많습니다." : "리뷰 평이 엇갈립니다.";
 
-                    return String.format("%s는 %s 관련 리뷰가 많습니다. %s",
+                    return String.format("'%s'은(는) '%s'을(를) 키워드로 한 리뷰가 많습니다. 또한 %s",
                             store.getStoreName(), topKeyword, sentimentText);
                 })
                 .flatMap(summary -> saveSummaryReactive(store, summary).thenReturn(summary));
