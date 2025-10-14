@@ -1,12 +1,17 @@
 package com.babgo.repository.store;
 
 import com.babgo.domain.store.Store;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.same;
@@ -36,5 +41,22 @@ class StoreRepositoryImplTest {
         assertThat(result).isSameAs(persisted);
         verify(storeJpaRepository, times(1)).save(same(input));
         verifyNoMoreInteractions(storeJpaRepository);
+    }
+
+    @DisplayName("findByStoreId: 존재하면 Store를 반환한다")
+    @Test
+    void findByStoreId_success() {
+        // given
+        UUID storeId = UUID.randomUUID();
+        Store found = mock(Store.class);
+        when(storeJpaRepository.findById(same(storeId))).thenReturn(Optional.of(found));
+
+        // when
+        Store result = storeRepositoryImpl.findByStoreId(storeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+        // then
+        assertThat(result).isSameAs(found);
+        verify(storeJpaRepository, times(1)).findById(same(storeId));
     }
 }

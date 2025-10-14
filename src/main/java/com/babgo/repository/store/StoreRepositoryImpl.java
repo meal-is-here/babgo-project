@@ -29,4 +29,9 @@ public class StoreRepositoryImpl implements StoreRepository {
     public List<Store> findByStoreIdIn(List<UUID> storeIds) {
         return storeJpaRepository.findByStoreIdIn(storeIds);
     }
+
+    @Override
+    public Optional<Store> findByStoreId(UUID storeId) {
+        return storeJpaRepository.findById(storeId);
+    }
 }
