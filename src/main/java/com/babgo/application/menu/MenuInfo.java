@@ -31,9 +31,12 @@ public class MenuInfo {
     private LocalDateTime deletedAt;
     private String deletedBy;
 
+    private int stock;
+
     // 생성자 방식
     public MenuInfo(UUID menuId, UUID storeId, String storeName, String name, Long price,
                     String description, String category, MenuStatus status,
+                    int stock,
                     LocalDateTime createdAt, String createdBy,
                     LocalDateTime updatedAt, String updatedBy,
                     LocalDateTime deletedAt, String deletedBy) {
@@ -51,6 +54,7 @@ public class MenuInfo {
         this.updatedBy = updatedBy;
         this.deletedAt = deletedAt;
         this.deletedBy = deletedBy;
+        this.stock = stock;
     }
 
     public static MenuInfo from(Menu menu) {
@@ -75,6 +79,7 @@ public class MenuInfo {
                 menu.getDescription(),
                 menu.getCategory(),
                 menu.getMenuStatus(),
+                menu.getStock(),
                 menu.getCreatedAt(),
                 menu.getCreatedBy(),
                 menu.getUpdatedAt(),

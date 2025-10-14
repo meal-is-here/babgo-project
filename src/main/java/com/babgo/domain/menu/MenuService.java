@@ -21,7 +21,7 @@ public class MenuService {
 
     @Transactional
     public Menu addMenu(UUID storeId, String name, Long price, String description,
-                        String category, String createBy) {
+                        String category, int stock, String createBy) {
 
         // 스토어 조회 및, storeId 유효성 체크
         Optional<Store> storeOpt = storeRepository.findById(storeId);
@@ -33,6 +33,7 @@ public class MenuService {
                 description,
                 category,
                 MenuStatus.AVAILABLE,
+                stock,
                 createBy,
                 store
 //                storeId // store가 활성화 되면 비활성화 되어야 함
@@ -74,6 +75,26 @@ public class MenuService {
                 .orElseThrow(() -> new IllegalArgumentException("메뉴를 찾을 수 없습니다."));
 
         menu.deleteMenu(deleteBy);
+        return menuRepository.save(menu);
+    }
+
+    // 재고 감소
+    @Transactional
+    public Menu decreaseStock(UUID menuId, int quantity) {
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "메뉴를 찾을 수 없습니다."));
+
+        menu.decreaseStock(quantity);
+        return menuRepository.save(menu);
+    }
+
+    // 재고 증가
+    @Transactional
+    public Menu increaseStock(UUID menuId, int quantity) {
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "메뉴를 찾을 수 없습니다."));
+
+        menu.increaseStock(quantity);
         return menuRepository.save(menu);
     }
 }

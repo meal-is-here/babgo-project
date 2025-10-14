@@ -33,6 +33,9 @@ public class Menu {
 
     private String category;
 
+    @Column(name = "stock") // 재고 수량 필드 추가
+    private int stock;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "menu_status")
     private MenuStatus menuStatus;
@@ -73,7 +76,7 @@ public class Menu {
 //    private List<Menu> menus = new ArrayList<>();
 
     public Menu(String name, Long price, String description, String category,
-                MenuStatus menuStatus, String createdBy, Store store) {
+                MenuStatus menuStatus, int stock, String createdBy, Store store) {
 //                                                      UUID storeId
         this.menuId = UUID.randomUUID();
         this.name = name;
@@ -81,6 +84,7 @@ public class Menu {
         this.description = description;
         this.category = category;
         this.menuStatus = menuStatus;
+        this.stock = stock;
         this.createdAt = LocalDateTime.now();
         this.createdBy = createdBy;
 //        this.storeId = storeId;
@@ -117,5 +121,36 @@ public class Menu {
         // 업데이트 시각/사용자도 같이 갱신
         this.updatedAt = LocalDateTime.now();
         this.updatedBy = deletedBy;
+    }
+
+    // -------------------------
+    // 재고 관련 로직 추가
+    // -------------------------
+
+    // 재고 차감 (주문 시)
+    public void decreaseStock(int quantity) {
+        if (this.stock < quantity) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
+        this.stock -= quantity;
+
+        // 재고 0이면 자동 SOLD_OUT
+        if (this.stock == 0) {
+            this.menuStatus = MenuStatus.SOLD_OUT;
+        }
+
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // 재고 보충
+    public void increaseStock(int quantity) {
+        this.stock += quantity;
+
+        // 재고가 생기면 AVAILABLE로 복귀
+        if (this.stock > 0 && this.menuStatus == MenuStatus.SOLD_OUT) {
+            this.menuStatus = MenuStatus.AVAILABLE;
+        }
+
+        this.updatedAt = LocalDateTime.now();
     }
 }

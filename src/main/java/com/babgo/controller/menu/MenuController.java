@@ -28,6 +28,7 @@ public class MenuController {
                 request.getPrice(),
                 request.getDescription(),
                 request.getCategory(),
+                request.getStock(),
                 request.getCreatedBy()
         );
 
@@ -85,6 +86,24 @@ public class MenuController {
         return toMenuResponse(menuInfo);
     }
 
+    // 재고 차감
+    @PatchMapping("/{menuId}/stock/decrease")
+    public MenuResponse decreaseStock(@PathVariable UUID storeId,
+                                      @PathVariable UUID menuId,
+                                      @RequestBody MenuRequest request) {
+        MenuInfo menuInfo = menuFacade.decreaseStock(menuId, request.getQuantity());
+        return toMenuResponse(menuInfo);
+    }
+
+    // 재고 증가
+    @PatchMapping("/{menuId}/stock/increase")
+    public MenuResponse increaseStock(@PathVariable UUID storeId,
+                                      @PathVariable UUID menuId,
+                                      @RequestBody MenuRequest request) {
+        MenuInfo menuInfo = menuFacade.increaseStock(menuId, request.getQuantity());
+        return toMenuResponse(menuInfo);
+    }
+
     // MenuInfo → MenuResponse 변환 헬퍼
     private MenuResponse toMenuResponse(MenuInfo info) {
         return new MenuResponse(
@@ -93,7 +112,8 @@ public class MenuController {
                 info.getPrice(),
                 info.getDescription(),
                 info.getCategory(),
-                info.getStatus()
+                info.getStatus(),
+                info.getStock()
         );
     }
 }

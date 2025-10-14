@@ -35,8 +35,8 @@ public class MenuFacade {
     // 메뉴 생성
     @Transactional
     public MenuInfo createMenu(UUID storeId, String name, Long price, String description,
-                               String category, String createdBy) {
-        Menu menu = menuService.addMenu(storeId, name, price, description, category, createdBy);
+                               String category, int stock, String createdBy) {
+        Menu menu = menuService.addMenu(storeId, name, price, description, category, stock, createdBy);
         return MenuInfo.from(menu);
     }
 
@@ -59,6 +59,18 @@ public class MenuFacade {
     @Transactional
     public MenuInfo deleteMenu(UUID menuId, String deletedBy) {
         Menu menu = menuService.deleteMenu(menuId, deletedBy);
+        return MenuInfo.from(menu);
+    }
+
+    @Transactional
+    public MenuInfo decreaseStock(UUID menuId, int quantity) {
+        Menu menu = menuService.decreaseStock(menuId, quantity);
+        return MenuInfo.from(menu);
+    }
+
+    @Transactional
+    public MenuInfo increaseStock(UUID menuId, int quantity) {
+        Menu menu = menuService.increaseStock(menuId, quantity);
         return MenuInfo.from(menu);
     }
 }

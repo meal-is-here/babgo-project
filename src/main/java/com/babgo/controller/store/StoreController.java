@@ -40,20 +40,6 @@ public class StoreController {
         return ApiResponse.success("가게 삭제를 성공했습니다.");
     }
 
-    // 세준
-    @GetMapping("/{storeId}")
-    public ResponseEntity<Store> getStore(@PathVariable UUID id) {
-        return storeFacade.getStoreById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // 세준
-    @GetMapping("/{storeId}/summary")
-    public ResponseEntity<String> getSummary(@PathVariable UUID id) {
-        String summary = storeFacade.getStoreSummary(id);
-        return ResponseEntity.ok(summary);
-
     // 가게 단건 조회
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreInfo.Detail> getStore(@PathVariable UUID storeId) {
