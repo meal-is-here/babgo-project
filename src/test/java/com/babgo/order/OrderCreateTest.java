@@ -14,7 +14,7 @@ public class OrderCreateTest {
 
     UUID orderId;
     UUID storeId = UUID.randomUUID();
-    UUID userId =  UUID.randomUUID();
+    Long userId = 1L;
 
 
     @BeforeEach

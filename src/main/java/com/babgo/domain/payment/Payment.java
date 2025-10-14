@@ -7,9 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 //TODO version 추가
@@ -32,6 +30,7 @@ public class Payment extends BaseTimeEntity {
 
     @Version
     private Long version;
+
     //TODO 부분 유니크 인덱스
     @Column(name = "transaction_id")
     private String transactionId;

@@ -6,11 +6,7 @@ import com.babgo.application.payment.PaymentWebhookHandler;
 import com.babgo.global.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.asn1.ocsp.Request;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.UUID;
 
 @Slf4j
@@ -67,9 +63,6 @@ public class PaymentController {
             case "REFUND_COMPLETED"       -> paymentWebhookHandler.handleRefund(payload);
         }
 
-        /**
-         * pg 사에게 바로 리턴해주기
-         */
         return ApiResponse.success("Webhook received successfully.");
     }
 

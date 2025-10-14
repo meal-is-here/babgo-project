@@ -3,12 +3,9 @@ package com.babgo.controller.payment;
 import com.babgo.domain.payment.CardBrand;
 import com.babgo.domain.payment.CardType;
 import com.babgo.domain.payment.PaymentMethod;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @NoArgsConstructor

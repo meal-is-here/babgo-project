@@ -1,8 +1,6 @@
 package com.babgo.application.payment.async;
 import com.babgo.application.payment.processor.PaymentProcessContext;
 import com.babgo.application.payment.processor.PaymentProcessor;
-import com.babgo.domain.order.Order;
-import com.babgo.domain.order.OrderService;
 import com.babgo.domain.payment.Payment;
 import com.babgo.domain.payment.PaymentService;
 import com.babgo.global.exception.CustomException;
@@ -20,7 +18,6 @@ import java.util.UUID;
 public class PaymentAsyncExecutor {
 
     private final PaymentService paymentService;
-    private final OrderService orderService;
     private final List<PaymentProcessor> processors;
 
     //비동기로 외부 pg를 호출만 함

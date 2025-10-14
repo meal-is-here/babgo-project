@@ -18,7 +18,7 @@ public class OrderItemService {
                         i .getMenuId(),
                         i .getMenuOptionId(),
                         i .getClientPrice(),
-                        10000l,
+                        10000L,
                         i.getQuantity()
                 )).toList();
 

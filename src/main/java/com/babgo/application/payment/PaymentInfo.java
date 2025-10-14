@@ -102,9 +102,4 @@ public class PaymentInfo {
         }
     }
 
-    @Getter
-    @RequiredArgsConstructor
-    public static class ConfirmResult {
-
-    }
 }

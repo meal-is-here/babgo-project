@@ -120,8 +120,4 @@ public class PaymentFacade {
         //3) 비동기 실행 시작 (ID만 넘기기)
         paymentAsyncExecutor.requestPgAsync(payment.getPaymentId() , paymentKey, amount);
     }
-
-    public void handle(PaymentRequest.WebhookPayload payload) {
-
-    }
 }
