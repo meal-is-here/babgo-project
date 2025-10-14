@@ -26,6 +26,11 @@ public class StoreRepositoryImpl implements StoreRepository {
     }
 
     @Override
+    public List<Store> saveAll(List<Store> stores) {
+        return storeJpaRepository.saveAll(stores);
+    }
+
+    @Override
     public List<Store> findByStoreIdIn(List<UUID> storeIds) {
         return storeJpaRepository.findByStoreIdIn(storeIds);
     }

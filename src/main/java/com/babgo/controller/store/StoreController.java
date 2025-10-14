@@ -1,10 +1,7 @@
 package com.babgo.controller.store;
 
-<<<<<<< Updated upstream
-=======
 import com.babgo.application.store.StoreInfo;
 import com.babgo.domain.ai.StoreSummaryService;
->>>>>>> Stashed changes
 import com.babgo.application.store.StoreFacade;
 import com.babgo.domain.store.Store;
 import com.babgo.global.api.ApiResponse;
@@ -31,7 +28,6 @@ public class StoreController {
         return ApiResponse.success("가게 등록을 성공했습니다.");
     }
 
-<<<<<<< Updated upstream
     @PatchMapping("/{storeId}")
     public ApiResponse<Void> updateStore(@PathVariable UUID storeId, @Validated({ValidateGroups.OnUpdate.class, Default.class}) @RequestBody StoreRequest.Upsert storeRequest) {
         storeFacade.updateStore(storeId, storeRequest.toUpdateInfo());
@@ -57,7 +53,7 @@ public class StoreController {
     public ResponseEntity<String> getSummary(@PathVariable UUID id) {
         String summary = storeFacade.getStoreSummary(id);
         return ResponseEntity.ok(summary);
-=======
+
     // 가게 단건 조회
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreInfo.Detail> getStore(@PathVariable UUID storeId) {
@@ -79,7 +75,6 @@ public class StoreController {
             return ResponseEntity.status(404)
                     .body(StoreInfo.Summary.of("STORE_NOT_FOUND"));
         }
->>>>>>> Stashed changes
     }
 
 }

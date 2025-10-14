@@ -9,12 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-<<<<<<< Updated upstream
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-=======
->>>>>>> Stashed changes
 import java.util.UUID;
 
 @Service
