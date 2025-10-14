@@ -30,8 +30,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-// 불가피하면 아래 주석 해제해서 전체를 너그럽게 만들 수도 있음 (권장 X)
-// @MockitoSettings(strictness = Strictness.LENIENT)
 public class ReadPayment {
 
     @Mock private OrderService orderService;
