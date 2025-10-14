@@ -1,10 +1,11 @@
 package com.babgo.domain.user;
 
 import com.babgo.global.entity.BaseTimeEntity;
+import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 사용자 엔티티
@@ -21,6 +22,9 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long userId;
 
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false, columnDefinition = "uuid")
+    private UUID publicId;
+
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
@@ -35,6 +39,21 @@ public class User extends BaseTimeEntity {
 
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
+
+    @Column(name = "address_line", length = 100)
+    private String addressLine = "서울특별시 종로구 세종대로 172";  // 기본값: 광화문
+
+    @Column(name = "latitude")
+    private double latitude = 37.5759;  // 광화문 위도
+
+    @Column(name = "longitude")
+    private double longitude = 126.9768;  // 광화문 경도
+
+    @Column(name = "administrative_code", length = 10)
+    private String administrativeCode = "1111054000";  // 행정코드: 서울특별시 종로구 사직동
+
+    @Column(name = "legal_code", length = 10)
+    private String legalCode = "1111010300";  // 법정코드: 서울특별시 종로구 사직동
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
@@ -56,8 +75,9 @@ public class User extends BaseTimeEntity {
      * 고객 사용자 생성 팩토리 메서드
      */
     public static User ofCustomer(String email, String encodedPassword,
-                                   String name, String nickname, String phoneNumber) {
+                                  String name, String nickname, String phoneNumber) {
         User user = new User();
+        user.publicId = UuidCreator.getTimeOrderedEpoch();
         user.email = email;
         user.password = encodedPassword;
         user.name = name;
@@ -75,6 +95,7 @@ public class User extends BaseTimeEntity {
     public static User ofOwner(String email, String encodedPassword,
                                String name, String nickname, String phoneNumber) {
         User user = new User();
+        user.publicId = UuidCreator.getTimeOrderedEpoch();
         user.email = email;
         user.password = encodedPassword;
         user.name = name;
@@ -86,55 +107,17 @@ public class User extends BaseTimeEntity {
         return user;
     }
 
-    // TODO: 소프트 딜리트 처리 메소드를 작성해야 합니다
-    // - isUserDeleted를 true로 설정
-    // - deletedAt 시간 설정 (BaseTimeEntity의 markAsDeleted 호출)
-    // - deletedBy에 삭제한 사용자 ID 설정
-    public void delete(String deletedBy) {
-        // 구현 필요
-    }
-
-    // TODO: 복구 메소드를 작성해야 합니다
-    // - isUserDeleted를 false로 설정
-    // - deletedAt을 null로 설정 (BaseTimeEntity의 restore 호출)
-    // - deletedBy를 null로 설정
+    /**
+     * 소프트 딜리트된 사용자 복구
+     */
     public void restore() {
-        // 구현 필요
+        this.isUserDeleted = false;
+        this.deletedBy = null;
+        super.restore();
     }
 
-    /**
-     * 사용자 정보 수정
-     */
-    public void updateUserInfo(String nickname, String phoneNumber) {
-        this.nickname = nickname;
-        this.phoneNumber = phoneNumber;
-    }
-
-    /**
-     * 프로필 공개 설정 변경
-     */
-    public void updateProfilePublic(Boolean isPublic) {
-        this.isProfilePublic = isPublic;
-        if (isPublic) {
-            this.profilePublicAt = java.time.LocalDateTime.now();
-        }
-    }
-
-    // TODO: 비밀번호 변경 메소드를 작성해야 합니다
-    // - BCryptPasswordEncoder로 암호화된 비밀번호를 받아서 설정
-    public void updatePassword(String encodedPassword) {
-        // 구현 필요
-    }
-
-    // TODO: 권한 변경 메소드를 작성해야 합니다
-    // - 관리자가 사용자의 권한을 변경할 때 사용
-    public void updateRole(UserRole newRole) {
-        // 구현 필요
-    }
-
-    public void updateProfile(String email, String encodedPassword, String name, String nickname,
-                              String phoneNumber, Boolean isProfilePublic) {
-
+    public void updateProfile(String email, String encodedPassword, String name,
+                              String nickname, String phoneNumber, Boolean isProfilePublic) {
         if (email != null && !email.isBlank()) {
             this.email = email;
         }
@@ -144,16 +127,17 @@ public class User extends BaseTimeEntity {
         if (name != null && !name.isBlank()) {
             this.name = name;
         }
-        if (nickname != null && !nickname.isBlank()) {
+        if (nickname != null) {
             this.nickname = nickname;
         }
-        if (phoneNumber != null && !phoneNumber.isBlank()) {
+        if (phoneNumber != null) {
             this.phoneNumber = phoneNumber;
         }
-
-        if (isProfilePublic != null && !isProfilePublic.equals(this.isProfilePublic)) {
+        if (isProfilePublic != null) {
             this.isProfilePublic = isProfilePublic;
-            this.profilePublicAt = isProfilePublic ? LocalDateTime.now() : null;
+            if (isProfilePublic) {
+                this.profilePublicAt = java.time.LocalDateTime.now();
+            }
         }
     }
 }
