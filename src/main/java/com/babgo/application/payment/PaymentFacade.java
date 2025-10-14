@@ -1,18 +1,21 @@
 package com.babgo.application.payment;
 
+import com.babgo.application.payment.async.PaymentAsyncExecutor;
+import com.babgo.controller.payment.PaymentRequest;
+import com.babgo.controller.payment.gateway.PaymentGateway;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderService;
 import com.babgo.domain.order.OrderStatus;
 import com.babgo.domain.payment.Payment;
 import com.babgo.domain.payment.PaymentService;
-import com.babgo.domain.payment.exception.PaymentErrorType;
-import com.babgo.domain.payment.exception.PaymentException;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
+import com.babgo.repository.payment.client.ClientResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.UUID;
 
@@ -22,24 +25,26 @@ public class PaymentFacade {
 
     private final OrderService orderService;
     private final PaymentService paymentService;
+    private final PaymentAsyncExecutor paymentAsyncExecutor;
+    private final PaymentGateway paymentGateway;
 
     @Transactional
     public PaymentInfo.ReadyResult ready(PaymentInfo.Ready input) {
         //User id 검증
         //User user = "userService.getUser(info.userId)";
-        UUID user = UUID.randomUUID();
+        Long user = 1L;
 
         Order order = orderService.getOrder(input.getOrderId());
         if (order.getOrderStatus() != OrderStatus.PENDING) {
             throw new CustomException(
-                    ErrorCode.BAD_REQUEST,
+                    ErrorCode.ORDER_NOT_PAYABLE,
                     "현재 주문은 결제할 수 없습니다. 동일 구성으로 재주문해 주세요."
             );
         }
 
-        paymentService.getPayment(order.getOrderId()).ifPresent(p -> {
+        paymentService.getPaymentByOrderId(order.getOrderId()).ifPresent(p -> {
             throw new CustomException(
-                    ErrorCode.BAD_REQUEST,
+                    ErrorCode.PAYMENT_ALREADY_IN_PROGRESS,
                     "이미 결제가 진행 중이거나 완료되었습니다."
             );
         });
@@ -48,8 +53,9 @@ public class PaymentFacade {
         Long expected = order.getTotalPrice();
         if (input.getAmount() != null && !expected.equals(input.getAmount())) {
             throw new CustomException(
-                    ErrorCode.BAD_REQUEST,
-                    "결제 금액이 주문 금액과 일치하지 않습니다.");
+                    ErrorCode.PAYMENT_ALREADY_EXISTS,
+                    "이미 결제가 생성되었습니다."
+            );
         }
 
         Payment payment = Payment.of(
@@ -63,11 +69,59 @@ public class PaymentFacade {
 
         try {
             Payment readPayment = paymentService.create(payment);
-            return PaymentInfo.ReadyResult.from(readPayment);
+
+            String successUrl = UriComponentsBuilder
+                    .fromUriString("http://localhost:8080/v1/payments/success")
+                    .queryParam("orderId", readPayment.getOrderId())
+                    .build(true)
+                    .toUriString();
+
+            String failUrl = UriComponentsBuilder
+                    .fromUriString("http://localhost:8080/pay/fail")
+                    .queryParam("orderId", readPayment.getOrderId())
+                    .build(true)
+                    .toUriString();
+
+            String webhookUrl = "http://localhost:8080/v1/payments/webhook";
+
+            PaymentInfo.CreatePg creteInfo =  PaymentInfo.CreatePg.from(readPayment, successUrl, failUrl, webhookUrl);
+
+            ClientResponse.create result = paymentGateway.create(creteInfo);
+            PaymentInfo.ReadyResult readyResult = PaymentInfo.ReadyResult.from(readPayment, result.getUrl());
+
+            return readyResult;
         }catch (DataIntegrityViolationException e){
-            throw new CustomException(ErrorCode.BAD_REQUEST, "이미 결제가 생성되었습니다.");
+            throw new CustomException(
+                    ErrorCode.PAYMENT_ALREADY_EXISTS,
+                    "이미 결제가 생성되었습니다."
+            );
         }
     }
 
+    public void pay(String paymentKey, UUID orderId, Long amount){
+        // 1) 결제 로드
+        Payment payment = paymentService.getPaymentByOrderId(orderId)
+                .orElseThrow(() -> new CustomException(
+                        ErrorCode.NOT_FOUND,
+                        "결제 건을 찾을 수 없습니다.")
+                );
 
+        // 추후 재시도 또는 취소를 위해 저장해두기
+        /*paymentService.attachPaymentKey(payment.getPaymentId(), paymentKey);*/
+
+        //2) 원자적 전이(CAS)
+        if (!paymentService.startPayment(payment.getPaymentId())) {
+            throw new CustomException(
+                    ErrorCode.PAYMENT_ALREADY_IN_PROGRESS,
+                    "이미 진행 중이거나 완료된 결제입니다."
+            );
+        }
+
+        //3) 비동기 실행 시작 (ID만 넘기기)
+        paymentAsyncExecutor.requestPgAsync(payment.getPaymentId() , paymentKey, amount);
+    }
+
+    public void handle(PaymentRequest.WebhookPayload payload) {
+
+    }
 }

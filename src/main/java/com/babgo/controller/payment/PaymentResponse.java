@@ -25,4 +25,9 @@ public class PaymentResponse {
             );
         }
     }
+
+    @Getter
+    public static class createPg {
+
+    }
 }

@@ -18,7 +18,7 @@ public class OrderInfo {
     @RequiredArgsConstructor
     public static class Create{
         private final String storeId;
-        private final String userId;
+        private final Long userId;
         private final String deliveryRequest;
         private final String deliveryAddress;
         private final List<OrderItemDetail> items;
@@ -43,8 +43,8 @@ public class OrderInfo {
     @Getter
     @RequiredArgsConstructor
     public static class OrderItemDetail {
-        private final String menuId;
-        private final String menuOptionId;
+        private final UUID menuId;
+        private final UUID menuOptionId;
         private final Long clientPrice;
         private final Integer quantity;
 

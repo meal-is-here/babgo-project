@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -26,8 +28,10 @@ public class Payment extends BaseTimeEntity {
     private UUID orderId;
 
     @Column(name = "user_id", nullable = false, updatable = false)
-    private UUID userId;
+    private Long userId;
 
+    @Version
+    private Long version;
     //TODO 부분 유니크 인덱스
     @Column(name = "transaction_id")
     private String transactionId;
@@ -51,16 +55,13 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "card_type", updatable=false)
     private CardType cardType;
 
-    private OffsetDateTime approvedAt;
+    private LocalDateTime approvedAt;
 
-    @Column(name = "approve_no")
-    private String approveNo;
-
-    private OffsetDateTime refundedAt;
+    private LocalDateTime refundedAt;
 
     private Payment(
             UUID orderId,
-            UUID userId,
+            Long userId,
             Long amount,
             PaymentMethod method,
             CardBrand cardBrand,
@@ -96,7 +97,7 @@ public class Payment extends BaseTimeEntity {
 
     public static Payment of(
             UUID orderId,
-            UUID userId,
+            Long userId,
             Long amount,
             PaymentMethod method,
             CardBrand cardBrand,
@@ -112,5 +113,18 @@ public class Payment extends BaseTimeEntity {
         );
     }
 
-    //TODO paymentType 변동 메서드 추가 예정
+    public void markApproved(String transactionId){
+        this.paymentStatus = PaymentStatus.PAID;
+        this.transactionId = transactionId;
+    }
+
+    public void markFailed() {
+        this.paymentStatus = PaymentStatus.FAILED;
+    }
+
+    public void markProcessing() {
+        this.paymentStatus  = PaymentStatus.PROCESSING;
+    }
+
+
 }

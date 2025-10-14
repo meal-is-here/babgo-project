@@ -2,6 +2,8 @@ package com.babgo.payment;
 
 import com.babgo.application.payment.PaymentFacade;
 import com.babgo.application.payment.PaymentInfo;
+import com.babgo.application.payment.async.PaymentAsyncExecutor;
+import com.babgo.controller.payment.gateway.PaymentGateway;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderService;
 import com.babgo.domain.order.OrderStatus;
@@ -32,22 +34,26 @@ public class ReadPayment {
     private OrderService orderService;
     @Mock
     private PaymentService paymentService;
+    @Mock
+    private PaymentAsyncExecutor paymentAsyncExecutor;
 
+    @Mock
+    private PaymentGateway paymentGateway;
     private PaymentFacade sut;
 
     @BeforeEach
     void setUp() {
-        sut = new PaymentFacade(orderService, paymentService);
+        sut = new PaymentFacade(orderService, paymentService,paymentAsyncExecutor, paymentGateway);
     }
 
-        private static Order pendingOrder(UUID orderId, UUID userId, long totalPrice) {
+        private static Order pendingOrder(UUID orderId, Long userId, long totalPrice) {
             Order o = mock(Order.class);
             when(o.getOrderId()).thenReturn(orderId);
             when(o.getOrderStatus()).thenReturn(OrderStatus.PENDING);
             return o;
         }
 
-        private static PaymentInfo.Ready readyInput(UUID userId, UUID orderId, Long amount, PaymentMethod method, CardBrand cardBrand, CardType cardType) {
+        private static PaymentInfo.Ready readyInput(Long userId, UUID orderId, Long amount, PaymentMethod method, CardBrand cardBrand, CardType cardType) {
             return new PaymentInfo.Ready(userId, orderId , amount, method, cardBrand, cardType);
         }
 
@@ -56,7 +62,7 @@ public class ReadPayment {
         @DisplayName("성공: PENDING 주문이고 기존 결제 없고 금액 일치하면 새 Payment 생성")
         void ready_success() {
             UUID orderId = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
+            Long userId = 1L;
             long price = 15000L;
 
             Order order = pendingOrder(orderId, userId, price);
@@ -87,7 +93,7 @@ public class ReadPayment {
         @DisplayName("실패: 주문 상태가 PENDING이 아니면 UNPROCESSABLE")
         void ready_fail_when_order_not_pending() {
             UUID orderId = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
+            Long userId = 1L;
             Order order = mock(Order.class);
             when(order.getOrderStatus()).thenReturn(OrderStatus.CANCELLED);
             when(orderService.getOrder(orderId)).thenReturn(order);
@@ -108,7 +114,7 @@ public class ReadPayment {
         @DisplayName("실패: 동일 orderId로 기존 결제가 있으면 CONFLICT")
         void ready_fail_when_existing_payment() {
             UUID orderId = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
+            Long userId = 1L;
             long price = 12000L;
 
             Order order = pendingOrder(orderId, userId, price);
@@ -133,7 +139,7 @@ public class ReadPayment {
         @DisplayName("실패: 금액 불일치면 AMOUNT_MISMATCH")
         void ready_fail_when_amount_mismatch() {
             UUID orderId = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
+            Long userId = 1L;
             long price = 10000L;
 
             Order order = pendingOrder(orderId, userId, price);
@@ -156,7 +162,7 @@ public class ReadPayment {
     @DisplayName("실패: 동시성 등으로 DB 유니크 충돌 시 CONFLICT 변환")
     void ready_fail_when_unique_violation() {
         UUID orderId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
+        Long userId = 1L;
         long price = 20_000L;
 
         Order order = mock(Order.class);
