@@ -1,7 +1,6 @@
 package com.babgo.application.payment;
 
 import com.babgo.application.payment.async.PaymentAsyncExecutor;
-import com.babgo.controller.payment.PaymentRequest;
 import com.babgo.controller.payment.gateway.PaymentGateway;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderService;
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.UUID;
 
@@ -27,6 +25,7 @@ public class PaymentFacade {
     private final PaymentService paymentService;
     private final PaymentAsyncExecutor paymentAsyncExecutor;
     private final PaymentGateway paymentGateway;
+    private final PaymentUrlResolver urlResolver;
 
     @Transactional
     public PaymentInfo.ReadyResult ready(PaymentInfo.Ready input) {
@@ -53,8 +52,8 @@ public class PaymentFacade {
         Long expected = order.getTotalPrice();
         if (input.getAmount() != null && !expected.equals(input.getAmount())) {
             throw new CustomException(
-                    ErrorCode.PAYMENT_ALREADY_EXISTS,
-                    "이미 결제가 생성되었습니다."
+                    ErrorCode.PAYMENT_AMOUNT_MISMATCH,
+                    "결제 금액이 주문 금액과 일치하지 않습니다."
             );
         }
 
@@ -70,23 +69,14 @@ public class PaymentFacade {
         try {
             Payment readPayment = paymentService.create(payment);
 
-            String successUrl = UriComponentsBuilder
-                    .fromUriString("http://localhost:8080/v1/payments/success")
-                    .queryParam("orderId", readPayment.getOrderId())
-                    .build(true)
-                    .toUriString();
+            PaymentInfo.CreatePg createInfo = PaymentInfo.CreatePg.from(
+                    readPayment,
+                    urlResolver.successUrl(readPayment),
+                    urlResolver.failUrl(readPayment),
+                    urlResolver.webhookUrl()
+            );
 
-            String failUrl = UriComponentsBuilder
-                    .fromUriString("http://localhost:8080/pay/fail")
-                    .queryParam("orderId", readPayment.getOrderId())
-                    .build(true)
-                    .toUriString();
-
-            String webhookUrl = "http://localhost:8080/v1/payments/webhook";
-
-            PaymentInfo.CreatePg creteInfo =  PaymentInfo.CreatePg.from(readPayment, successUrl, failUrl, webhookUrl);
-
-            ClientResponse.create result = paymentGateway.create(creteInfo);
+            ClientResponse.create result = paymentGateway.create(createInfo);
             PaymentInfo.ReadyResult readyResult = PaymentInfo.ReadyResult.from(readPayment, result.getUrl());
 
             return readyResult;
