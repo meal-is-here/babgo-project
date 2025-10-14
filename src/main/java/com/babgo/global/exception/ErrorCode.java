@@ -1,14 +1,12 @@
 package com.babgo.global.exception;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ErrorCode implements ErrorType{
+public enum ErrorCode{
 
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 	INVALID(HttpStatus.BAD_REQUEST, "올바르지 않은 값입니다."),
@@ -16,7 +14,7 @@ public enum ErrorCode implements ErrorType{
 	BAD_REQUEST(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않습니다."),
 	NOT_FOUND(HttpStatus.NOT_FOUND, "요청하신 경로를 찾을 수 없습니다."),
 	NOT_RESOURCE_OWNER(HttpStatus.FORBIDDEN, "해당 리소스 소유자가 아닙니다."),
-
+	EXTERNAL(HttpStatus.BAD_GATEWAY, "외부 시스템 연동 중 오류가 발생했습니다."),
 	// Valid
 	VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "Validation Error"),
 
@@ -37,6 +35,17 @@ public enum ErrorCode implements ErrorType{
 	// Profile
 	ALREADY_DELETE_USER(HttpStatus.BAD_REQUEST, "이미 삭제된 계정입니다."),
 
+	// Order
+	ORDER_NOT_PAYABLE(HttpStatus.UNPROCESSABLE_ENTITY, "주문 상태상 결제를 진행할 수 없습니다."),
+
+	// Payment
+	PAYMENT_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "PG 응답이 시간 초과되었습니다."),
+	PAYMENT_ALREADY_IN_PROGRESS(HttpStatus.CONFLICT, "이미 진행 중이거나 완료된 결제입니다."),
+	PAYMENT_ALREADY_COMPLETED(HttpStatus.CONFLICT, "이미 완료된 결제입니다."),
+	PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "결제가 이미 생성되어 있습니다."),
+	PAYMENT_AMOUNT_MISMATCH(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
+	PAYMENT_STATUS_CONFLICT(HttpStatus.CONFLICT, "결제 상태 전이 중 충돌이 발생했습니다."),
+	PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보를 찾을 수 없습니다.")
 	;
 
 	private final HttpStatus httpStatus;
