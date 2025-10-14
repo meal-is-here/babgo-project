@@ -50,9 +50,15 @@ public class OrderService {
         return orderItemRepository.orderItemRepository(orderId);
     }
 
-    public Order findOrder(UUID orderId) {
+    public Order getOrder(UUID orderId) {
         return orderRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
+    }
+
+    public void markConfirmed(UUID orderId) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
+        order.markConfirmed();
     }
 
     //TODO 주문 단건 조회

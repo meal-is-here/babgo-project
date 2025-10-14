@@ -23,7 +23,7 @@ public class Order extends BaseTimeEntity {
     private UUID storeId;
 
     @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    private Long userId;
 
     @Column(name = "total_price", nullable = false)
     private Long totalPrice;
@@ -40,7 +40,7 @@ public class Order extends BaseTimeEntity {
     private Order(
             UUID orderId,
             UUID store,
-            UUID user,
+            Long user,
             String deliveryRequest,
             String deliveryAddress,
             Long totalPrice
@@ -63,7 +63,7 @@ public class Order extends BaseTimeEntity {
         }
 
         if (deliveryAddress == null || deliveryAddress.isBlank()){
-            throw new CustomException(ErrorCode.INVALID, "주소는 반드시 입력되어야 합니다.");
+            throw new CustomException(ErrorCode.INVALID,  "주소는 반드시 입력되어야 합니다.");
         }
 
         this.orderId = orderId;
@@ -78,7 +78,7 @@ public class Order extends BaseTimeEntity {
     public static Order of(
             UUID orderId,
             UUID store,
-            UUID user,
+            Long user,
             String deliveryRequest,
             String deliveryAddress,
             Long totalPrice
@@ -86,4 +86,7 @@ public class Order extends BaseTimeEntity {
         return new Order(orderId, store, user, deliveryRequest, deliveryAddress,totalPrice);
     }
 
+    public void markConfirmed() {
+        this.orderStatus = OrderStatus.CONFIRMED;
+    }
 }

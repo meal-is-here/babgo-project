@@ -4,6 +4,7 @@ import com.babgo.application.order.OrderFacade;
 import com.babgo.application.order.OrderInfo;
 import com.babgo.application.order.OrderQueryFacade;
 import com.babgo.global.api.ApiResponse;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,15 +18,17 @@ public class OrderController {
     private final OrderFacade orderFacade;
     private final OrderQueryFacade orderQueryFacade;
 
+    @PermitAll
     @PostMapping()
     public ApiResponse<OrderResponse.Create> createOrder(
-            @RequestHeader String idempotencyKey,
+          /*  @RequestHeader String idempotencyKey,*/
             @RequestBody OrderRequest.CreateOrder request
     ){
+        String idempotencyKey ="dfsdfsd";
         OrderInfo.Create input = OrderInfo.Create.from(request);
         OrderInfo.CreateResult output = orderFacade.createOrder(idempotencyKey, input);
         OrderResponse.Create response = OrderResponse.Create.from(output);
-        return ApiResponse.success("주문이 접수되었습니다. 취소는 5초 이내 가능합니다.",response);
+        return ApiResponse.success("주문이 생성되었습니다. 결제 정보를 입력해주세요.",response);
     }
 
     @GetMapping()

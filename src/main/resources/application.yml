@@ -26,3 +26,11 @@ logging:
     com.babgo: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
+
+payment:
+  success-base-url: ${PAYMENT_BASEURL}
+  fail-base-url: ${PAYMENT_FAIL_BASEURL}
+  webhook-url: ${PAYMENT_WEBHOOK_URL}
+
+pg-sim:
+  auto: approve  # 기본 자동승인

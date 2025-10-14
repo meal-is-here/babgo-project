@@ -86,8 +86,17 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // HTTP 요청 인가 규칙 설정
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/error").permitAll()
+                        // PG 시뮬/리다이렉트/웹훅
+                        .requestMatchers(
+                                "/pg-sim/**",
+                                "/v1/payments/success",
+                                "/v1/payments/fail",
+                                "/v1/payments/webhook",
+                                "/webhooks/**"
+                        ).permitAll()
                         // 인증 없이 접근 가능한 경로 (회원가입, 로그인)
-                        .requestMatchers("/api/auth/**","v1/orders/**").permitAll()
+                        .requestMatchers("/api/auth/**","/v1/orders/**","/v1/orders","/v1/payments/**").permitAll()
                         // 나머지 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
