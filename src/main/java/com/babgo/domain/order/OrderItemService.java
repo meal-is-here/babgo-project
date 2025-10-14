@@ -4,7 +4,6 @@ import com.babgo.application.order.OrderInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -12,16 +11,25 @@ public class OrderItemService {
 
     private final OrderItemRepository orderItemRepository;
 
-    public void create(List<OrderItem> items) {
-        orderItemRepository.saveAll(items);
+    public void create(List<OrderInfo.OrderItemDetail> items, Order order) {
+        List<OrderItem> item = items.stream().map(i ->
+                OrderItem.of(
+                        order,
+                        i .getMenuId(),
+                        i .getMenuOptionId(),
+                        i .getClientPrice(),
+                        10000l,
+                        i.getQuantity()
+                )).toList();
+
+        orderItemRepository.saveAll(item);
     }
 
-    public List<OrderItem> verifyOrderItemsAvailability(
-            List<OrderInfo.OrderItemDetail> items,
-            UUID orderId
+  /*  public List<OrderItem> verifyOrderItemsAvailability(
+            List<OrderInfo.OrderItemDetail> items, UUID orderId
     ) {
 
-        return null;
+        return r;
     }
-    
+    */
 }

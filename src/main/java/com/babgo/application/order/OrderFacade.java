@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -19,7 +18,7 @@ public class OrderFacade {
     public OrderInfo.CreateResult createOrder(String idempotencyKey, OrderInfo.Create input){
         //1. 사용자 검증
         //User user = "userService.getUser(info.userId)";
-        UUID user = UUID.randomUUID();
+        Long user = 1L;
         //2.idempotencyKey 검증
         // checkIdempotency(idempotencyKey);
 
@@ -31,10 +30,11 @@ public class OrderFacade {
         UUID store = UUID.randomUUID();
 
         //4. 요청 아이템 → 엔티티 변환 오더 아이템 재고 있는지 검증 후 검증된 객체 리스트 반환
-        List<OrderItem> items = orderItemService.verifyOrderItemsAvailability(input.getItems(), orderId);
-
+       /* List<OrderItem> items = orderItemService.verifyOrderItemsAvailability(input.getItems(), orderId);
+*/
         //5. 총액 계산(서버 기준)
-        Long totalPrice = orderService.calculateTotal(items);
+      /*  Long totalPrice = orderService.calculateTotal(items);*/
+        Long totalPrice =10000L;
 
         //오더 임시 객체 생성
         Order order = Order.of(
@@ -50,9 +50,10 @@ public class OrderFacade {
         Order pendingOrder = orderService.create(order);
 
         //7. 검증 완료된 오더 아이템 저장
-        orderItemService.create(items);
+        orderItemService.create(input.getItems(), pendingOrder);
 
         //8. 응답 DTO
+        //@하드코딩 대신 @Value/설정(예: order.cancel-window-seconds) 주입 권장. 또한 Clock 주입으로 테스트 용이성↑.
         LocalDateTime cancelTime = pendingOrder.getCreatedAt().plusSeconds(5);
 
         return OrderInfo.CreateResult.from(pendingOrder, cancelTime);
