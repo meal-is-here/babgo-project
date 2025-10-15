@@ -2,15 +2,10 @@ package com.babgo.application.order;
 
 import com.babgo.application.order.event.OrderCreatedEvent;
 import com.babgo.domain.order.*;
-import com.babgo.repository.payment.PaymentCancelRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
-
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component

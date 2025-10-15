@@ -4,7 +4,6 @@ import com.babgo.application.order.OrderFacade;
 import com.babgo.application.order.OrderInfo;
 import com.babgo.application.order.OrderQueryFacade;
 import com.babgo.global.api.ApiResponse;
-import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

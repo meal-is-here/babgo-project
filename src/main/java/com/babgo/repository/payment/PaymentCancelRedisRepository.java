@@ -2,12 +2,9 @@ package com.babgo.repository.payment;
 
 import com.babgo.application.order.CancelWindow;
 import com.babgo.repository.redis.order.OrderRedisProps;
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
