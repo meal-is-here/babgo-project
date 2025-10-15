@@ -49,8 +49,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)  // JWT 사용으로 CSRF 불필요
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // 세션 미사용
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/v1/auth/**").permitAll()  // 회원가입/로그인/토큰갱신 인증 불필요
-                        .anyRequest().authenticated()  // 나머지 모든 요청은 인증 필요
+//                        .requestMatchers("/v1/auth/**").permitAll()  // 회원가입/로그인/토큰갱신 인증 불필요
+//                        .anyRequest().authenticated()  // 나머지 모든 요청은 인증 필요
+                        .anyRequest().permitAll()  // 나머지 모든 요청은 인증 필요
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)  // 인증 실패 시
