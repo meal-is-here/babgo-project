@@ -24,6 +24,7 @@ public class SearchServiceTest extends MockTest {
     private double latitude = 37.5665;       // 서울 위도
     private double longitude = 126.9780;      // 서울 경도
     private SearchType searchType; // 검색 타입 (예: 가게)
+    private String regionCode = "11110"; // 지역코드
     private String keyword = "치킨";     // 검색 키워드
     private String sort = "DISTANCE";    // 정렬 기준 (거리순)
     private int page = 0;
@@ -34,7 +35,7 @@ public class SearchServiceTest extends MockTest {
     void 카테고리_타입으로_가게_조회_성공(){
 
         // given: 조회 요청에 사용할 Command 파라미터 준비
-        SearchCommand.Create command = SearchCommand.Create.of(latitude, longitude, SearchType.KATEGORIE.name(), keyword, sort, page, size);
+        SearchCommand.Create command = SearchCommand.Create.of(latitude, longitude, regionCode, SearchType.KATEGORIE.name(), keyword, sort, page, size);
 
         // given: Repository가 반환할 가짜 Search 객체(Mock) 준비
         Search search1 = Mockito.mock(Search.class);
@@ -61,7 +62,7 @@ public class SearchServiceTest extends MockTest {
     void 카테고리_타입으로_가게_조회_결과_없으면_빈값_반환(){
 
         // given: 조회 요청에 사용할 Command 파라미터 준비 및 조회 시 빈값 세팅
-        SearchCommand.Create command = SearchCommand.Create.of(latitude, longitude, SearchType.KATEGORIE.name(), keyword, sort, page, size);
+        SearchCommand.Create command = SearchCommand.Create.of(latitude, longitude, regionCode, SearchType.KATEGORIE.name(), keyword, sort, page, size);
         List<Search> emptyResult = Collections.emptyList();
 
         Mockito.when(searchRepository.getCategorySearch(command, SearchService.DEFAULT_RADIUS_METER)).thenReturn(emptyResult);
@@ -82,7 +83,7 @@ public class SearchServiceTest extends MockTest {
 
         // given: 조회 요청에 사용할 Command 파라미터 준비
         SearchCommand.Create command = SearchCommand.Create.of(
-            latitude, longitude, SearchType.KATEGORIE.name(), keyword, sort, page, size
+            latitude, longitude, regionCode, SearchType.KATEGORIE.name(), keyword, sort, page, size
         );
 
         // given: Search.of()로 검색 결과 10개 생성
@@ -95,6 +96,7 @@ public class SearchServiceTest extends MockTest {
                 "카테고리" + i,                          // categoryName
                 4.0 + (i % 5) * 0.1,                    // avgRating
                 i * 3,                                  // likes
+                1,                                      // ordercount
                 "가능",                                  // deliveryStatus
                 "영업중",                                // storeStatus
                 37.5665 + i * 0.001,                    // latitude
@@ -121,7 +123,7 @@ public class SearchServiceTest extends MockTest {
     void 가게명_검색타입으로_가게_조회_성공() {
         // given: 카테고리 검색 요청 반환할 가짜 Search 객체(Mock) 준비
         SearchCommand.Create command = SearchCommand.Create.of(
-            latitude, longitude, SearchType.STORE.name(), keyword, sort, page, size
+            latitude, longitude, regionCode, SearchType.STORE.name(), keyword, sort, page, size
         );
 
         Search search1 = Mockito.mock(Search.class);
@@ -140,6 +142,18 @@ public class SearchServiceTest extends MockTest {
         Mockito.verify(searchRepository, Mockito.times(1)).getStoreSearch(command, SearchService.DEFAULT_RADIUS_METER);
     }
 
+
+    @Test
+    void 가게명_검색타입_조회시_레디스에_데이터_있음(){
+
+        // given: 카테고리 검색 요청 반환할 가짜 Search 객체(Mock) 준비
+        SearchCommand.Create command = SearchCommand.Create.of(
+            latitude, longitude, regionCode, SearchType.STORE.name(), keyword, sort, page, size
+        );
+
+        // 키캆으로 레디스 키 찾기
+
+    }
 
 
 
