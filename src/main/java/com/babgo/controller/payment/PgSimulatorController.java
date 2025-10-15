@@ -70,29 +70,12 @@ public class PgSimulatorController {
             });
         }
 
-        // 수동 테스트(화면)도 필요하면 checkoutPage 유지
         return Map.of(
                 "code", 0,
                 "checkoutPage", "http://localhost:8080/pg-sim/checkout?o=" + orderId
         );
     }
 
-    @GetMapping("/checkout")
-    public ResponseEntity<String> checkout(@RequestParam("o") String orderId) {
-        return ResponseEntity.ok("""
-          <html><body>
-            <h3>PG 시뮬레이터 - 주문 %s</h3>
-            <form action="/pg-sim/approve" method="post">
-              <input type="hidden" name="orderId" value="%s"/>
-              <button type="submit">승인(성공)</button>
-            </form>
-            <form action="/pg-sim/decline" method="post">
-              <input type="hidden" name="orderId" value="%s"/>
-              <button type="submit">거절(실패)</button>
-            </form>
-          </body></html>
-        """.formatted(orderId, orderId, orderId));
-    }
 
     @PostMapping("/approve")
     public ResponseEntity<Void> approve(@RequestParam String orderId) {

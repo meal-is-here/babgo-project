@@ -57,7 +57,8 @@ public class SecurityConfig {
                                 "/v1/payments/success",
                                 "/v1/payments/fail",
                                 "/v1/payments/webhook",
-                                "/webhooks/**"
+                                "/webhooks/**",
+                                "/pay/**"
                         ).permitAll()
                         .requestMatchers("/v1/auth/**","/v1/orders/**","/v1/orders","/v1/payments/**").permitAll()  // 회원가입/로그인/토큰갱신 인증 불필요
                         .anyRequest().authenticated()  // 나머지 모든 요청은 인증 필요

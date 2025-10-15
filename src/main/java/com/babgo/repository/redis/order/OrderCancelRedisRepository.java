@@ -1,7 +1,6 @@
-package com.babgo.repository.payment;
+package com.babgo.repository.redis.order;
 
-import com.babgo.application.order.CancelWindow;
-import com.babgo.repository.redis.order.OrderRedisProps;
+import com.babgo.application.order.port.CancelWindow;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -9,12 +8,12 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class PaymentCancelRedisRepository implements CancelWindow {
+public class OrderCancelRedisRepository implements CancelWindow {
 
     private final RedisTemplate<String, String> redis;
     private final OrderRedisProps props;
 
-    public PaymentCancelRedisRepository(
+    public OrderCancelRedisRepository(
             @Qualifier("orderRedisTemplate") RedisTemplate<String, String> redis,
             OrderRedisProps props
     ) {

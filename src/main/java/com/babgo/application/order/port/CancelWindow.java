@@ -1,4 +1,4 @@
-package com.babgo.application.order;
+package com.babgo.application.order.port;
 
 import java.util.UUID;
 

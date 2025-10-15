@@ -1,6 +1,7 @@
 package com.babgo.application.payment;
 
 import com.babgo.application.payment.async.PaymentAsyncExecutor;
+import com.babgo.application.payment.port.PaymentEndpointResolver;
 import com.babgo.controller.payment.gateway.PaymentGateway;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderService;
@@ -25,7 +26,7 @@ public class PaymentFacade {
     private final PaymentService paymentService;
     private final PaymentAsyncExecutor paymentAsyncExecutor;
     private final PaymentGateway paymentGateway;
-    private final PaymentUrlResolver urlResolver;
+    private final PaymentEndpointResolver urlResolver;
 
     @Transactional
     public PaymentInfo.ReadyResult ready(PaymentInfo.Ready input) {
@@ -71,8 +72,8 @@ public class PaymentFacade {
 
             PaymentInfo.CreatePg createInfo = PaymentInfo.CreatePg.from(
                     readPayment,
-                    urlResolver.successUrl(readPayment),
-                    urlResolver.failUrl(readPayment),
+                    urlResolver.approveUrl(readPayment.getOrderId()),
+                    urlResolver.failUrl(readPayment.getOrderId()),
                     urlResolver.webhookUrl()
             );
 
