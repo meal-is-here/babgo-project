@@ -1,5 +1,6 @@
 package com.babgo.domain.store;
 
+import com.babgo.domain.ai.store_summary.StoreSummary;
 import com.babgo.domain.store.status.StoreStatus;
 import com.babgo.global.entity.BaseTimeEntity;
 import com.babgo.global.exception.CustomException;
@@ -8,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalTime;
 import java.util.UUID;
@@ -63,6 +65,12 @@ public class Store extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    // by세준, db테이블에 영향x, 객체 메서드를 사용하기 위한 추가 컬럼입니다.
+    @Getter
+    @Setter
+    @OneToOne(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private StoreSummary storeSummary;
 
     private Store(
             String storeName,
