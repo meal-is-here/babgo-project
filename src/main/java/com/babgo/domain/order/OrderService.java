@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +42,6 @@ public class OrderService {
         return sum;
     }
 
-    //TODO 주문 목록 조회
     public Page<Order> findOrders(UUID userId, OrderStatus status,Pageable pageable) {
         return orderRepository.findOrders(userId, status,pageable);
     }
@@ -50,10 +50,33 @@ public class OrderService {
         return orderItemRepository.orderItemRepository(orderId);
     }
 
-    public Order findOrder(UUID orderId) {
+    public Order getOrder(UUID orderId) {
         return orderRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
     }
 
-    //TODO 주문 단건 조회
+    @Transactional
+    public void updateConfirmed(UUID orderId) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
+        order.markConfirmed();
+    }
+
+    @Transactional
+    public void markPaymentInProgress(UUID orderId) {
+
+    }
+
+    @Transactional
+    public void updateCancel(Order order) {
+        order.markCancel();
+    }
+
+    @Transactional
+    public void updateCancelRequested(Order order) {
+    }
+
+    @Transactional
+    public void updateRefundRequested(Order order) {
+    }
 }

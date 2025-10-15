@@ -40,7 +40,7 @@ public class OrderQueryFacade {
 
     @Transactional(readOnly = true)
     public OrderInfo.OrderAndItems getOrderAndItems(UUID orderId) {
-        Order order = orderService.findOrder(orderId);
+        Order order = orderService.getOrder(orderId);
         List<OrderItem> orderItems = orderService.findAllOrderItem(order.getOrderId());
 
         List<OrderInfo.Item> items = orderItems
