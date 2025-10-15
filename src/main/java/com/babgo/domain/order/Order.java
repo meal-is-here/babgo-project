@@ -45,7 +45,7 @@ public class Order extends BaseTimeEntity {
             String deliveryRequest,
             String deliveryAddress,
             Long totalPrice
-    ){
+    ) {
 
         if (orderId == null) {
             throw new CustomException(ErrorCode.INVALID, "주문 아이디가 올바르지 않습니다.");
@@ -55,15 +55,15 @@ public class Order extends BaseTimeEntity {
             throw new CustomException(ErrorCode.INVALID, "총 가격은 0원 이상이어야 합니다.");
         }
 
-        if (user == null){
+        if (user == null) {
             throw new CustomException(ErrorCode.INVALID, "사용자의 정보가 올바르지 않습니다.");
         }
 
-        if (store == null){
+        if (store == null) {
             throw new CustomException(ErrorCode.INVALID, "음식점의 정보가 올바르지 않습니다.");
         }
 
-        if (deliveryAddress == null || deliveryAddress.isBlank()){
+        if (deliveryAddress == null || deliveryAddress.isBlank()) {
             throw new CustomException(ErrorCode.INVALID, "주소는 반드시 입력되어야 합니다.");
         }
 
@@ -83,11 +83,15 @@ public class Order extends BaseTimeEntity {
             String deliveryRequest,
             String deliveryAddress,
             Long totalPrice
-    ){
-        return new Order(orderId, store, user, deliveryRequest, deliveryAddress,totalPrice);
+    ) {
+        return new Order(orderId, store, user, deliveryRequest, deliveryAddress, totalPrice);
     }
 
     public boolean isCompleted() {
         return this.orderStatus == OrderStatus.CONFIRMED;
+    }
+
+    public void updateStatus(OrderStatus status) {
+        this.orderStatus = status;
     }
 }
