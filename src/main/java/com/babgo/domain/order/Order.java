@@ -24,7 +24,7 @@ public class Order extends BaseTimeEntity {
 
     @Version
     @Column(name = "order_version", nullable = false)
-    private long version;
+    private Long version;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -108,7 +108,8 @@ public class Order extends BaseTimeEntity {
 
         this.orderStatus = OrderStatus.CANCELED;
     }
-}
+
     public boolean isCompleted() {
         return this.orderStatus == OrderStatus.CONFIRMED;
     }
+}
