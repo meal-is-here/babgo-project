@@ -53,6 +53,7 @@ public class StoreInfo {
         }
     }
 
+<<<<<<< Updated upstream
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Update {
@@ -93,6 +94,8 @@ public class StoreInfo {
         }
     }
 
+=======
+>>>>>>> Stashed changes
     // 단건 조회용 DTO
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
