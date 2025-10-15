@@ -2,7 +2,6 @@ package com.babgo.payment;
 
 import com.babgo.application.payment.PaymentFacade;
 import com.babgo.application.payment.PaymentInfo;
-import com.babgo.application.payment.PaymentUrlResolver;
 import com.babgo.application.payment.async.PaymentAsyncExecutor;
 import com.babgo.controller.payment.gateway.PaymentGateway;
 import com.babgo.domain.order.Order;
@@ -12,6 +11,7 @@ import com.babgo.domain.payment.*;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import com.babgo.repository.payment.client.ClientResponse;
+import com.babgo.repository.payment.resolver.PaymentUrlResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -78,8 +78,8 @@ public class ReadPayment {
         when(paymentService.create(any(Payment.class))).thenReturn(saved);
 
         // URL/PG 스텁 (이 테스트에서 실제로 사용됨)
-        when(urlResolver.successUrl(saved)).thenReturn("http://localhost:8080/pay/success?orderId=" + orderId);
-        when(urlResolver.failUrl(saved)).thenReturn("http://localhost:8080/pay/fail?orderId=" + orderId);
+        when(urlResolver.approveUrl(saved.getOrderId())).thenReturn("http://localhost:8080/pay/success?orderId=" + orderId);
+        when(urlResolver.failUrl(saved.getOrderId())).thenReturn("http://localhost:8080/pay/fail?orderId=" + orderId);
         when(urlResolver.webhookUrl()).thenReturn("http://localhost:8080/v1/payments/webhook");
 
         ClientResponse.create pgResp = mock(ClientResponse.create.class);
