@@ -1,6 +1,5 @@
-package com.babgo.controller.user;
+package com.babgo.controller.user.dto;
 
-import com.babgo.domain.user.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -74,10 +73,10 @@ public class UserRequest {
 
         @NotBlank(message = "비밀번호는 필수입니다")
         private String password;
-    }
 
-    // TODO: 필요한 추가 요청 DTO를 작성하세요
-    // - 비밀번호 변경 요청
-    // - 사용자 정보 수정 요청
-    // - 토큰 갱신 요청 (Refresh Token 구현시)
+        // 정적 팩토리 메서드: 회원가입 후 자동 로그인 시 사용
+        public static LoginRequest of(String email, String password) {
+            return new LoginRequest(email, password);
+        }
+    }
 }
