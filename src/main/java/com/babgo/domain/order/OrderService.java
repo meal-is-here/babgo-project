@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -56,7 +55,8 @@ public class OrderService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
     }
 
-    public void markConfirmed(UUID orderId) {
+    @Transactional
+    public void updateConfirmed(UUID orderId) {
         Order order = orderRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
         order.markConfirmed();
@@ -64,7 +64,19 @@ public class OrderService {
 
     @Transactional
     public void markPaymentInProgress(UUID orderId) {
-        Order order = getOrder(orderId);
-        order.markPaymentInProgress();
+
+    }
+
+    @Transactional
+    public void updateCancel(Order order) {
+        order.markCancel();
+    }
+
+    @Transactional
+    public void updateCancelRequested(Order order) {
+    }
+
+    @Transactional
+    public void updateRefundRequested(Order order) {
     }
 }

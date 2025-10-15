@@ -106,7 +106,7 @@ public class ReadPayment {
         Long userId = 1L;
 
         Order order = mock(Order.class);
-        when(order.getOrderStatus()).thenReturn(OrderStatus.CANCELLED);
+        when(order.getOrderStatus()).thenReturn(OrderStatus.CANCELED);
         when(orderService.getOrder(orderId)).thenReturn(order);
 
         PaymentInfo.Ready input =

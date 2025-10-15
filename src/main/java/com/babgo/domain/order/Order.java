@@ -100,4 +100,12 @@ public class Order extends BaseTimeEntity {
         }
 
         this.orderStatus = OrderStatus.PAYMENT_IN_PROGRESS;}
+
+    public void markCancel(){
+        if (orderStatus != OrderStatus.PENDING) {
+            throw new CustomException(ErrorCode.ORDER_NOT_CANCELABLE, "현재 상태에서는 취소할 수 없습니다.");
+        }
+
+        this.orderStatus = OrderStatus.CANCELED;
+    }
 }

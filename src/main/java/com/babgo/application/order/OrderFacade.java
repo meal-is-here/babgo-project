@@ -4,6 +4,7 @@ import com.babgo.application.order.event.OrderCreatedEvent;
 import com.babgo.domain.order.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
@@ -58,21 +59,51 @@ public class OrderFacade {
         return OrderInfo.CreateResult.from(pendingOrder);
     }
 
-    public OrderInfo.CancelResult cancelOrder(UUID orderId, Long userId){
+    @Transactional
+    public OrderInfo.CancelResult cancelOrder(UUID orderId){
 
         if (!cancelWindow.isOpen(orderId)) {
-            return OrderInfo.CancelResult.reject("취소 가능 시간이 지났습니다.");
+            return OrderInfo.CancelResult.reject("이미 취소되었거나, 취소 가능 시간이 만료되었습니다.");
         }
 
-        // 도메인 상태 가드: CREATED / PAYMENT_READY 에서만 취소 허용
-
-
         Order order = orderService.getOrder(orderId);
+        try {
+            switch (order.getOrderStatus()) {
+                case PENDING -> {
+                    orderService.updateCancel(order);
+                    cancelWindow.close(orderId);
+                    return OrderInfo.CancelResult.ok("주문을 취소했습니다.");
+                }
+                case PAYMENT_IN_PROGRESS -> {
+                    // 결제 진행중: PG 취소 요청 비동기
+                    // paymentService.requestCancel(order);
+                    orderService.updateCancelRequested(order);
+                    cancelWindow.close(orderId);
+                    return OrderInfo.CancelResult.ok("결제 취소를 요청했습니다. 처리 중입니다.");
+                }
+                case CONFIRMED -> {
+                    //refundService.requestRefund(order);
+                    orderService.updateRefundRequested(order);
+                    cancelWindow.close(orderId);
+                    return OrderInfo.CancelResult.ok("환불을 요청했습니다. 처리 중입니다.");
+                }
+                case CANCELED, CANCEL_REQUESTED -> {
+                    return OrderInfo.CancelResult.reject("이미 취소된 주문입니다.");
+                }
 
-        // 시간 측정 여기에서 바로 불가능 상태면 반환
-        // 가능 상태이면 Order 및 payment 상태 파악 -> 분기
+                case REFUNDED, REFUND_REQUESTED -> {
+                    return OrderInfo.CancelResult.reject("이미 환불 처리 경로에 있습니다.");
+                }
 
-        return OrderInfo.CancelResult.ok();
+                default -> {
+                    return OrderInfo.CancelResult.reject("현재 상태에서는 취소할 수 없습니다.");
+                }
+            }
+        }catch (OptimisticLockingFailureException | jakarta.persistence.OptimisticLockException e) {
+            return OrderInfo.CancelResult.reject("이미 상태가 변경되었습니다." + order.getOrderStatus().getDescription());
+        } catch (IllegalStateException e) {
+            return OrderInfo.CancelResult.reject(e.getMessage());
+        }
     }
 
 }

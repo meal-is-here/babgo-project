@@ -45,7 +45,8 @@ public class PaymentService {
         }
     }
 
-    public void markApproved(Payment payment, String transactionKey) {
+    @Transactional
+    public void updateApproved(Payment payment, String transactionKey) {
         payment.markApproved(transactionKey);
     }
 }

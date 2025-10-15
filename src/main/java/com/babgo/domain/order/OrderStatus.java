@@ -11,7 +11,10 @@ public enum OrderStatus {
     PENDING("준비중"),
     CONFIRMED("확정됨"),
     PAYMENT_IN_PROGRESS("결제 중"),
-    CANCELLED("취소됨"),
+    CANCEL_REQUESTED("취소 요청 중"),
+    CANCELED("취소됨"),
+    REFUNDED("환불됨"),
+    REFUND_REQUESTED("환불 요청중"),
     FAILED("실패");
 
     private final String description;
