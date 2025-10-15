@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -62,5 +63,21 @@ public class StoreFacade {
     public void deleteStore(UUID storeId) {
         Store store = storeService.findByStoreId(storeId);
         storeService.delete(store, "userName");
+    }
+
+    // 가게조회
+    public StoreInfo.Detail getStoreById(UUID id) {
+        Store store = storeService.getStoreById(id)
+                .orElseThrow(() -> new RuntimeException("STORE_NOT_FOUND"));
+        return StoreInfo.Detail.fromEntity(store);
+    }
+
+    // 가게요약
+    public StoreInfo.Summary getStoreSummary(UUID id) {
+        String summaryText = storeService.getStoreSummary(id);
+        if (summaryText == null || summaryText.isBlank()) {
+            summaryText = "요약이 존재하지 않습니다.";
+        }
+        return StoreInfo.Summary.of(summaryText);
     }
 }
