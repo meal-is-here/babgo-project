@@ -3,6 +3,7 @@ package com.babgo.domain.review;
 import com.babgo.domain.ai.review_analysis.ReviewAnalysis;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.user.User;
+import com.babgo.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,23 +17,26 @@ import java.util.UUID;
 @Setter
 @Table(name = "p_reviews")
 @NoArgsConstructor
-public class Review {
+public class Review extends BaseTimeEntity {
 
     @Id
     @Column(name = "review_id")
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID review_id;
+    private UUID reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
+    @JoinColumn(name = "store_id", insertable = false, updatable = false)
     private Store store;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
+    @Column(nullable = false)
+    private int rating;
+
+    @Column(nullable = false, length = 500)
     private String content;
-    private int rating; // 1~5
 
     @Column(name="created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -41,10 +45,31 @@ public class Review {
     @Column(name="deleted_at")
     private LocalDateTime deletedAt = LocalDateTime.now();
 
+    @Column(name="user_id", nullable = false)
+    private Long userId;
+
+    @Column(name="order_id",nullable = false)
+    private UUID orderId;
+
+    @Column(name="store_id",nullable = false)
+    private UUID storeId;
+
     @Column(name="deleted_by")
     private String deletedBy;
 
+
     @OneToOne(mappedBy = "review", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private ReviewAnalysis analysis;
-}
 
+    public Review(int rating, String content, Long userId, UUID storeId, UUID orderId) {
+        this.rating = rating;
+        this.content = content;
+        this.userId = userId;
+        this.storeId = storeId;
+        this.orderId = orderId;
+    }
+
+    public static Review of(int rating, String content, Long userId, UUID storeId, UUID orderId) {
+        return new Review(rating, content, userId, storeId, orderId);
+    }
+}

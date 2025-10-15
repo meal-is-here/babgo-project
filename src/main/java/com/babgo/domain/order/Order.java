@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.util.UUID;
 
 @Entity
@@ -23,7 +24,7 @@ public class Order extends BaseTimeEntity {
     private UUID storeId;
 
     @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    private Long userId;
 
     @Column(name = "total_price", nullable = false)
     private Long totalPrice;
@@ -40,11 +41,11 @@ public class Order extends BaseTimeEntity {
     private Order(
             UUID orderId,
             UUID store,
-            UUID user,
+            Long user,
             String deliveryRequest,
             String deliveryAddress,
             Long totalPrice
-    ){
+    ) {
 
         if (orderId == null) {
             throw new CustomException(ErrorCode.INVALID, "주문 아이디가 올바르지 않습니다.");
@@ -54,15 +55,15 @@ public class Order extends BaseTimeEntity {
             throw new CustomException(ErrorCode.INVALID, "총 가격은 0원 이상이어야 합니다.");
         }
 
-        if (user == null){
+        if (user == null) {
             throw new CustomException(ErrorCode.INVALID, "사용자의 정보가 올바르지 않습니다.");
         }
 
-        if (store == null){
+        if (store == null) {
             throw new CustomException(ErrorCode.INVALID, "음식점의 정보가 올바르지 않습니다.");
         }
 
-        if (deliveryAddress == null || deliveryAddress.isBlank()){
+        if (deliveryAddress == null || deliveryAddress.isBlank()) {
             throw new CustomException(ErrorCode.INVALID, "주소는 반드시 입력되어야 합니다.");
         }
 
@@ -78,12 +79,19 @@ public class Order extends BaseTimeEntity {
     public static Order of(
             UUID orderId,
             UUID store,
-            UUID user,
+            Long user,
             String deliveryRequest,
             String deliveryAddress,
             Long totalPrice
-    ){
-        return new Order(orderId, store, user, deliveryRequest, deliveryAddress,totalPrice);
+    ) {
+        return new Order(orderId, store, user, deliveryRequest, deliveryAddress, totalPrice);
     }
 
+    public boolean isCompleted() {
+        return this.orderStatus == OrderStatus.CONFIRMED;
+    }
+
+    public void updateStatus(OrderStatus status) {
+        this.orderStatus = status;
+    }
 }
