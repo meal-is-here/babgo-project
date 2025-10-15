@@ -19,7 +19,7 @@ public class OrderFacade {
     public OrderInfo.CreateResult createOrder(String idempotencyKey, OrderInfo.Create input){
         //1. 사용자 검증
         //User user = "userService.getUser(info.userId)";
-        UUID user = UUID.randomUUID();
+        Long user =1L;
         //2.idempotencyKey 검증
         // checkIdempotency(idempotencyKey);
 

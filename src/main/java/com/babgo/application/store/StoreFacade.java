@@ -9,12 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-<<<<<<< Updated upstream
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-=======
->>>>>>> Stashed changes
 import java.util.UUID;
 
 @Service
@@ -43,7 +40,6 @@ public class StoreFacade {
         storeService.create(store, "userName");
     }
 
-<<<<<<< Updated upstream
     @Transactional
     public void updateStore(UUID storeId, StoreInfo.Update input) {
         Store store = storeService.findByStoreId(storeId);
@@ -76,15 +72,6 @@ public class StoreFacade {
         return StoreInfo.Detail.fromEntity(store);
     }
 
-=======
-    // 가게조회
-    public StoreInfo.Detail getStoreById(UUID id) {
-        Store store = storeService.getStoreById(id)
-                .orElseThrow(() -> new RuntimeException("STORE_NOT_FOUND"));
-        return StoreInfo.Detail.fromEntity(store);
-    }
-
->>>>>>> Stashed changes
     // 가게요약
     public StoreInfo.Summary getStoreSummary(UUID id) {
         String summaryText = storeService.getStoreSummary(id);

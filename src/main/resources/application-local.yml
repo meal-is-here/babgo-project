@@ -22,8 +22,8 @@ spring:
       google-location: "us-central1"
       chat:
         base-url: https://generativelanguage.googleapis.com
-#        base-url: https://generativelanguage.googleapis.com/v1beta/openai/
-#        base-url: https://generativelanguage.googleapis.com
+        #        base-url: https://generativelanguage.googleapis.com/v1beta/openai/
+        #        base-url: https://generativelanguage.googleapis.com
         completion-path: /v1beta/models
         model: gemini-1.5-flash
       embedding:

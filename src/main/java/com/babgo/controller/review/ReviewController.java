@@ -1,31 +1,33 @@
 package com.babgo.controller.review;
 
-import com.babgo.application.review.ReviewFacade;
-import com.babgo.application.review.ReviewInfo;
+import com.babgo.controller.review.dto.ReviewCreateRequest;
+import com.babgo.controller.review.dto.ReviewResponse;
+import com.babgo.domain.review.ReviewService;
+import com.babgo.global.api.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
 
-    private final ReviewFacade reviewFacade;
+    private final ReviewService reviewService;
 
+    // create review
     @PostMapping
-    public ResponseEntity<ReviewResponse> postReview(@RequestBody ReviewRequest req) {
-        ReviewInfo info = reviewFacade.createReview(req.getStoreId(), req.getUserId(), req.getContent(), req.getRating());
-        ReviewResponse res = new ReviewResponse(
-                info.getReviewId(),
-                info.getStoreId(),
-                info.getUserId(),
-                info.getContent(),
-                info.getRating(),
-                info.getCreatedAt()
-        );
-        return ResponseEntity.ok(res);
+    public ApiResponse<ReviewResponse> createReview(
+            // TODO: 인증 추가 예정
+            // @AuthenticationPrincipal Long userId,
+            @Valid @RequestBody ReviewCreateRequest request
+    ) {
+        Long userId = 1L;
+        ReviewResponse response = reviewService.createReview(userId, request);
+        return ApiResponse.success("리뷰 등록 성공", response);
     }
 }
