@@ -1,6 +1,5 @@
 package com.babgo.global.security.config;
 
-import com.babgo.domain.user.UserDetailService;
 import com.babgo.global.security.jwt.JwtAccessDeniedHandler;
 import com.babgo.global.security.jwt.JwtAuthenticationEntryPoint;
 import com.babgo.global.security.jwt.JwtAuthenticationFilter;
