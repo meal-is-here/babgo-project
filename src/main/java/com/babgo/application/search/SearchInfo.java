@@ -21,6 +21,8 @@ public class SearchInfo {
 
         private double longitude;
 
+        private String regionCode;
+
         private SearchType searchType;
 
         private String keyword;
@@ -31,9 +33,10 @@ public class SearchInfo {
 
         private int size;
 
-        private Create(double latitude, double longitude, SearchType searchType, String keyword, String sort, int page, int size) {
+        private Create(double latitude, double longitude, String regionCode, SearchType searchType, String keyword, String sort, int page, int size) {
             this.latitude = latitude;
             this.longitude = longitude;
+            this.regionCode = regionCode;
             this.searchType = searchType;
             this.keyword = keyword;
             this.sort = sort;
@@ -41,13 +44,13 @@ public class SearchInfo {
             this.size = size;
         }
 
-        public static Create of(double latitude, double longitude, SearchType searchType, String keyword, String sort, int page, int size) {
-            return new Create(latitude, longitude, searchType, keyword, sort, page, size);
+        public static Create of(double latitude, double longitude, String regionCode, SearchType searchType, String keyword, String sort, int page, int size) {
+            return new Create(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
         }
 
         public SearchCommand.Create toCommand(){
 
-            return SearchCommand.Create.of(latitude, longitude, searchType.name(), keyword, sort, page, size);
+            return SearchCommand.Create.of(latitude, longitude, regionCode, searchType.name(), keyword, sort, page, size);
 
         }
 
@@ -73,8 +76,11 @@ public class SearchInfo {
 
         private String storeStatus;
 
+        private String regionCode;
 
-        private CreateResult(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus){
+
+
+        private CreateResult(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus, String regionCode) {
             this.storeId = storeId;
             this.storeName = storeName;
             this.categoryId = categoryId;
@@ -82,10 +88,11 @@ public class SearchInfo {
             this.avgRating = avgRating;
             this.likes = likes;
             this.storeStatus = storeStatus;
+            this.regionCode = regionCode;
         }
 
-        public static CreateResult of(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus) {
-            return new CreateResult(storeId, storeName, categoryId, categoryName, avgRating, likes, storeStatus);
+        public static CreateResult of(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus, String regionCode) {
+            return new CreateResult(storeId, storeName, categoryId, categoryName, avgRating, likes, storeStatus, regionCode);
         }
 
 
@@ -99,7 +106,8 @@ public class SearchInfo {
                     search.getCategoryName(),
                     search.getAvgRating(),
                     search.getLikes(),
-                    search.getStoreStatus()
+                    search.getStoreStatus(),
+                    search.getRegionCode()
                 ))
                 .toList();
 

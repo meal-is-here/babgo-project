@@ -17,6 +17,8 @@ public class SearchCommand {
 
         private double longitude;
 
+        private String regionCode;
+
         private String searchType;
 
         private String keyword;
@@ -27,9 +29,10 @@ public class SearchCommand {
 
         private int size;
 
-        private Create(double latitude, double longitude, String searchType, String keyword, String sort, int page, int size) {
+        private Create(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, int page, int size) {
             this.latitude = latitude;
             this.longitude = longitude;
+            this.regionCode = regionCode;
             this.searchType = searchType;
             this.keyword = keyword;
             this.sort = sort;
@@ -37,8 +40,8 @@ public class SearchCommand {
             this.size = size;
         }
 
-        public static Create of(double latitude, double longitude, String searchType, String keyword, String sort, int page, int size) {
-            return new Create(latitude, longitude, searchType, keyword, sort, page, size);
+        public static Create of(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, int page, int size) {
+            return new Create(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
         }
 
 

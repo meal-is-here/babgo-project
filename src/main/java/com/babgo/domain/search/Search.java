@@ -44,6 +44,9 @@ public class Search extends BaseTimeEntity {
     @Column(name = "likes")
     private int likes;
 
+    @Column(name = "order_count")
+    private int orderCount;
+
     @Column(name = "delivery_status")
     private String deliveryStatus;
 
@@ -60,7 +63,7 @@ public class Search extends BaseTimeEntity {
 
 
 
-    private Search(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, String deliveryStatus, String storeStatus, double latitude, double longitude) {
+    private Search(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, int orderCount, String deliveryStatus, String storeStatus, double latitude, double longitude) {
         this.storeId = storeId;
         this.regionCode = regionCode;
         this.storeName = storeName;
@@ -68,6 +71,7 @@ public class Search extends BaseTimeEntity {
         this.categoryName = categoryName;
         this.avgRating = avgRating;
         this.likes = likes;
+        this.orderCount = orderCount;
         this.deliveryStatus = deliveryStatus;
         this.storeStatus = storeStatus;
         this.latitude = latitude;
@@ -75,8 +79,8 @@ public class Search extends BaseTimeEntity {
     }
 
 
-    public static Search of(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, String deliveryStatus, String storeStatus, double latitude, double longitude){
-        return new Search(storeId, regionCode, storeName, categoryId, categoryName, avgRating, likes, deliveryStatus, storeStatus, latitude, longitude);
+    public static Search of(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, int orderCount, String deliveryStatus, String storeStatus, double latitude, double longitude){
+        return new Search(storeId, regionCode, storeName, categoryId, categoryName, avgRating, likes, orderCount, deliveryStatus, storeStatus, latitude, longitude);
     }
 
 
