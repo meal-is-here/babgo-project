@@ -1,15 +1,15 @@
 package com.babgo.domain.user;
 
-import com.babgo.controller.user.UserRequest;
-import com.babgo.controller.user.UserResponse;
+import com.babgo.controller.user.dto.UserRequest;
+import com.babgo.controller.user.dto.UserResponse;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
-import com.babgo.global.security.jwt.JwtProperties;
 import com.babgo.global.security.jwt.JwtTokenProvider;
+import com.babgo.global.security.jwt.RedisService;
 import com.babgo.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,20 +22,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtProperties jwtProperties;
-    private final AuthenticationManager authenticationManager;
+    private final RedisService redisService;
+    private final com.babgo.global.security.jwt.JwtProperties jwtProperties;
 
-    /**
-     * 고객 회원가입
-     */
+    // 고객 회원가입: 이메일 중복 검증 후 CUSTOMER 권한으로 사용자 생성 및 저장
     @Transactional
     public UserResponse.SignUpResponse signUpCustomer(UserRequest.CustomerSignUpRequest request) {
-        // 1. 이메일 중복 체크
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
-
-        // 2. User 엔티티 생성
         User user = User.ofCustomer(
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()),
@@ -43,14 +38,10 @@ public class UserService {
                 request.getNickname(),
                 request.getPhoneNumber()
         );
-
-        // 3. 저장
         User savedUser = userRepository.save(user);
         log.info("고객 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
-
-        // 4. 응답 반환
         return UserResponse.SignUpResponse.of(
-                String.valueOf(savedUser.getUserId()),
+                savedUser.getPublicId(),
                 savedUser.getEmail(),
                 savedUser.getName(),
                 savedUser.getNickname(),
@@ -60,17 +51,12 @@ public class UserService {
         );
     }
 
-    /**
-     * 가게 사장 회원가입
-     */
+    // 사장 회원가입: 이메일 중복 검증 후 OWNER 권한으로 사용자 생성 및 저장
     @Transactional
     public UserResponse.SignUpResponse signUpOwner(UserRequest.OwnerSignUpRequest request) {
-        // 1. 이메일 중복 체크
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
-
-        // 2. User 엔티티 생성 (OWNER 권한)
         User user = User.ofOwner(
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()),
@@ -78,14 +64,10 @@ public class UserService {
                 request.getNickname(),
                 request.getPhoneNumber()
         );
-
-        // 3. 저장
         User savedUser = userRepository.save(user);
         log.info("사장 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
-
-        // 4. 응답 반환
         return UserResponse.SignUpResponse.of(
-                String.valueOf(savedUser.getUserId()),
+                savedUser.getPublicId(),
                 savedUser.getEmail(),
                 savedUser.getName(),
                 savedUser.getNickname(),
@@ -95,49 +77,72 @@ public class UserService {
         );
     }
 
-    /**
-     * 로그인
-     */
+    // 로그인: 이메일/비밀번호 검증 후 액세스 토큰(15분)과 리프레시 토큰(1일) 발급하고 Redis에 리프레시 토큰 저장
     @Transactional(readOnly = true)
     public UserResponse.LoginResponse login(UserRequest.LoginRequest request) {
-        // 1. 이메일로 사용자 조회
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
-
-        // 2. 비밀번호 검증
+        if (Boolean.TRUE.equals(user.getIsUserDeleted())) {
+            throw new CustomException(ErrorCode.USER_DELETED);
+        }
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
-
-        // 3. JWT Access Token 생성
         String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getUserId(),
                 user.getEmail(),
                 user.getRole()
         );
-
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
+        redisService.saveRefreshToken(user.getUserId(), refreshToken, jwtProperties.getRefreshTokenExpiration());
         log.info("로그인 성공: userId={}, email={}, role={}", user.getUserId(), user.getEmail(), user.getRole());
-
         return UserResponse.LoginResponse.of(
                 accessToken,
-                String.valueOf(user.getUserId()),
+                refreshToken,
+                user.getPublicId(),
                 user.getEmail(),
                 user.getName(),
                 user.getRole()
         );
     }
 
-    /**
-     * userId로 사용자 조회
-     */
+    // 사용자 조회: userId로 삭제되지 않은 사용자 조회
     @Transactional(readOnly = true)
     public User findByUserId(Long userId) {
         return userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
-    // TODO: 필요한 추가 메소드를 작성하세요
-    // - 사용자 정보 수정
-    // - 비밀번호 변경
-    // - 토큰 갱신 (Refresh Token 구현시)
+    // 토큰 갱신: 리프레시 토큰의 블랙리스트 체크 후 유효성 검증하고 새로운 액세스 토큰만 재발급 (리프레시 토큰은 재사용)
+    @Transactional(readOnly = true)
+    public UserResponse.RefreshTokenResponse refreshToken(String refreshToken) {
+        if (redisService.isBlacklisted(refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+        Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
+        if (!redisService.validateRefreshToken(userId, refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+        User user = findByUserId(userId);
+        String newAccessToken = jwtTokenProvider.generateAccessToken(
+                user.getUserId(),
+                user.getEmail(),
+                user.getRole()
+        );
+        log.info("액세스 토큰 갱신 완료: userId={}", userId);
+        return UserResponse.RefreshTokenResponse.of(newAccessToken, null);
+    }
+
+    // 로그아웃: 리프레시 토큰을 블랙리스트에 추가하여 무효화된 토큰의 추적 및 Redis에서 삭제
+    public void logout(Long userId) {
+        String refreshToken = redisService.getRefreshToken(userId);
+        if (refreshToken != null) {
+            redisService.addToBlacklist(refreshToken, jwtProperties.getRefreshTokenExpiration());
+        }
+        redisService.deleteRefreshToken(userId);
+        log.info("로그아웃 완료: userId={}", userId);
+    }
 }

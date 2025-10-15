@@ -6,15 +6,21 @@ import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderRepository;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
+import com.babgo.domain.ai.ReviewAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ReviewService {
 
+    private final ReviewAnalysisService reviewAnalysisService;
     private final ReviewRepository reviewRepository;
     private final OrderRepository orderRepository;
 
@@ -40,6 +46,14 @@ public class ReviewService {
                 order.getOrderId()
         );
         Review saved = reviewRepository.save(review);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCommit() {
+                // 비동기로 분석 시작 (쯕시 응답, 분석은 백그라운드)
+                reviewAnalysisService.analyzeReviewAsync(saved.getReviewId());
+            }
+        });
 
         return ReviewResponse.from(saved);
     }
