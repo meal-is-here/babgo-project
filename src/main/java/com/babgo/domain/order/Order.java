@@ -87,7 +87,7 @@ public class Order extends BaseTimeEntity {
             String deliveryAddress,
             Long totalPrice
     ){
-        return new Order(orderId, store, user, deliveryRequest, deliveryAddress,totalPrice);
+        return new Order(orderId, store, user, deliveryRequest, deliveryAddress, totalPrice);
     }
 
     public void markConfirmed() {
@@ -109,3 +109,6 @@ public class Order extends BaseTimeEntity {
         this.orderStatus = OrderStatus.CANCELED;
     }
 }
+    public boolean isCompleted() {
+        return this.orderStatus == OrderStatus.CONFIRMED;
+    }

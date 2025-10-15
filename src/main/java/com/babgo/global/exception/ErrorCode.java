@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ErrorCode{
+public enum ErrorCode {
 
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 	INVALID(HttpStatus.BAD_REQUEST, "올바르지 않은 값입니다."),
@@ -40,11 +40,15 @@ public enum ErrorCode{
 	ALREADY_DELETE_USER(HttpStatus.BAD_REQUEST, "이미 삭제된 계정입니다."),
 
 	// Order
-	ORDER_NOT_PAYABLE(HttpStatus.UNPROCESSABLE_ENTITY, "주문 상태상 결제를 진행할 수 없습니다."),
-	ORDER_NOT_CANCELABLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 상태에서는 주문을 취소할 수 없습니다."),
-	ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "이미 취소된 주문입니다."),
-	ORDER_ALREADY_REFUNDED(HttpStatus.CONFLICT, "이미 환불된 주문입니다."),
 	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+	ORDER_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "주문이 완료되지 않았습니다."),
+    ORDER_NOT_PAYABLE(HttpStatus.UNPROCESSABLE_ENTITY, "주문 상태상 결제를 진행할 수 없습니다."),
+    ORDER_NOT_CANCELABLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 상태에서는 주문을 취소할 수 없습니다."),
+    ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "이미 취소된 주문입니다."),
+    ORDER_ALREADY_REFUNDED(HttpStatus.CONFLICT, "이미 환불된 주문입니다."),
+
+	// Review
+	REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 해당 주문에 대한 리뷰가 존재합니다."),
 
 	// Payment
 	PAYMENT_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "PG 응답이 시간 초과되었습니다."),
@@ -58,5 +62,4 @@ public enum ErrorCode{
 
 	private final HttpStatus httpStatus;
 	private final String message;
-
 }
