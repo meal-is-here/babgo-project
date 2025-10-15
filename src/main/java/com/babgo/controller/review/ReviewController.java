@@ -22,9 +22,11 @@ public class ReviewController {
     // create review
     @PostMapping
     public ApiResponse<ReviewResponse> createReview(
-            @AuthenticationPrincipal Long userId,
+            // TODO: 인증 추가 예정
+            // @AuthenticationPrincipal Long userId,
             @Valid @RequestBody ReviewCreateRequest request
     ) {
+        Long userId = 1L;
         ReviewResponse response = reviewService.createReview(userId, request);
         return ApiResponse.success("리뷰 등록 성공", response);
     }
