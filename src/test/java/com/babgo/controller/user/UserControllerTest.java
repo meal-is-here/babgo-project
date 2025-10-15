@@ -1,5 +1,6 @@
 package com.babgo.controller.user;
 
+import com.babgo.controller.user.dto.UserRequest;
 import com.babgo.domain.user.User;
 import com.babgo.repository.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = com.babgo.BabgoApplication.class)
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")  // 테스트 프로파일 활성화 (Embedded Redis 사용)
 class UserControllerTest {
 
     @Autowired
@@ -61,7 +64,12 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data.name").value("홍길동"))
                 .andExpect(jsonPath("$.data.nickname").value("길동이"))
                 .andExpect(jsonPath("$.data.role").value("CUSTOMER"))
-                .andExpect(jsonPath("$.data.userId").exists());
+                .andExpect(jsonPath("$.data.publicId").exists())
+                .andExpect(header().exists("Authorization"))
+                .andExpect(cookie().exists("accessToken"))
+                .andExpect(cookie().exists("refreshToken"))
+                .andExpect(cookie().httpOnly("accessToken", true))
+                .andExpect(cookie().httpOnly("refreshToken", true));
     }
 
     @Test
@@ -88,7 +96,12 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.data.name").value("김사장"))
                 .andExpect(jsonPath("$.data.nickname").value("사장님"))
                 .andExpect(jsonPath("$.data.role").value("OWNER"))
-                .andExpect(jsonPath("$.data.userId").exists());
+                .andExpect(jsonPath("$.data.publicId").exists())
+                .andExpect(header().exists("Authorization"))
+                .andExpect(cookie().exists("accessToken"))
+                .andExpect(cookie().exists("refreshToken"))
+                .andExpect(cookie().httpOnly("accessToken", true))
+                .andExpect(cookie().httpOnly("refreshToken", true));
     }
 
     @Test
@@ -164,7 +177,12 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(header().exists("Set-Cookie"));
+                .andExpect(jsonPath("$.message").value("로그인 성공"))
+                .andExpect(header().exists("Authorization"))
+                .andExpect(cookie().exists("accessToken"))
+                .andExpect(cookie().exists("refreshToken"))
+                .andExpect(cookie().httpOnly("accessToken", true))
+                .andExpect(cookie().httpOnly("refreshToken", true));
     }
 
     @Test
@@ -191,7 +209,12 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(header().exists("Set-Cookie"));
+                .andExpect(jsonPath("$.message").value("로그인 성공"))
+                .andExpect(header().exists("Authorization"))
+                .andExpect(cookie().exists("accessToken"))
+                .andExpect(cookie().exists("refreshToken"))
+                .andExpect(cookie().httpOnly("accessToken", true))
+                .andExpect(cookie().httpOnly("refreshToken", true));
     }
 
     @Test
@@ -245,8 +268,11 @@ class UserControllerTest {
         mockMvc.perform(post("/v1/auth/user/logout"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(header().exists("Set-Cookie"))
-                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("Max-Age=0")));
+                .andExpect(jsonPath("$.message").value("로그아웃 성공"))
+                .andExpect(cookie().exists("accessToken"))
+                .andExpect(cookie().exists("refreshToken"))
+                .andExpect(cookie().maxAge("accessToken", 0))
+                .andExpect(cookie().maxAge("refreshToken", 0));
     }
 
     @Test
@@ -255,7 +281,10 @@ class UserControllerTest {
         mockMvc.perform(post("/v1/auth/owner/logout"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(header().exists("Set-Cookie"))
-                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("Max-Age=0")));
+                .andExpect(jsonPath("$.message").value("로그아웃 성공"))
+                .andExpect(cookie().exists("accessToken"))
+                .andExpect(cookie().exists("refreshToken"))
+                .andExpect(cookie().maxAge("accessToken", 0))
+                .andExpect(cookie().maxAge("refreshToken", 0));
     }
 }

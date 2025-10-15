@@ -22,6 +22,10 @@ public class Order extends BaseTimeEntity {
     @Column(name = "store_id", nullable = false)
     private UUID storeId;
 
+    @Version
+    @Column(name = "order_version", nullable = false)
+    private long version;
+
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
@@ -88,5 +92,20 @@ public class Order extends BaseTimeEntity {
 
     public void markConfirmed() {
         this.orderStatus = OrderStatus.CONFIRMED;
+    }
+
+    public void markPaymentInProgress(){
+        if (this.orderStatus != OrderStatus.PENDING) {
+            throw new CustomException(ErrorCode.PAYMENT_ALREADY_IN_PROGRESS, "이미 결제가 진행 중이거나 완료된 주문입니다.");
+        }
+
+        this.orderStatus = OrderStatus.PAYMENT_IN_PROGRESS;}
+
+    public void markCancel(){
+        if (orderStatus != OrderStatus.PENDING) {
+            throw new CustomException(ErrorCode.ORDER_NOT_CANCELABLE, "현재 상태에서는 취소할 수 없습니다.");
+        }
+
+        this.orderStatus = OrderStatus.CANCELED;
     }
 }

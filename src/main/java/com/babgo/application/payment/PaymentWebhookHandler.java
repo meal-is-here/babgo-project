@@ -37,8 +37,8 @@ public class PaymentWebhookHandler {
         switch (payload.getStatus()){
             case "APPROVED" ->
                     {
-                        paymentService.markApproved(payment, payload.getTransactionKey());
-                        orderService.markConfirmed(orderId);
+                        paymentService.updateApproved(payment, payload.getTransactionKey());
+                        orderService.updateConfirmed(orderId);
                         //사장님께 이벤트 보내기
                         //eventPublisher.publishEvent(new PaymentEvent.Approved(orderId));
 

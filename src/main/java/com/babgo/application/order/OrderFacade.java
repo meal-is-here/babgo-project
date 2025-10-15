@@ -1,10 +1,13 @@
 package com.babgo.application.order;
 
+import com.babgo.application.order.event.OrderCreatedEvent;
+import com.babgo.application.order.port.CancelWindow;
 import com.babgo.domain.order.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component
@@ -13,7 +16,8 @@ public class OrderFacade {
 
     private final OrderService orderService;
     private final OrderItemService orderItemService;
-
+    private final ApplicationEventPublisher eventPublisher;
+    private final CancelWindow cancelWindow;
     @Transactional
     public OrderInfo.CreateResult createOrder(String idempotencyKey, OrderInfo.Create input){
         //1. 사용자 검증
@@ -52,11 +56,55 @@ public class OrderFacade {
         //7. 검증 완료된 오더 아이템 저장
         orderItemService.create(input.getItems(), pendingOrder);
 
-        //8. 응답 DTO
-        //@하드코딩 대신 @Value/설정(예: order.cancel-window-seconds) 주입 권장. 또한 Clock 주입으로 테스트 용이성↑.
-        LocalDateTime cancelTime = pendingOrder.getCreatedAt().plusSeconds(5);
+        eventPublisher.publishEvent(new OrderCreatedEvent(orderId));
+        return OrderInfo.CreateResult.from(pendingOrder);
+    }
 
-        return OrderInfo.CreateResult.from(pendingOrder, cancelTime);
+    @Transactional
+    public OrderInfo.CancelResult cancelOrder(UUID orderId){
+
+        if (!cancelWindow.isOpen(orderId)) {
+            return OrderInfo.CancelResult.reject("이미 취소되었거나, 취소 가능 시간이 만료되었습니다.");
+        }
+
+        Order order = orderService.getOrder(orderId);
+        try {
+            switch (order.getOrderStatus()) {
+                case PENDING -> {
+                    orderService.updateCancel(order);
+                    cancelWindow.close(orderId);
+                    return OrderInfo.CancelResult.ok("주문을 취소했습니다.");
+                }
+                case PAYMENT_IN_PROGRESS -> {
+                    // 결제 진행중: PG 취소 요청 비동기
+                    // paymentService.requestCancel(order);
+                    orderService.updateCancelRequested(order);
+                    cancelWindow.close(orderId);
+                    return OrderInfo.CancelResult.ok("결제 취소를 요청했습니다. 처리 중입니다.");
+                }
+                case CONFIRMED -> {
+                    //refundService.requestRefund(order);
+                    orderService.updateRefundRequested(order);
+                    cancelWindow.close(orderId);
+                    return OrderInfo.CancelResult.ok("환불을 요청했습니다. 처리 중입니다.");
+                }
+                case CANCELED, CANCEL_REQUESTED -> {
+                    return OrderInfo.CancelResult.reject("이미 취소된 주문입니다.");
+                }
+
+                case REFUNDED, REFUND_REQUESTED -> {
+                    return OrderInfo.CancelResult.reject("이미 환불 처리 경로에 있습니다.");
+                }
+
+                default -> {
+                    return OrderInfo.CancelResult.reject("현재 상태에서는 취소할 수 없습니다.");
+                }
+            }
+        }catch (OptimisticLockingFailureException | jakarta.persistence.OptimisticLockException e) {
+            return OrderInfo.CancelResult.reject("이미 상태가 변경되었습니다." + order.getOrderStatus().getDescription());
+        } catch (IllegalStateException e) {
+            return OrderInfo.CancelResult.reject(e.getMessage());
+        }
     }
 
 }

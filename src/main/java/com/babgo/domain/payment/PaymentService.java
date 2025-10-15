@@ -31,7 +31,7 @@ public class PaymentService {
     @Transactional
     public boolean startPayment(UUID paymentId) {
         try {
-            Payment payment = paymentRepository.findById(paymentId)
+            Payment payment = getPayment(paymentId)
                     .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "결제 없음"));
 
             if (payment.getPaymentStatus() != PaymentStatus.READY)
@@ -45,7 +45,8 @@ public class PaymentService {
         }
     }
 
-    public void markApproved(Payment payment, String transactionKey) {
+    @Transactional
+    public void updateApproved(Payment payment, String transactionKey) {
         payment.markApproved(transactionKey);
     }
 }

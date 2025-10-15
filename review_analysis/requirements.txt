@@ -1,0 +1,13 @@
+# FastAPI 웹 서버
+fastapi==0.115.0
+uvicorn==0.31.0
+pydantic==2.9.2
+
+# ML / NLP
+torch==2.2.2
+transformers>=4.41
+sentencepiece==0.1.99    # 일부 BERT 모델에서 필요
+tokenizers>=0.20.3       # transformers 내부 종속성
+
+# Optional: 로깅
+loguru==0.7.0
