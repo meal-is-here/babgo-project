@@ -16,14 +16,21 @@ public class RecommendationForSearchService {
 
     public List<RecommendedStoreDTO> recommendStoresWithReason(String userQuery, int topK) {
 
-        // 1️⃣ 후보 가게 추출 + 유사도 계산
+        // 후보 가게 추출 + 유사도 계산
         List<Store> topStores = storeSimilarityService.findSimilarStores(userQuery, topK);
 
-        // 2️⃣ AI 추천 이유 생성
+        // AI 추천 이유 생성 + DTO로 변환
         return topStores.stream()
                 .map(store -> {
                     String reason = aiRecommendationService.generateRecommendationReason(userQuery, store);
-                    return new RecommendedStoreDTO(store, reason);
+
+                    // Lazy 로딩 안전하게 필드만 뽑아서 DTO 생성
+                    return new RecommendedStoreDTO(
+                            store.getStoreId(),
+                            store.getStoreName(),
+                            store.getCategory() != null ? store.getCategory().getCategoryName() : null,
+                            reason
+                    );
                 })
                 .collect(Collectors.toList());
     }

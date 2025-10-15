@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @EnableAsync
 public class StoreSimilarityService {
 
-    private final OpenAiProperties openAiProperties;
     private final ReviewAnalysisRepositoryImpl reviewAnalysisRepository;
     private final StoreRepositoryImpl storeRepository;
 
@@ -42,6 +41,7 @@ public class StoreSimilarityService {
 
             // 2️⃣ 전체 가게 후보 로드
             List<Store> candidates = storeRepository.findAll();
+
 
             // 3️⃣ 각 가게 임베딩 비동기 호출
             Map<Store, CompletableFuture<List<Double>>> storeEmbeddingFutures = new HashMap<>();
@@ -104,16 +104,15 @@ public class StoreSimilarityService {
         }
 
         try {
-            String url = String.format(
-                    "https://generativelanguage.googleapis.com/v1beta/projects/%s/locations/%s/models/gemini-embedding-001:embedText",
-                    openAiProperties.getGoogleProjectId(),
-                    openAiProperties.getGoogleLocation()
-            );
+            String url = "https://generativelanguage.googleapis.com/v1beta/openai/embeddings";
 
-            Map<String, Object> payload = Map.of("input", inputText);
+            // OpenAI 스타일 페이로드
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("model", "gemini-embedding-001");
+            payload.put("input", inputText);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + googleApiKey);
+            headers.set("Authorization", "Bearer " + googleApiKey); // GOOGLE_AI_API_KEY
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
@@ -122,11 +121,12 @@ public class StoreSimilarityService {
             ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
 
             Map<?, ?> body = response.getBody();
-            if (body == null || !body.containsKey("responses")) {
+            if (body == null || !body.containsKey("data")) {
                 throw new IllegalStateException("임베딩 생성 실패: response 데이터 없음");
             }
 
-            List<Double> embedding = ((List<?>) ((Map<?, ?>) ((List<?>) body.get("responses")).get(0)).get("embedding"))
+            // OpenAI 스타일: "data" -> 첫 번째 객체 -> "embedding"
+            List<Double> embedding = ((List<?>) ((Map<?, ?>) ((List<?>) body.get("data")).get(0)).get("embedding"))
                     .stream()
                     .map(v -> ((Number) v).doubleValue())
                     .collect(Collectors.toList());
@@ -135,6 +135,7 @@ public class StoreSimilarityService {
                 throw new IllegalStateException("임베딩 생성 실패: embedding 비어있음");
             }
 
+            // 캐시에 저장
             embeddingCache.put(inputText, embedding);
 
             return CompletableFuture.completedFuture(embedding);

@@ -2,9 +2,12 @@ package com.babgo.domain.ai.by_search_recommendation;
 
 import com.babgo.domain.store.Store;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +17,6 @@ import java.util.Map;
 public class AIRecommendationService {
 
     private final OpenAiProperties openAiProperties;
-    private final RestClient restClient;
 
     public String generateRecommendationReason(String userQuery, Store store) {
 
@@ -25,25 +27,38 @@ public class AIRecommendationService {
         );
 
         // 요청 payload
-        Map<String, Object> request = Map.of(
-                "model", openAiProperties.getChat().getModel(),
+        Map<String, Object> requestPayload = Map.of(
+                "model", openAiProperties.getChat().getModel(),   // ex: gemini-2.0-flash
                 "messages", List.of(Map.of("role", "user", "content", prompt))
         );
 
-        // API 호출
-        ResponseEntity<Map> response = restClient.post()
-                .uri(openAiProperties.getChat().getCompletionPath())
-                .body(request)
-                .retrieve()
-                .toEntity(Map.class);
+        // 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + openAiProperties.getApiKey());
+
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestPayload, headers);
+
+        // RestTemplate로 POST 요청
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Map> response = restTemplate.postForEntity(
+                "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+//                openAiProperties.getChat().getCompletionPath(),  // ex: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+                requestEntity,
+                Map.class
+        );
 
         // 응답에서 텍스트 추출
-        List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
+        Map<String, Object> responseBody = response.getBody();
+        if (responseBody == null) return "";
+
+        List<Map<String, Object>> choices = (List<Map<String, Object>>) responseBody.get("choices");
         if (choices != null && !choices.isEmpty()) {
             Map<String, Object> firstChoice = choices.get(0);
             Map<String, Object> message = (Map<String, Object>) firstChoice.get("message");
             return message != null ? (String) message.get("content") : "";
         }
+
         return "";
     }
 }
