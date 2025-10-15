@@ -1,8 +1,8 @@
 package com.babgo.domain.ai.by_user_recommendation;
 
+import com.babgo.controller.ai.RecommendationForUserResponse;
 import com.babgo.domain.ai.by_user_recommendation.dto_recommendationService_with_python.RecomRequest;
 import com.babgo.domain.ai.by_user_recommendation.dto_recommendationService_with_python.RecomResponse;
-import com.babgo.controller.ai.RecommendationForUserResponse;
 import com.babgo.domain.store.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

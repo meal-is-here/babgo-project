@@ -1,5 +1,6 @@
 package com.babgo.domain.ai.by_search_recommendation;
 
+import com.babgo.domain.ai.by_search_recommendation.OpenAiProperties;
 import com.babgo.domain.ai.review_analysis.ReviewAnalysis;
 import com.babgo.domain.store.Store;
 import com.babgo.repository.ai.review_analysis.ReviewAnalysisRepositoryImpl;
@@ -14,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,9 +57,9 @@ public class StoreSimilarityService {
             }
 
             // 4️⃣ 모든 Future 모으기
-            CompletableFuture<Double>[] futuresArray = storeEmbeddingFutures.values()
-                    .toArray(new CompletableFuture[0]); // 먼저 배열로 만들고
-            CompletableFuture<?> allFutures = CompletableFuture.allOf((CompletableFuture<?>[]) futuresArray);
+            CompletableFuture<?> allFutures = CompletableFuture.allOf(
+                    storeEmbeddingFutures.values().toArray(new CompletableFuture[0])
+            );
 
             // 5️⃣ 완료 대기
             allFutures.join();
@@ -93,41 +93,40 @@ public class StoreSimilarityService {
         }
     }
 
-
     /**
      * 비동기 임베딩 생성 (캐시 포함)
      */
     @Async
     public CompletableFuture<List<Double>> getEmbeddingAsync(String inputText) {
+        // 캐시 확인
         if (embeddingCache.containsKey(inputText)) {
             return CompletableFuture.completedFuture(embeddingCache.get(inputText));
         }
 
         try {
-            Map<String, Object> payload = Map.of(
-                    "model", "gemini-embedding-001",
-                    "input", inputText
+            String url = String.format(
+                    "https://generativelanguage.googleapis.com/v1beta/projects/%s/locations/%s/models/gemini-embedding-001:embedText",
+                    openAiProperties.getGoogleProjectId(),
+                    openAiProperties.getGoogleLocation()
             );
 
+            Map<String, Object> payload = Map.of("input", inputText);
+
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + openAiProperties.getApiKey());
+            headers.set("Authorization", "Bearer " + googleApiKey);
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
 
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<Map> response = restTemplate.postForEntity(
-                    "https://generativelanguage.googleapis.com/v1beta/openai/embeddings",
-                    entity,
-                    Map.class
-            );
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
 
             Map<?, ?> body = response.getBody();
-            if (body == null || !body.containsKey("data")) {
-                throw new IllegalStateException("임베딩 생성 실패: response data 없음");
+            if (body == null || !body.containsKey("responses")) {
+                throw new IllegalStateException("임베딩 생성 실패: response 데이터 없음");
             }
 
-            List<Double> embedding = ((List<?>) ((Map<?, ?>) ((List<?>) body.get("data")).get(0)).get("embedding"))
+            List<Double> embedding = ((List<?>) ((Map<?, ?>) ((List<?>) body.get("responses")).get(0)).get("embedding"))
                     .stream()
                     .map(v -> ((Number) v).doubleValue())
                     .collect(Collectors.toList());
@@ -137,13 +136,13 @@ public class StoreSimilarityService {
             }
 
             embeddingCache.put(inputText, embedding);
+
             return CompletableFuture.completedFuture(embedding);
 
         } catch (Exception e) {
             throw new RuntimeException("임베딩 생성 실패: " + e.getMessage(), e);
         }
     }
-
 
     /**
      * 코사인 유사도 계산
