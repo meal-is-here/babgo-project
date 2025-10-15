@@ -1,4 +1,4 @@
-package com.babgo.global.config;
+package com.babgo.global.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

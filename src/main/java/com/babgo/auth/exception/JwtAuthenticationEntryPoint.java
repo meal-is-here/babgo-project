@@ -1,4 +1,4 @@
-package com.babgo.global.security.jwt;
+package com.babgo.auth.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

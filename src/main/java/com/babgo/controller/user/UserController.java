@@ -6,7 +6,7 @@ import com.babgo.controller.user.dto.UserResponse;
 import com.babgo.global.api.ApiResponse;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
-import com.babgo.global.security.jwt.JwtProperties;
+import com.babgo.auth.jwtfilter.JwtCookiesProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserFacade userFacade;
-    private final JwtProperties jwtProperties;
+    private final JwtCookiesProperties jwtCookiesProperties;
 
     // 고객 회원가입: 이메일, 비밀번호, 이름, 닉네임, 전화번호로 CUSTOMER 권한 사용자 생성 후 자동 로그인하여 액세스/리프레시 토큰 발급
     @PostMapping("/register/user")
@@ -176,10 +176,10 @@ public class UserController {
     private ResponseCookie createAccessTokenCookie(String token) {
         return ResponseCookie.from("accessToken", token)
                 .httpOnly(true)
-                .secure(jwtProperties.getCookie().isSecure())
+                .secure(jwtCookiesProperties.getCookie().isSecure())
                 .path("/")
-                .maxAge(jwtProperties.getAccessTokenExpiration() / 1000)  // 초 단위로 변환
-                .sameSite(jwtProperties.getCookie().getSameSite())
+                .maxAge(jwtCookiesProperties.getAccessTokenExpiration() / 1000)  // 초 단위로 변환
+                .sameSite(jwtCookiesProperties.getCookie().getSameSite())
                 .build();
     }
 
@@ -187,10 +187,10 @@ public class UserController {
     private ResponseCookie createRefreshTokenCookie(String token) {
         return ResponseCookie.from("refreshToken", token)
                 .httpOnly(true)
-                .secure(jwtProperties.getCookie().isSecure())
+                .secure(jwtCookiesProperties.getCookie().isSecure())
                 .path("/")
-                .maxAge(jwtProperties.getRefreshTokenExpiration() / 1000)  // 초 단위로 변환
-                .sameSite(jwtProperties.getCookie().getSameSite())
+                .maxAge(jwtCookiesProperties.getRefreshTokenExpiration() / 1000)  // 초 단위로 변환
+                .sameSite(jwtCookiesProperties.getCookie().getSameSite())
                 .build();
     }
 
@@ -198,10 +198,10 @@ public class UserController {
     private ResponseCookie createExpiredCookie(String name) {
         return ResponseCookie.from(name, "")
                 .httpOnly(true)
-                .secure(jwtProperties.getCookie().isSecure())
+                .secure(jwtCookiesProperties.getCookie().isSecure())
                 .path("/")
                 .maxAge(0)
-                .sameSite(jwtProperties.getCookie().getSameSite())
+                .sameSite(jwtCookiesProperties.getCookie().getSameSite())
                 .build();
     }
 }

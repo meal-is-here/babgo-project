@@ -36,6 +36,8 @@ public enum ErrorCode {
 	USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 탈퇴한 사용자입니다."),
 	USER_NOT_DELETED(HttpStatus.BAD_REQUEST, "탈퇴하지 않은 사용자입니다."),
 	UNAUTHORIZED_ACTION(HttpStatus.FORBIDDEN, "해당 작업을 수행할 권한이 없습니다."),
+	TOO_MANY_ATTEMPTS(HttpStatus.TOO_MANY_REQUESTS, "로그인 시도 횟수가 초과되었습니다. 5분 후 다시 시도해주세요."),
+	TOO_MANY_SESSIONS(HttpStatus.FORBIDDEN, "동시 접속 가능한 디바이스 수를 초과했습니다."),
 
 	// Profile
 	ALREADY_DELETE_USER(HttpStatus.BAD_REQUEST, "이미 삭제된 계정입니다."),

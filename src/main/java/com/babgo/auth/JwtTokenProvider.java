@@ -1,5 +1,6 @@
-package com.babgo.global.security.jwt;
+package com.babgo.auth;
 
+import com.babgo.auth.jwtfilter.JwtCookiesProperties;
 import com.babgo.domain.user.UserRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -21,14 +22,14 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private final JwtProperties jwtProperties;
+    private final JwtCookiesProperties jwtCookiesProperties;
     private final UserDetailsService userDetailsService;
     private SecretKey secretKey;
 
     // JWT Secret Key 초기화: application.yml의 jwt.secret을 바탕으로 HMAC-SHA 키 생성
     @PostConstruct
     public void init() {
-        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = jwtCookiesProperties.getSecret().getBytes(StandardCharsets.UTF_8);
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
         log.info("JWT Secret Key 초기화 완료");
     }
@@ -36,7 +37,7 @@ public class JwtTokenProvider {
     // 액세스 토큰 생성: userId(subject), email/role(claims) 포함, 15분 유효기간
     public String generateAccessToken(Long userId, String email, UserRole role) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtProperties.getAccessTokenExpiration());
+        Date expiryDate = new Date(now.getTime() + jwtCookiesProperties.getAccessTokenExpiration());
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .claim("email", email)
@@ -50,7 +51,7 @@ public class JwtTokenProvider {
     // 리프레시 토큰 생성: userId(subject), type=refresh(claim) 포함, 1일 유효기간
     public String generateRefreshToken(Long userId) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtProperties.getRefreshTokenExpiration());
+        Date expiryDate = new Date(now.getTime() + jwtCookiesProperties.getRefreshTokenExpiration());
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .claim("type", "refresh")

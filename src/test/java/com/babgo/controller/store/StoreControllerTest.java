@@ -2,7 +2,7 @@ package com.babgo.controller.store;
 
 import com.babgo.application.store.StoreFacade;
 import com.babgo.application.store.StoreInfo;
-import com.babgo.global.security.jwt.JwtTokenProvider;
+import com.babgo.auth.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

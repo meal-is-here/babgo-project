@@ -1,5 +1,6 @@
-package com.babgo.global.security.jwt;
+package com.babgo.auth.jwtfilter;
 
+import com.babgo.auth.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
