@@ -36,6 +36,13 @@ public enum ErrorCode {
 	// Profile
 	ALREADY_DELETE_USER(HttpStatus.BAD_REQUEST, "이미 삭제된 계정입니다."),
 
+	// Order
+	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+	ORDER_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "주문이 완료되지 않았습니다."),
+
+	// Review
+	REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 해당 주문에 대한 리뷰가 존재합니다."),
+
 	;
 
 	private final HttpStatus httpStatus;
