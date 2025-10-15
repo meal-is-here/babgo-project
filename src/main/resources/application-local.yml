@@ -27,7 +27,7 @@ spring:
         completion-path: /v1beta/models
         model: gemini-1.5-flash
       embedding:
-        model: models/embedding-001
+        model: models/gemini-embedding-001
 
 jwt:
   secret: ${JWT_SECRET:1iwoidbaoibdoi2biosfioboiwwfnpadsopnofw}
