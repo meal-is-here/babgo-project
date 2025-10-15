@@ -45,8 +45,13 @@ public class OrderController {
             @PathVariable("orderId") UUID orderId
     ){
        Long userId = 1L;
-       orderFacade.cancelOrder(orderId, userId);
-       return ApiResponse.success("취소 요청을 접수했습니다.");
+       OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId, userId);
+
+        if (!result.isOk()) {
+            return ApiResponse.success(result.getMessage());
+        }
+
+        return ApiResponse.success(result.getMessage(), null);
     }
 
     @GetMapping()

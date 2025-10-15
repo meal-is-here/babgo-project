@@ -1,9 +1,15 @@
 package com.babgo.application.order;
 
+import com.babgo.application.order.event.OrderCreatedEvent;
 import com.babgo.domain.order.*;
+import com.babgo.repository.payment.PaymentCancelRedisRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,7 +19,8 @@ public class OrderFacade {
 
     private final OrderService orderService;
     private final OrderItemService orderItemService;
-
+    private final ApplicationEventPublisher eventPublisher;
+    private final CancelWindow cancelWindow;
     @Transactional
     public OrderInfo.CreateResult createOrder(String idempotencyKey, OrderInfo.Create input){
         //1. 사용자 검증
@@ -52,19 +59,25 @@ public class OrderFacade {
         //7. 검증 완료된 오더 아이템 저장
         orderItemService.create(input.getItems(), pendingOrder);
 
-        //8. 응답 DTO
-        //@하드코딩 대신 @Value/설정(예: order.cancel-window-seconds) 주입 권장. 또한 Clock 주입으로 테스트 용이성↑.
-        LocalDateTime cancelTime = pendingOrder.getCreatedAt().plusSeconds(5);
-
-        return OrderInfo.CreateResult.from(pendingOrder, cancelTime);
+        eventPublisher.publishEvent(new OrderCreatedEvent(orderId));
+        return OrderInfo.CreateResult.from(pendingOrder);
     }
 
-    public void cancelOrder(UUID orderId, Long userId){
+    public OrderInfo.CancelResult cancelOrder(UUID orderId, Long userId){
+
+        if (!cancelWindow.isOpen(orderId)) {
+            return OrderInfo.CancelResult.reject("취소 가능 시간이 지났습니다.");
+        }
+
+        // 도메인 상태 가드: CREATED / PAYMENT_READY 에서만 취소 허용
+
+
         Order order = orderService.getOrder(orderId);
 
         // 시간 측정 여기에서 바로 불가능 상태면 반환
         // 가능 상태이면 Order 및 payment 상태 파악 -> 분기
 
+        return OrderInfo.CancelResult.ok();
     }
 
 }

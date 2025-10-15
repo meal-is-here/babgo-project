@@ -84,14 +84,12 @@ public class OrderInfo {
         private final UUID orderId;
         private final String status;
         private final Long totalPrice;
-        private final LocalDateTime cancelUntil;
 
-        public static CreateResult from(Order order, LocalDateTime cancelUntil) {
+        public static CreateResult from(Order order) {
             return new CreateResult(
                     order.getOrderId(),
                     order.getOrderStatus().name(),
-                    order.getTotalPrice(),
-                    cancelUntil
+                    order.getTotalPrice()
             );
         }
     }
@@ -164,6 +162,26 @@ public class OrderInfo {
                     item.getQuantity(),
                     item.getTotalPrice()
             );
+        }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class CancelResult {
+
+        private final boolean ok;
+        private final String message;
+
+        public static CancelResult ok() {
+            return new CancelResult(true, "취소되었습니다.");
+        }
+
+        public static CancelResult ok(String message) {
+            return new CancelResult(true, message);
+        }
+
+        public static CancelResult reject(String message) {
+            return new CancelResult(false, message);
         }
     }
 }
