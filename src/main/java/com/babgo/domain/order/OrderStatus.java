@@ -10,7 +10,7 @@ public enum OrderStatus {
 
     PENDING("준비중"),
     CONFIRMED("확정됨"),
-    PAYMENT("결제 중"),
+    PAYMENT_IN_PROGRESS("결제 중"),
     CANCELLED("취소됨"),
     FAILED("실패");
 

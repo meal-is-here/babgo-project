@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +43,6 @@ public class OrderService {
         return sum;
     }
 
-    //TODO 주문 목록 조회
     public Page<Order> findOrders(UUID userId, OrderStatus status,Pageable pageable) {
         return orderRepository.findOrders(userId, status,pageable);
     }
@@ -61,5 +62,9 @@ public class OrderService {
         order.markConfirmed();
     }
 
-    //TODO 주문 단건 조회
+    @Transactional
+    public void markPaymentInProgress(UUID orderId) {
+        Order order = getOrder(orderId);
+        order.markPaymentInProgress();
+    }
 }

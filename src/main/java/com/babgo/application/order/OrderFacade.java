@@ -59,4 +59,12 @@ public class OrderFacade {
         return OrderInfo.CreateResult.from(pendingOrder, cancelTime);
     }
 
+    public void cancelOrder(UUID orderId, Long userId){
+        Order order = orderService.getOrder(orderId);
+
+        // 시간 측정 여기에서 바로 불가능 상태면 반환
+        // 가능 상태이면 Order 및 payment 상태 파악 -> 분기
+
+    }
+
 }

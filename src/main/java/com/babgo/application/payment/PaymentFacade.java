@@ -88,6 +88,7 @@ public class PaymentFacade {
         }
     }
 
+    //TODO 전이 우회 로직 추가하기
     public void pay(String paymentKey, UUID orderId, Long amount){
         // 1) 결제 로드
         Payment payment = paymentService.getPaymentByOrderId(orderId)
@@ -99,13 +100,14 @@ public class PaymentFacade {
         // 추후 재시도 또는 취소를 위해 저장해두기
         /*paymentService.attachPaymentKey(payment.getPaymentId(), paymentKey);*/
 
-        //2) 원자적 전이(CAS)
+        //2) TODO 원자적 전이(CAS) -> 낙관적 락으로 통일성 주기
         if (!paymentService.startPayment(payment.getPaymentId())) {
             throw new CustomException(
                     ErrorCode.PAYMENT_ALREADY_IN_PROGRESS,
                     "이미 진행 중이거나 완료된 결제입니다."
             );
         }
+        orderService.markPaymentInProgress(orderId);
 
         //3) 비동기 실행 시작 (ID만 넘기기)
         paymentAsyncExecutor.requestPgAsync(payment.getPaymentId() , paymentKey, amount);

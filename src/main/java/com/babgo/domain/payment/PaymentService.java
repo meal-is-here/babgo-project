@@ -31,7 +31,7 @@ public class PaymentService {
     @Transactional
     public boolean startPayment(UUID paymentId) {
         try {
-            Payment payment = paymentRepository.findById(paymentId)
+            Payment payment = getPayment(paymentId)
                     .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "결제 없음"));
 
             if (payment.getPaymentStatus() != PaymentStatus.READY)

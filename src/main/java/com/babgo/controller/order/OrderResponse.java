@@ -124,4 +124,8 @@ public class OrderResponse {
             );
         }
     }
+
+    public static class Cancel {
+
+    }
 }
