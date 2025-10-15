@@ -1,5 +1,6 @@
 package com.babgo.domain.store;
 
+import com.babgo.domain.ai.StoreSummaryService;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -15,11 +17,13 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final CategoryService categoryService;
+    private final StoreSummaryService storeSummaryService;
 
     public Store create(Store store, String userName) {
         store.markCreateBy("userName");
         return storeRepository.save(store);
     }
+
 
     public Store findByStoreId(UUID storeId) {
         return storeRepository.findByStoreId(storeId)
@@ -74,5 +78,15 @@ public class StoreService {
 
     public void delete(Store store, String userName) {
         store.markDeletedBy("userName");
+    }
+
+    // 세준
+    public Optional<Store> getStoreById(UUID id) {
+        return storeRepository.findById(id);
+    }
+
+    // 세준
+    public String getStoreSummary(UUID id) {
+        return storeSummaryService.generateSummaryReactive(id).block();
     }
 }

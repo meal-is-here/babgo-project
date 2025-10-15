@@ -15,4 +15,5 @@ public class MenuResponse {
     private String description;
     private String category;
     private MenuStatus menuStatus;
+    private int stock; // 재고 수량 추가
 }

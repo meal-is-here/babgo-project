@@ -1,8 +1,6 @@
 package com.babgo.controller.user;
 
 import com.babgo.application.user.UserFacade;
-import com.babgo.controller.user.dto.UserRequest;
-import com.babgo.controller.user.dto.UserResponse;
 import com.babgo.global.api.ApiResponse;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;

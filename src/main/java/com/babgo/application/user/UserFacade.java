@@ -1,7 +1,7 @@
 package com.babgo.application.user;
 
-import com.babgo.controller.user.dto.UserRequest;
-import com.babgo.controller.user.dto.UserResponse;
+import com.babgo.controller.user.UserRequest;
+import com.babgo.controller.user.UserResponse;
 import com.babgo.domain.user.UserAuthService;
 import com.babgo.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
