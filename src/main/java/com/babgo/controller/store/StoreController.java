@@ -1,17 +1,13 @@
 package com.babgo.controller.store;
 
 import com.babgo.application.store.StoreInfo;
-import com.babgo.domain.ai.StoreSummaryService;
 import com.babgo.application.store.StoreFacade;
-import com.babgo.domain.store.Store;
 import com.babgo.global.api.ApiResponse;
-import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 

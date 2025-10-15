@@ -1,6 +1,6 @@
 package com.babgo.domain.review;
 
-import com.babgo.domain.ai.ReviewAnalysisService;
+import com.babgo.domain.ai.review_analysis.ReviewAnalysisService;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.user.User;
 import com.babgo.repository.review.ReviewRepositoryImpl;
