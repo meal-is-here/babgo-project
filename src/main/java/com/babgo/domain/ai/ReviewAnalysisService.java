@@ -2,8 +2,8 @@ package com.babgo.domain.ai;
 
 import com.babgo.domain.review.Review;
 import com.babgo.domain.ai.review_analysis.ReviewAnalysis;
+import com.babgo.domain.review.ReviewRepository;
 import com.babgo.repository.ai.review_analysis.ReviewAnalysisRepositoryImpl;
-import com.babgo.repository.review.ReviewRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReviewAnalysisService {
 
-    private final ReviewRepositoryImpl reviewRepository;
+    private final ReviewRepository reviewRepository;
     private final ReviewAnalysisRepositoryImpl reviewAnalysisRepository;
     private final FakeReviewMLService fakeReviewMLService;
 
@@ -42,14 +42,13 @@ public class ReviewAnalysisService {
     @Transactional
     public Mono<Void> analyzeReviewReactive(UUID reviewId) {
         // 1) 리뷰 조회
-        Review review = reviewRepository.findById(reviewId); // null일 수 있음
-        if (review == null) {
-            throw new IllegalArgumentException("리뷰를 찾을 수 없습니다: " + reviewId);
-        }
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다: " + reviewId));
+
 
         String content = review.getContent() == null ? "" : review.getContent();
 
-        // 2) 감점 점수 & 키워드 계산 (똥기)
+        // 2) 감점 점수 & 키워드 계산
         double sentimentScore = computeSentimentScore(content);
         String keywords = extractKeywords(content);
 

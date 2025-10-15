@@ -1,11 +1,12 @@
 package com.babgo.domain.review;
 
+import com.babgo.controller.review.dto.ReviewCreateRequest;
+import com.babgo.controller.review.dto.ReviewResponse;
+import com.babgo.domain.order.Order;
+import com.babgo.domain.order.OrderRepository;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import com.babgo.domain.ai.ReviewAnalysisService;
-import com.babgo.domain.store.Store;
-import com.babgo.domain.user.User;
-import com.babgo.repository.review.ReviewRepositoryImpl;
-import com.babgo.repository.store.StoreRepositoryImpl;
-import com.babgo.repository.user.UserRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,40 +17,44 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReviewService {
 
-    private final ReviewRepositoryImpl reviewRepository;
-    private final StoreRepositoryImpl storeRepository;
-    private final UserRepositoryImpl userRepository;
     private final ReviewAnalysisService reviewAnalysisService;
+    private final ReviewRepository reviewRepository;
+    private final OrderRepository orderRepository;
 
+    // create review
     @Transactional
-    public Review createReview(UUID storeId, Long userId, String content, int rating) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다: " + storeId));
+    public ReviewResponse createReview(Long userId, ReviewCreateRequest request) {
+        Order order = orderRepository.findByOrderId(request.getOrderId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다: " + userId));
+        if (!order.isCompleted()) {
+            throw new CustomException(ErrorCode.ORDER_NOT_COMPLETED);
+        }
 
-        Review review = new Review();
-        review.setStore(store);
-        review.setUser(user);
-        review.setRating(rating);
-        review.setContent(content);
+        // 중복 리뷰 방지
+        reviewRepository.findByOrderId(request.getOrderId())
+                .ifPresent(r -> { throw new CustomException(ErrorCode.REVIEW_ALREADY_EXISTS); });
 
+        Review review = Review.of(
+                request.getRating(),
+                request.getContent(),
+                order.getUserId(),
+                order.getStoreId(),
+                order.getOrderId()
+        );
         Review saved = reviewRepository.save(review);
-
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
             @Override
             public void afterCommit() {
                 // 비동기로 분석 시작 (쯕시 응답, 분석은 백그라운드)
-                reviewAnalysisService.analyzeReviewAsync(saved.getReview_id());
+                reviewAnalysisService.analyzeReviewAsync(saved.getReviewId());
             }
         });
 
-        return saved;
+        return ReviewResponse.from(saved);
     }
-
-
 }
