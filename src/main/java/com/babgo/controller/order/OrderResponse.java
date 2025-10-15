@@ -61,14 +61,12 @@ public class OrderResponse {
     public static class Create {
         private final UUID orderId;
         private final Long totalPrice;
-        private final LocalDateTime cancelTime;
         private final String orderStatus;
 
         public static OrderResponse.Create from(OrderInfo.CreateResult output) {
             return new OrderResponse.Create(
                     output.getOrderId(),
                     output.getTotalPrice(),
-                    output.getCancelUntil(),
                     output.getStatus()
             );
         }
@@ -123,5 +121,9 @@ public class OrderResponse {
                     itemDetails
             );
         }
+    }
+
+    public static class Cancel {
+
     }
 }

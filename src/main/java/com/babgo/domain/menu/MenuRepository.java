@@ -7,5 +7,5 @@ import java.util.UUID;
 public interface MenuRepository {
     Menu save(Menu menu);
     Optional<Menu> findById(UUID menuId);
-    List<Menu> findByStoreId(UUID storeId);
+    List<Menu> findByStore_StoreId(UUID storeId);
 }

@@ -17,12 +17,31 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
 jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+  cookie:
+    secure: ${JWT_COOKIE_SECURE:false}  # 개발환경: false, 운영환경: true
+    domain: ${JWT_COOKIE_DOMAIN:localhost}  # 운영환경에서 실제 도메인 예정
+    same-site: ${JWT_COOKIE_SAME_SITE:Lax}  # Strict, Lax, None 중 선택 가능
 
 logging:
   level:
     com.babgo: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
+
+payment:
+  success-base-url: ${PAYMENT_BASEURL}
+  fail-base-url: ${PAYMENT_FAIL_BASEURL}
+  webhook-url: ${PAYMENT_WEBHOOK_URL}
+
+pg-sim:
+  auto: approve  # 기본 자동승인

@@ -39,7 +39,6 @@ public class OrderItem{
     private Integer quantity;
 
     private OrderItem(
-            UUID orderItemId,
             Order order,
             UUID menuId,
             UUID menuOptionId,
@@ -64,7 +63,6 @@ public class OrderItem{
             throw new CustomException(ErrorCode.VALIDATION_ERROR,"메뉴의 옵션 정보를 찾을 수 없습니다.");
         }
 
-        this.orderItemId = orderItemId;
         this.order = order;
         this.menuId = menuId;
         this.menuOptionId = menuOptionId;
@@ -74,7 +72,6 @@ public class OrderItem{
     }
 
     public static OrderItem of(
-            UUID orderItemId,
             Order order,
             UUID menuId,
             UUID menuOptionId,
@@ -82,6 +79,6 @@ public class OrderItem{
             Long totalPrice,
             Integer quantity
     ) {
-        return new OrderItem(orderItemId, order, menuId, menuOptionId, unitPrice, totalPrice , quantity);
+        return new OrderItem(order, menuId, menuOptionId, unitPrice, totalPrice , quantity);
     }
 }
