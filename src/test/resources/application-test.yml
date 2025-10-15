@@ -22,7 +22,7 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6370  # 운영과 다른 포트 사용 (embedded redis)
+      port: 6379  # Redis 기본 포트
       password:
 
 jwt:
@@ -33,6 +33,18 @@ jwt:
     secure: false  # 테스트 환경에서는 false
     domain: localhost
     same-site: Lax
+
+  ai:
+    openai:
+      api-key: test-api-key
+      chat:
+        base-url: http://localhost:8000
+        completion-path: /v1/chat/completions
+        model: gpt-3.5-turbo
+
+fastapi:
+  RECOMMENDATION_FASTAPI_URL: http://localhost:8000  # 테스트용 더미 URL
+  REVIEW_ANALYSIS_FASTAPI_URL: http://localhost:8000  # 테스트용 더미 URL
 
 logging:
   level:
