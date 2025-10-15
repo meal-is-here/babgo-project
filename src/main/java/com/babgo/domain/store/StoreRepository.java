@@ -9,6 +9,7 @@ public interface StoreRepository {
 
     Optional<Store> findByStoreId(UUID storeId);
 
+    Optional<Store> findById(UUID storeId);
     List<Store> saveAll(List<Store> stores);
     List<Store> findByStoreIdIn(List<UUID> storeIds);
 }
