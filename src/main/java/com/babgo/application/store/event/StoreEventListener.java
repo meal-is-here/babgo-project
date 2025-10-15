@@ -1,6 +1,5 @@
-package com.babgo.application.store;
+package com.babgo.application.store.event;
 
-import com.babgo.domain.store.StoreEvent;
 import com.babgo.domain.store.StoreNotificationPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +10,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class StoreEventHandler {
+public class StoreEventListener {
 
     private final StoreNotificationPort port;
 
