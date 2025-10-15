@@ -1,15 +1,25 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/testdb
-    username: testuser
-    password: testpass
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
-      show-sql: true
-  sql:
-    init:
-      mode: always
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
   ai:
     openai:
       api-key: ${GOOGLE_AI_API_KEY}
@@ -22,8 +32,13 @@ spring:
           model: text-embedding-ada-002
 
 jwt:
-  secret: ${JWT_SECRET:1iwoidbaoibdoi2biosfioboiwwfnpadsopnofw}
-  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+  cookie:
+    secure: false
+    domain: localhost
+    same-site: Lax
 
 fastapi:
   RECOMMENDATION_FASTAPI_URL: ${RECOMMENDATION_FASTAPI_URL}

@@ -1,36 +1,10 @@
 spring:
+  profiles:
+    active: local
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: babgo
-
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
-
-jwt:
-  secret: ${JWT_SECRET}
-  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
-  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
-  cookie:
-    secure: ${JWT_COOKIE_SECURE:false}  # 개발환경: false, 운영환경: true
-    domain: ${JWT_COOKIE_DOMAIN:localhost}  # 운영환경에서 실제 도메인 예정
-    same-site: ${JWT_COOKIE_SAME_SITE:Lax}  # Strict, Lax, None 중 선택 가능
 
 logging:
   level:
