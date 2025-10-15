@@ -1,7 +1,7 @@
 package com.babgo.global.security.jwt;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -9,12 +9,16 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RedisService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
     private static final String BLACKLIST_PREFIX = "blacklist:";
+
+    public RedisService(
+            @Qualifier("authRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     // 리프레시 토큰 저장: Redis에 userId를 키로 토큰을 저장하고 TTL 설정
     public void saveRefreshToken(Long userId, String refreshToken, long expirationMillis) {

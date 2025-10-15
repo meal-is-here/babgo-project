@@ -16,5 +16,11 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-parameters" />
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="babgo-project.modules" options="" />
+      <module name="babgo-project.modules.pg-simulator" options="" />
+      <module name="babgo-project.modules.pg-simulator.main" options="" />
+      <module name="babgo-project.modules.pg-simulator.test" options="" />
+    </option>
   </component>
 </project>
