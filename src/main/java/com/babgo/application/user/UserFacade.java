@@ -2,8 +2,8 @@ package com.babgo.application.user;
 
 import com.babgo.controller.user.UserRequest;
 import com.babgo.controller.user.UserResponse;
-import com.babgo.domain.user.UserAuthService;
-import com.babgo.domain.user.UserService;
+import com.babgo.domain.user.AuthenticationService;
+import com.babgo.domain.user.UserRegistService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -14,16 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * UserFacade - Controller와 Domain Service 사이의 중간 계층
  * - DTO 변환 및 비즈니스 로직 조합
- * - 인증 관련 로직은 UserAuthService에 위임
- * - 사용자 CRUD는 UserService에 위임
+ * - 인증 관련 로직은 AuthenticationService에 위임
+ * - 사용자 등록은 UserRegiService에 위임
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserFacade {
 
-    private final UserService userService;
-    private final UserAuthService userAuthService;
+    private final UserRegistService userRegistService;
+    private final AuthenticationService authenticationService;
 
     // ========== 회원가입 ==========
 
@@ -32,7 +32,7 @@ public class UserFacade {
      */
     @Transactional
     public UserResponse.SignUpResponse signUpCustomer(UserRequest.CustomerSignUpRequest request) {
-        return userService.signUpCustomer(request);
+        return userRegistService.signUpCustomer(request);
     }
 
     /**
@@ -40,17 +40,17 @@ public class UserFacade {
      */
     @Transactional
     public UserResponse.SignUpResponse signUpOwner(UserRequest.OwnerSignUpRequest request) {
-        return userService.signUpOwner(request);
+        return userRegistService.signUpOwner(request);
     }
 
-    // ========== 로그인/로그아웃 (UserAuthService에 위임) ==========
+    // ========== 로그인/로그아웃 (AuthenticationService에 위임) ==========
 
     /**
      * 로그인 (고객/사장 공통)
      */
     @Transactional(readOnly = true)
     public UserResponse.LoginResponse login(UserRequest.LoginRequest request) {
-        return userAuthService.login(request);
+        return authenticationService.login(request);
     }
 
     /**
@@ -60,7 +60,7 @@ public class UserFacade {
      */
     @Transactional(readOnly = true)
     public UserResponse.LoginResponse loginWithDevice(UserRequest.LoginRequest request, String deviceId) {
-        return userAuthService.loginWithDevice(request, deviceId);
+        return authenticationService.loginWithDevice(request, deviceId);
     }
 
     /**
@@ -68,7 +68,7 @@ public class UserFacade {
      */
     @Transactional(readOnly = true)
     public UserResponse.RefreshTokenResponse refreshToken(String refreshToken) {
-        return userAuthService.refreshAccessToken(refreshToken);
+        return authenticationService.refreshAccessToken(refreshToken);
     }
 
     /**
@@ -79,7 +79,7 @@ public class UserFacade {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetailInfo userDetailInfo) {
             Long userId = Long.parseLong(userDetailInfo.getUserId());
-            userAuthService.logout(userId);
+            authenticationService.logout(userId);
         }
     }
 
@@ -91,7 +91,7 @@ public class UserFacade {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetailInfo userDetailInfo) {
             Long userId = Long.parseLong(userDetailInfo.getUserId());
-            userAuthService.logoutDevice(userId, deviceId);
+            authenticationService.logoutDevice(userId, deviceId);
         }
     }
 
@@ -102,7 +102,7 @@ public class UserFacade {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetailInfo userDetailInfo) {
             Long userId = Long.parseLong(userDetailInfo.getUserId());
-            userAuthService.logoutAllDevices(userId);
+            authenticationService.logoutAllDevices(userId);
         }
     }
 
@@ -127,7 +127,7 @@ public class UserFacade {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetailInfo userDetailInfo) {
             Long userId = Long.parseLong(userDetailInfo.getUserId());
-            return userAuthService.getActiveSessionCount(userId);
+            return authenticationService.getActiveSessionCount(userId);
         }
         return 0;
     }

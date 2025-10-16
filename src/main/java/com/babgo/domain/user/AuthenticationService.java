@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * User 도메인 인증 서비스
+ * 인증 서비스
  * - 로그인/로그아웃 처리
  * - 토큰 생성 및 갱신
  * - Redis를 통한 세션 관리
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserAuthService {
+public class AuthenticationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -47,7 +47,7 @@ public class UserAuthService {
 
         // 1. 로그인 시도 제한 확인 (Brute Force 방어)
         if (userRedisTemplete.isLoginBlocked(email, MAX_LOGIN_ATTEMPTS)) {
-            log.warn("로그인 시도 횟수 초과: email={}", email);
+            log.warn("로그인 시도 횟수 초과 - email: {}", email);
             throw new CustomException(ErrorCode.TOO_MANY_ATTEMPTS);
         }
 
@@ -66,7 +66,7 @@ public class UserAuthService {
         // 4. 비밀번호 검증
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             userRedisTemplete.incrementLoginAttempts(email);
-            log.warn("비밀번호 불일치: userId={}", user.getUserId());
+            log.warn("로그인 실패 - 비밀번호 불일치, userId: {}", user.getUserId());
             throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
@@ -88,7 +88,7 @@ public class UserAuthService {
                 jwtCookiesProperties.getRefreshTokenExpiration()
         );
 
-        log.info("로그인 성공: userId={}, email={}, role={}", user.getUserId(), user.getEmail(), user.getRole());
+        log.info("로그인 성공 - userId: {}, email: {}, role: {}", user.getUserId(), user.getEmail(), user.getRole());
 
         return UserResponse.LoginResponse.of(
                 accessToken,
@@ -112,7 +112,7 @@ public class UserAuthService {
 
         // 1. 로그인 시도 제한 확인
         if (userRedisTemplete.isLoginBlocked(email, MAX_LOGIN_ATTEMPTS)) {
-            log.warn("로그인 시도 횟수 초과: email={}", email);
+            log.warn("로그인 시도 횟수 초과 - email: {}", email);
             throw new CustomException(ErrorCode.TOO_MANY_ATTEMPTS);
         }
 
@@ -134,7 +134,7 @@ public class UserAuthService {
 
         // 3. 동시 접속 디바이스 수 제한 확인
         if (!userRedisTemplete.canAddNewSession(user.getUserId(), MAX_DEVICES)) {
-            log.warn("디바이스 수 제한 초과: userId={}", user.getUserId());
+            log.warn("디바이스 수 제한 초과 - userId: {}", user.getUserId());
             throw new CustomException(ErrorCode.TOO_MANY_SESSIONS);
         }
 
@@ -157,7 +157,7 @@ public class UserAuthService {
                 java.time.Duration.ofMillis(jwtCookiesProperties.getRefreshTokenExpiration())
         );
 
-        log.info("멀티 디바이스 로그인 성공: userId={}, deviceId={}", user.getUserId(), deviceId);
+        log.info("멀티 디바이스 로그인 성공 - userId: {}, deviceId: {}", user.getUserId(), deviceId);
 
         return UserResponse.LoginResponse.of(
                 accessToken,
@@ -178,13 +178,13 @@ public class UserAuthService {
     public UserResponse.RefreshTokenResponse refreshAccessToken(String refreshToken) {
         // 1. 블랙리스트 확인
         if (userRedisTemplete.isBlacklisted(refreshToken)) {
-            log.warn("블랙리스트 토큰 사용 시도");
+            log.warn("토큰 검증 실패 - 블랙리스트 토큰 사용 시도");
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
         // 2. JWT 토큰 자체 검증 (서명, 만료시간)
         if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
-            log.warn("유효하지 않은 리프레시 토큰");
+            log.warn("토큰 검증 실패 - 유효하지 않은 리프레시 토큰");
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
@@ -193,7 +193,7 @@ public class UserAuthService {
 
         // 4. Redis 저장값과 비교 검증
         if (!userRedisTemplete.validateRefreshToken(userId, refreshToken)) {
-            log.warn("Redis 저장값 불일치: userId={}", userId);
+            log.warn("토큰 검증 실패 - Redis 저장값 불일치, userId: {}", userId);
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
@@ -208,7 +208,7 @@ public class UserAuthService {
                 user.getRole()
         );
 
-        log.info("액세스 토큰 갱신 완료: userId={}", userId);
+        log.info("액세스 토큰 갱신 완료 - userId: {}", userId);
 
         return UserResponse.RefreshTokenResponse.of(newAccessToken, null);
     }
@@ -232,7 +232,7 @@ public class UserAuthService {
         // 3. Redis에서 토큰 삭제
         userRedisTemplete.deleteRefreshToken(userId);
 
-        log.info("로그아웃 완료: userId={}", userId);
+        log.info("로그아웃 완료 - userId: {}", userId);
     }
 
     /**
@@ -255,7 +255,7 @@ public class UserAuthService {
         // 3. 디바이스 세션 삭제
         userRedisTemplete.logoutDevice(userId, deviceId);
 
-        log.info("디바이스 로그아웃 완료: userId={}, deviceId={}", userId, deviceId);
+        log.info("디바이스 로그아웃 완료 - userId: {}, deviceId: {}", userId, deviceId);
     }
 
     /**
@@ -276,7 +276,7 @@ public class UserAuthService {
             userRedisTemplete.deleteRefreshToken(userId);
         }
 
-        log.info("모든 디바이스 강제 로그아웃: userId={}", userId);
+        log.info("모든 디바이스 강제 로그아웃 - userId: {}", userId);
     }
 
     /**

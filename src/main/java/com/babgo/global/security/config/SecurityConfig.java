@@ -3,6 +3,7 @@ package com.babgo.global.security.config;
 import com.babgo.auth.exception.JwtAccessDeniedHandler;
 import com.babgo.auth.exception.JwtAuthenticationEntryPoint;
 import com.babgo.auth.jwtfilter.JwtAuthenticationFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

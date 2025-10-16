@@ -12,15 +12,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * User 도메인 서비스
- * - 사용자 CRUD
- * - 비즈니스 로직 처리
- * - 인증/인가 로직은 UserAuthService로 분리됨
+ * 사용자 등록 서비스
+ * - 회원가입 처리 (고객/사장)
+ * - 이메일 중복 검증
+ * - 비밀번호 암호화
+ * - 인증/인가 로직은 AuthenticationService로 분리됨
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserRegistService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -47,7 +48,7 @@ public class UserService {
         );
 
         User savedUser = userRepository.save(user);
-        log.info("고객 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
+        log.info("고객 회원가입 완료 - userId: {}, email: {}", savedUser.getUserId(), savedUser.getEmail());
 
         return UserResponse.SignUpResponse.of(
                 savedUser.getPublicId(),
@@ -82,7 +83,7 @@ public class UserService {
         );
 
         User savedUser = userRepository.save(user);
-        log.info("사장 회원가입 완료: userId={}, email={}", savedUser.getUserId(), savedUser.getEmail());
+        log.info("사장 회원가입 완료 - userId: {}, email: {}", savedUser.getUserId(), savedUser.getEmail());
 
         return UserResponse.SignUpResponse.of(
                 savedUser.getPublicId(),

@@ -2,6 +2,8 @@ package com.babgo.auth;
 
 import com.babgo.auth.jwtfilter.JwtCookiesProperties;
 import com.babgo.domain.user.UserRole;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -17,6 +19,10 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+/**
+ * JWT 토큰 생성 및 검증을 담당하는 Provider
+ * 액세스 토큰과 리프레시 토큰의 생성, 파싱, 검증 기능을 제공합니다.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -26,7 +32,10 @@ public class JwtTokenProvider {
     private final UserDetailsService userDetailsService;
     private SecretKey secretKey;
 
-    // JWT Secret Key 초기화: application.yml의 jwt.secret을 바탕으로 HMAC-SHA 키 생성
+    /**
+     * JWT Secret Key를 초기화합니다.
+     * application.yml의 jwt.secret 값을 기반으로 HMAC-SHA 키를 생성합니다.
+     */
     @PostConstruct
     public void init() {
         byte[] keyBytes = jwtCookiesProperties.getSecret().getBytes(StandardCharsets.UTF_8);
@@ -34,7 +43,15 @@ public class JwtTokenProvider {
         log.info("JWT Secret Key 초기화 완료");
     }
 
-    // 액세스 토큰 생성: userId(subject), email/role(claims) 포함, 15분 유효기간
+    /**
+     * 액세스 토큰을 생성합니다.
+     * subject에 userId, claim에 email과 role을 포함하며 15분의 유효기간을 가집니다.
+     *
+     * @param userId 사용자 ID
+     * @param email  사용자 이메일
+     * @param role   사용자 권한
+     * @return 생성된 액세스 토큰 문자열
+     */
     public String generateAccessToken(Long userId, String email, UserRole role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtCookiesProperties.getAccessTokenExpiration());
@@ -48,7 +65,13 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // 리프레시 토큰 생성: userId(subject), type=refresh(claim) 포함, 1일 유효기간
+    /**
+     * 리프레시 토큰을 생성합니다.
+     * subject에 userId, claim에 type=refresh를 포함하며 1일의 유효기간을 가집니다.
+     *
+     * @param userId 사용자 ID
+     * @return 생성된 리프레시 토큰 문자열
+     */
     public String generateRefreshToken(Long userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtCookiesProperties.getRefreshTokenExpiration());
@@ -61,12 +84,23 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // 토큰에서 userId 추출: subject 필드 파싱
+    /**
+     * 토큰에서 userId를 추출합니다.
+     *
+     * @param token JWT 토큰
+     * @return 사용자 ID 문자열
+     */
     public String getUserId(String token) {
         return getClaims(token).getSubject();
     }
 
-    // 토큰 파싱: Secret Key로 서명 검증 후 Claims 추출
+    /**
+     * 토큰을 파싱하여 Claims를 추출합니다.
+     * Secret Key로 서명을 검증한 후 페이로드를 반환합니다.
+     *
+     * @param token JWT 토큰
+     * @return Claims 객체
+     */
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
@@ -75,53 +109,77 @@ public class JwtTokenProvider {
                 .getPayload();
     }
 
-    // 액세스 토큰 유효성 검증: 서명, 만료시간, 형식 등 확인
+    /**
+     * 액세스 토큰의 유효성을 검증합니다.
+     * 서명, 만료시간, 형식 등을 확인합니다.
+     *
+     * @param token JWT 액세스 토큰
+     * @return 유효하면 true, 그렇지 않으면 false
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
             return true;
         } catch (ExpiredJwtException e) {
-            log.error("만료된 토큰: {}", e.getMessage());
+            log.error("토큰 검증 실패 - 만료된 토큰: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
-            log.error("지원되지 않는 토큰: {}", e.getMessage());
+            log.error("토큰 검증 실패 - 지원되지 않는 토큰: {}", e.getMessage());
         } catch (MalformedJwtException e) {
-            log.error("잘못된 형식: {}", e.getMessage());
+            log.error("토큰 검증 실패 - 잘못된 형식: {}", e.getMessage());
         } catch (SecurityException e) {
-            log.error("서명 검증 실패: {}", e.getMessage());
+            log.error("토큰 검증 실패 - 서명 검증 실패: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            log.error("빈 토큰: {}", e.getMessage());
+            log.error("토큰 검증 실패 - 빈 토큰: {}", e.getMessage());
         }
         return false;
     }
 
-    // 리프레시 토큰 유효성 검증: type=refresh 확인 + 서명/만료시간 검증
+    /**
+     * 리프레시 토큰의 유효성을 검증합니다.
+     * type=refresh claim 확인 및 서명/만료시간을 검증합니다.
+     *
+     * @param token JWT 리프레시 토큰
+     * @return 유효하면 true, 그렇지 않으면 false
+     */
     public boolean validateRefreshToken(String token) {
         try {
             Claims claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
             if (!"refresh".equals(claims.get("type", String.class))) {
-                log.error("리프레시 토큰이 아님");
+                log.error("토큰 검증 실패 - 리프레시 토큰이 아님");
                 return false;
             }
             return true;
         } catch (ExpiredJwtException e) {
-            log.error("만료된 리프레시 토큰: {}", e.getMessage());
+            log.error("토큰 검증 실패 - 만료된 리프레시 토큰: {}", e.getMessage());
         } catch (Exception e) {
-            log.error("리프레시 토큰 검증 실패: {}", e.getMessage());
+            log.error("토큰 검증 실패 - 리프레시 토큰 검증 실패: {}", e.getMessage());
         }
         return false;
     }
 
-    // 리프레시 토큰에서 userId 추출: subject를 Long으로 파싱
+    /**
+     * 리프레시 토큰에서 userId를 추출합니다.
+     *
+     * @param token JWT 리프레시 토큰
+     * @return 사용자 ID (Long)
+     * @throws CustomException 토큰이 유효하지 않은 경우
+     */
     public Long getUserIdFromRefreshToken(String token) {
         try {
             return Long.parseLong(getClaims(token).getSubject());
         } catch (Exception e) {
-            log.error("리프레시 토큰에서 userId 추출 실패: {}", e.getMessage());
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰");
+            log.error("리프레시 토큰에서 userId 추출 실패 - message: {}", e.getMessage());
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
     }
 
-    // 토큰으로 Spring Security 인증 객체 생성: UserDetailsService로 사용자 조회 후 Authentication 생성
+    /**
+     * 토큰으로부터 Spring Security 인증 객체를 생성합니다.
+     * UserDetailsService로 사용자를 조회한 후 Authentication 객체를 생성합니다.
+     *
+     * @param token JWT 토큰
+     * @return Authentication 객체
+     */
     public Authentication getAuthentication(String token) {
         String userId = getUserId(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(userId);

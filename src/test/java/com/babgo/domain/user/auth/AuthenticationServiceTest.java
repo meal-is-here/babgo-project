@@ -5,7 +5,7 @@ import com.babgo.auth.jwtfilter.JwtCookiesProperties;
 import com.babgo.controller.user.UserRequest;
 import com.babgo.controller.user.UserResponse;
 import com.babgo.domain.user.User;
-import com.babgo.domain.user.UserAuthService;
+import com.babgo.domain.user.AuthenticationService;
 import com.babgo.domain.user.infrastructure.UserRedisTemplete;
 import com.babgo.domain.user.UserRole;
 import com.babgo.global.exception.CustomException;
@@ -30,8 +30,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UserAuthService 단위 테스트")
-class UserAuthServiceTest {
+@DisplayName("AuthenticationService 단위 테스트")
+class AuthenticationServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -49,7 +49,7 @@ class UserAuthServiceTest {
     private JwtCookiesProperties jwtCookiesProperties;
 
     @InjectMocks
-    private UserAuthService userAuthService;
+    private AuthenticationService authenticationService;
 
     private User testUser;
     private UserRequest.LoginRequest loginRequest;
@@ -92,7 +92,7 @@ class UserAuthServiceTest {
             given(jwtCookiesProperties.getRefreshTokenExpiration()).willReturn(86400000L);
 
             // when
-            UserResponse.LoginResponse response = userAuthService.login(loginRequest);
+            UserResponse.LoginResponse response = authenticationService.login(loginRequest);
 
             // then
             assertThat(response).isNotNull();
@@ -116,7 +116,7 @@ class UserAuthServiceTest {
             given(userRedisTemplete.isLoginBlocked(loginRequest.getEmail(), 5)).willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> userAuthService.login(loginRequest))
+            assertThatThrownBy(() -> authenticationService.login(loginRequest))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.TOO_MANY_ATTEMPTS);
 
@@ -131,7 +131,7 @@ class UserAuthServiceTest {
             given(userRepository.findByEmail(loginRequest.getEmail())).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> userAuthService.login(loginRequest))
+            assertThatThrownBy(() -> authenticationService.login(loginRequest))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_CREDENTIALS);
 
@@ -147,7 +147,7 @@ class UserAuthServiceTest {
             given(userRepository.findByEmail(loginRequest.getEmail())).willReturn(Optional.of(testUser));
 
             // when & then
-            assertThatThrownBy(() -> userAuthService.login(loginRequest))
+            assertThatThrownBy(() -> authenticationService.login(loginRequest))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_DELETED);
         }
@@ -161,7 +161,7 @@ class UserAuthServiceTest {
             given(passwordEncoder.matches(loginRequest.getPassword(), testUser.getPassword())).willReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> userAuthService.login(loginRequest))
+            assertThatThrownBy(() -> authenticationService.login(loginRequest))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_CREDENTIALS);
 
@@ -188,7 +188,7 @@ class UserAuthServiceTest {
             given(jwtCookiesProperties.getRefreshTokenExpiration()).willReturn(86400000L);
 
             // when
-            UserResponse.LoginResponse response = userAuthService.loginWithDevice(loginRequest, deviceId);
+            UserResponse.LoginResponse response = authenticationService.loginWithDevice(loginRequest, deviceId);
 
             // then
             assertThat(response).isNotNull();
@@ -214,7 +214,7 @@ class UserAuthServiceTest {
             given(userRedisTemplete.canAddNewSession(testUser.getUserId(), 5)).willReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> userAuthService.loginWithDevice(loginRequest, deviceId))
+            assertThatThrownBy(() -> authenticationService.loginWithDevice(loginRequest, deviceId))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.TOO_MANY_SESSIONS);
 
@@ -240,7 +240,7 @@ class UserAuthServiceTest {
                     .willReturn("new-access-token");
 
             // when
-            UserResponse.RefreshTokenResponse response = userAuthService.refreshAccessToken(refreshToken);
+            UserResponse.RefreshTokenResponse response = authenticationService.refreshAccessToken(refreshToken);
 
             // then
             assertThat(response).isNotNull();
@@ -255,7 +255,7 @@ class UserAuthServiceTest {
             given(userRedisTemplete.isBlacklisted(refreshToken)).willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> userAuthService.refreshAccessToken(refreshToken))
+            assertThatThrownBy(() -> authenticationService.refreshAccessToken(refreshToken))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN);
         }
@@ -269,7 +269,7 @@ class UserAuthServiceTest {
             given(jwtTokenProvider.validateRefreshToken(refreshToken)).willReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> userAuthService.refreshAccessToken(refreshToken))
+            assertThatThrownBy(() -> authenticationService.refreshAccessToken(refreshToken))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN);
         }
@@ -285,7 +285,7 @@ class UserAuthServiceTest {
             given(userRedisTemplete.validateRefreshToken(1L, refreshToken)).willReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> userAuthService.refreshAccessToken(refreshToken))
+            assertThatThrownBy(() -> authenticationService.refreshAccessToken(refreshToken))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN);
         }
@@ -302,7 +302,7 @@ class UserAuthServiceTest {
             given(userRepository.findByUserIdAndDeletedAtIsNull(1L)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> userAuthService.refreshAccessToken(refreshToken))
+            assertThatThrownBy(() -> authenticationService.refreshAccessToken(refreshToken))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
         }
@@ -322,7 +322,7 @@ class UserAuthServiceTest {
             given(jwtCookiesProperties.getRefreshTokenExpiration()).willReturn(86400000L);
 
             // when
-            userAuthService.logout(userId);
+            authenticationService.logout(userId);
 
             // then
             verify(userRedisTemplete).addToBlacklist(eq(refreshToken), eq(86400000L));
@@ -337,7 +337,7 @@ class UserAuthServiceTest {
             given(userRedisTemplete.getRefreshToken(userId)).willReturn(null);
 
             // when
-            userAuthService.logout(userId);
+            authenticationService.logout(userId);
 
             // then
             verify(userRedisTemplete, never()).addToBlacklist(anyString(), anyLong());
@@ -355,7 +355,7 @@ class UserAuthServiceTest {
             given(jwtCookiesProperties.getRefreshTokenExpiration()).willReturn(86400000L);
 
             // when
-            userAuthService.logoutDevice(userId, deviceId);
+            authenticationService.logoutDevice(userId, deviceId);
 
             // then
             verify(userRedisTemplete).addToBlacklist(eq(refreshToken), eq(86400000L));
@@ -372,7 +372,7 @@ class UserAuthServiceTest {
             given(jwtCookiesProperties.getRefreshTokenExpiration()).willReturn(86400000L);
 
             // when
-            userAuthService.logoutAllDevices(userId);
+            authenticationService.logoutAllDevices(userId);
 
             // then
             verify(userRedisTemplete).logoutAllDevices(userId);
@@ -393,7 +393,7 @@ class UserAuthServiceTest {
             given(userRedisTemplete.getActiveSessionCount(userId)).willReturn(3);
 
             // when
-            int count = userAuthService.getActiveSessionCount(userId);
+            int count = authenticationService.getActiveSessionCount(userId);
 
             // then
             assertThat(count).isEqualTo(3);
@@ -408,7 +408,7 @@ class UserAuthServiceTest {
             given(userRedisTemplete.getLoginAttempts(email)).willReturn(2);
 
             // when
-            int attempts = userAuthService.getLoginAttempts(email);
+            int attempts = authenticationService.getLoginAttempts(email);
 
             // then
             assertThat(attempts).isEqualTo(2);
