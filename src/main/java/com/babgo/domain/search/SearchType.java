@@ -1,4 +1,4 @@
-package com.babgo.controller.search;
+package com.babgo.domain.search;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

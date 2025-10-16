@@ -1,0 +1,10 @@
+### 카테고리 기반 검색 (치킨 카테고리, 거리순)
+GET http://localhost:8080/v1/search/stores?latitude=37.5665&longitude=126.9780&searchType=KATEGORIE&regionCode=11110&keyword=aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa&sort=DISTANCE&page=1&size=10
+Content-Type: application/json
+
+
+
+### 가게명 LIKE 검색
+GET http://localhost:8080/v1/search/stores?latitude=37.5665&longitude=126.9780&searchType=STORE&regionCode=11110&keyword=피자&sort=LIKES&page=1&size=10
+Content-Type: application/json
+
