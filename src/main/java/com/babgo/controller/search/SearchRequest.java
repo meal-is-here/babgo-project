@@ -24,18 +24,18 @@ public class SearchRequest {
 
         private String regionCode;
 
-        private SearchType searchType;
+        private String searchType;
 
         private String keyword;
 
-        private SearchSort sort;
+        private String sort;
 
         private int page;
 
         private int size;
 
 
-        private Create(double latitude, double longitude, String regionCode, SearchType searchType, String keyword, SearchSort sort, Integer page, Integer size) {
+        private Create(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, Integer page, Integer size) {
 
            // 위도 검증
             if (latitude < -90.0 || latitude > 90.0) {
@@ -57,9 +57,6 @@ public class SearchRequest {
             this.regionCode = regionCode;
 
             // 검색 타입 검증
-            if (searchType == null) {
-                throw new  CustomException(ErrorCode.BAD_REQUEST, "검색 타입이 없습니다.");
-            }
             this.searchType = searchType;
 
             // 키워드 검증
@@ -69,7 +66,7 @@ public class SearchRequest {
             this.keyword = keyword;
 
             // 정렬 기본값 처리
-            this.sort = (sort != null) ? sort : SearchSort.CREATED;
+            this.sort = sort;
 
             // 페이지 기본값 + 검증
             this.page = (page != null && page > 0) ? page : 1;
@@ -79,13 +76,13 @@ public class SearchRequest {
 
         }
 
-        public static Create of(double latitude, double longitude, String regionCode, SearchType searchType, String keyword, SearchSort sort, Integer page, Integer size) {
+        public static Create of(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, Integer page, Integer size) {
             return new Create(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
         }
 
         public SearchInfo.Create toSearchInfo(){
 
-            return SearchInfo.Create.of(latitude, longitude, regionCode, searchType, keyword, sort.name(), page, size);
+            return SearchInfo.Create.of(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
         }
 
 

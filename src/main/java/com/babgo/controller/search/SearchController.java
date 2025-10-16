@@ -20,10 +20,10 @@ public class SearchController {
     @GetMapping("/stores")
     public ApiResponse<List<SearchResponse>> getSearch( @RequestParam double latitude,
         @RequestParam  double longitude,
-        @RequestParam  SearchType searchType,
+        @RequestParam  String searchType,
         @RequestParam String regionCode,
         @RequestParam  String keyword,
-        @RequestParam  SearchSort sort,
+        @RequestParam  String sort,
         @RequestParam int page,
         @RequestParam int size
     ) {

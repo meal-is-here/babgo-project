@@ -1,8 +1,11 @@
 package com.babgo.application.search;
 
-import com.babgo.controller.search.SearchType;
-import com.babgo.domain.search.Search;
 import com.babgo.domain.search.SearchCommand;
+import com.babgo.domain.search.SearchSort;
+import com.babgo.domain.search.SearchType;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -23,7 +26,7 @@ public class SearchInfo {
 
         private String regionCode;
 
-        private SearchType searchType;
+        private String searchType;
 
         private String keyword;
 
@@ -33,7 +36,7 @@ public class SearchInfo {
 
         private int size;
 
-        private Create(double latitude, double longitude, String regionCode, SearchType searchType, String keyword, String sort, int page, int size) {
+        private Create(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, int page, int size) {
             this.latitude = latitude;
             this.longitude = longitude;
             this.regionCode = regionCode;
@@ -44,14 +47,45 @@ public class SearchInfo {
             this.size = size;
         }
 
-        public static Create of(double latitude, double longitude, String regionCode, SearchType searchType, String keyword, String sort, int page, int size) {
+        public static Create of(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, int page, int size) {
             return new Create(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
         }
 
         public SearchCommand.Create toCommand(){
 
-            return SearchCommand.Create.of(latitude, longitude, regionCode, searchType.name(), keyword, sort, page, size);
+            return SearchCommand.Create.of(latitude, longitude, regionCode, validateSearchType(searchType), keyword, validateSort(sort), page, size);
 
+        }
+
+
+        private String validateSearchType(String type) {
+            // 검색 타입이 없으면 에러
+            if (type == null || type.isBlank()) {
+                throw new CustomException(ErrorCode.BAD_REQUEST, "검색 타입이 비어있습니다.");
+            }
+
+            // 도메인 enum 기반 검증
+            boolean isValid = Arrays.stream(SearchType.values())
+                .anyMatch(e -> e.name().equalsIgnoreCase(type));
+
+            if (!isValid) {
+                throw new CustomException(ErrorCode.BAD_REQUEST, "유효하지 않은 검색 타입입니다: " + type);
+            }
+
+            return type.toUpperCase();
+        }
+
+        private String validateSort(String sort) {
+
+            // null 이거나 공백이면 기본값: DISTANCE
+            if (sort == null || sort.isBlank()) {
+                return SearchSort.DISTANCE.name();
+            }
+
+            // SearchSort 안에 존재하는지 않아도 DISTANCE
+            return Arrays.stream(SearchSort.values())
+                .map(Enum::name)
+                .anyMatch(s -> s.equalsIgnoreCase(sort)) ? sort.toUpperCase() : SearchSort.DISTANCE.name();
         }
 
 
@@ -96,7 +130,7 @@ public class SearchInfo {
         }
 
 
-        public static List<CreateResult> from(List<Search> searchList){
+        public static List<CreateResult> from(List<SearchCommand.CreateResult> searchList){
 
             return searchList.stream()
                 .map(search -> CreateResult.of(
