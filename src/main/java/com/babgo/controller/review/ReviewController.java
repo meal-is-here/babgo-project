@@ -26,7 +26,7 @@ public class ReviewController {
             // @AuthenticationPrincipal Long userId,
             @Valid @RequestBody ReviewCreateRequest request
     ) {
-        Long userId = 1L;
+        Long userId = 2L;
         ReviewResponse response = reviewService.createReview(userId, request);
         return ApiResponse.success("리뷰 등록 성공", response);
     }

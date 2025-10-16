@@ -1,4 +1,4 @@
-package com.babgo.domain.ai;
+package com.babgo.domain.ai.review_analysis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

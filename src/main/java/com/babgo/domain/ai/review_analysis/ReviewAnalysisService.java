@@ -1,7 +1,6 @@
-package com.babgo.domain.ai;
+package com.babgo.domain.ai.review_analysis;
 
 import com.babgo.domain.review.Review;
-import com.babgo.domain.ai.review_analysis.ReviewAnalysis;
 import com.babgo.domain.review.ReviewRepository;
 import com.babgo.repository.ai.review_analysis.ReviewAnalysisRepositoryImpl;
 import lombok.RequiredArgsConstructor;

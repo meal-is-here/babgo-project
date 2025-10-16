@@ -2,18 +2,16 @@ package com.babgo.domain.review;
 
 import com.babgo.controller.review.dto.ReviewCreateRequest;
 import com.babgo.controller.review.dto.ReviewResponse;
+import com.babgo.domain.ai.review_analysis.ReviewAnalysisService;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderRepository;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
-import com.babgo.domain.ai.ReviewAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
