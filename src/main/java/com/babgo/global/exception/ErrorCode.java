@@ -52,6 +52,7 @@ public enum ErrorCode {
     ORDER_NOT_CANCELABLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 상태에서는 주문을 취소할 수 없습니다."),
     ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "이미 취소된 주문입니다."),
     ORDER_ALREADY_REFUNDED(HttpStatus.CONFLICT, "이미 환불된 주문입니다."),
+	VERSION_CONFLICT(HttpStatus.CONFLICT, "다른 요청에 의해 변경되었습니다."),
     CONFLICT(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
 
 	// Review

@@ -1,18 +1,25 @@
 package com.babgo.application.store;
 
 
+import com.babgo.application.store.event.StoreEvent;
+import com.babgo.domain.order.Order;
+import com.babgo.domain.order.OrderService;
 import com.babgo.domain.store.Category;
 import com.babgo.domain.store.CategoryService;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -23,6 +30,8 @@ public class StoreFacade {
 
     private final StoreService storeService;
     private final CategoryService categoryService;
+    private final OrderService orderService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void createStore(StoreInfo.Create input) {
@@ -83,7 +92,75 @@ public class StoreFacade {
         return StoreInfo.Summary.of(summaryText);
     }
 
-    public void acceptedOrder(UUID uuid) {
-        log.info("이벤트" + uuid);
+    // 웹훅핸들러에서 여기로 orderId옴.
+    @Transactional
+    public void acceptedOrder(UUID orderId) {
+        try {
+            Order order = orderService.getOrder(orderId);
+            Long userId = order.getUserId();
+            // Store에 ownerId 필드 추가해야함 인증되면 ->
+            // Store store = storeService.findByStoreId(order.getStoreId) ->
+            // store.getOwnerId 와 인증객체 id랑 같은지 비교/ 이유: 사장님이 수락버튼 누른다고 가정 userId == store.getOwnerId
+            storeService.acceptFromConfirmed(order);
+            publishStatusChanged(order, "주문 수락이 완료되었습니다.");
+        } catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
+            throw new CustomException(ErrorCode.VERSION_CONFLICT);
+        }
+    }
+
+    @Transactional
+    public StoreInfo.OrderStatusResult preparedOrder(UUID orderId) {
+        try {
+            Order order = orderService.getOrder(orderId);
+            // Store에 ownerId 필드 추가해야함! 인증되면 ->
+            // Store store = storeService.findByStoreId(order.getStoreId) ->
+            // store.getOwnerId 와 인증객체 id랑 같은지 비교/ 이유: 사장님이 수락버튼 누른다고 가정 userId == store.getOwnerId
+            storeService.prepareFromAccepted(order);
+            publishStatusChanged(order, "조리가 완료되었습니다.");
+            return StoreInfo.OrderStatusResult.from(order);
+        } catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
+            throw new CustomException(ErrorCode.VERSION_CONFLICT);
+        }
+    }
+
+    @Transactional
+    public StoreInfo.OrderStatusResult pickedUpOrder(UUID orderId) {
+        try {
+            Order order = orderService.getOrder(orderId);
+            // Store에 ownerId 필드 추가해야함! 인증되면 ->
+            // Store store = storeService.findByStoreId(order.getStoreId) ->
+            // store.getOwnerId 와 인증객체 id랑 같은지 비교/ 이유: 사장님이 수락버튼 누른다고 가정 userId == store.getOwnerId
+            storeService.pickupFromPrepared(order);
+            publishStatusChanged(order, "음식이 픽업되었습니다.");
+            return StoreInfo.OrderStatusResult.from(order);
+        } catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
+            throw new CustomException(ErrorCode.VERSION_CONFLICT);
+        }
+    }
+
+    @Transactional
+    public StoreInfo.OrderStatusResult deliveredOrder(UUID orderId) {
+        try {
+            Order order = orderService.getOrder(orderId);
+            // Store에 ownerId 필드 추가해야함! 인증되면 ->
+            // Store store = storeService.findByStoreId(order.getStoreId) ->
+            // store.getOwnerId 와 인증객체 id랑 같은지 비교/ 이유: 사장님이 수락버튼 누른다고 가정 userId == store.getOwnerId
+            storeService.deliverFromPickedUp(order);
+            publishStatusChanged(order, "배달이 완료되었습니다.");
+            return StoreInfo.OrderStatusResult.from(order);
+        } catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
+            throw new CustomException(ErrorCode.VERSION_CONFLICT);
+        }
+    }
+
+    private void publishStatusChanged(Order order, String message) {
+        eventPublisher.publishEvent(
+                StoreEvent.StatusChanged.of(
+                        order.getUserId(),
+                        order.getOrderId(),
+                        order.getOrderStatus(),
+                        message
+                )
+        );
     }
 }

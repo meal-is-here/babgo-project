@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -20,19 +19,24 @@ public class StoreController {
     private final StoreFacade storeFacade;
 
     @PostMapping
-    public ApiResponse<Void> createStore(@Validated({ValidateGroups.OnCreate.class, Default.class}) @RequestBody StoreRequest.Upsert storeRequest) {
+    public ApiResponse<Void> createStore(
+            @Validated({ValidateGroups.OnCreate.class, Default.class}) @RequestBody StoreRequest.Upsert storeRequest
+    ) {
         storeFacade.createStore(storeRequest.toCreateInfo());
         return ApiResponse.success("가게 등록을 성공했습니다.");
     }
 
     @PatchMapping("/{storeId}")
-    public ApiResponse<Void> updateStore(@PathVariable UUID storeId, @Validated({ValidateGroups.OnUpdate.class, Default.class}) @RequestBody StoreRequest.Upsert storeRequest) {
+    public ApiResponse<Void> updateStore(
+            @PathVariable("storeId") UUID storeId,
+            @Validated({ValidateGroups.OnUpdate.class, Default.class}) @RequestBody StoreRequest.Upsert storeRequest
+    ) {
         storeFacade.updateStore(storeId, storeRequest.toUpdateInfo());
         return ApiResponse.success("가게 수정을 성공했습니다.");
     }
 
     @DeleteMapping("/{storeId}")
-    public ApiResponse<Void> deleteStore(@PathVariable UUID storeId) {
+    public ApiResponse<Void> deleteStore(@PathVariable("storeId") UUID storeId) {
         storeFacade.deleteStore(storeId);
         return ApiResponse.success("가게 삭제를 성공했습니다.");
     }
@@ -60,4 +64,28 @@ public class StoreController {
         }
     }
 
+    // TODO: 인증객체 추가 해야함. @CurrentUser
+    @PatchMapping("/orders/{orderId}/prepared")
+    public ApiResponse<StoreResponse.OrderStatusResult> prepareOrder(@PathVariable("orderId") UUID orderId) {
+        StoreInfo.OrderStatusResult output = storeFacade.preparedOrder(orderId);
+        StoreResponse.OrderStatusResult response = StoreResponse.OrderStatusResult.from(output);
+        return ApiResponse.success("조리 완료 되었습니다.", response);
+    }
+
+    // TODO: 인증객체 추가 해야함. @CurrentUser
+    @PatchMapping("/orders/{orderId}/picked-up")
+    public ApiResponse<StoreResponse.OrderStatusResult> pickUpOrder(@PathVariable("orderId") UUID orderId) {
+        StoreInfo.OrderStatusResult output = storeFacade.pickedUpOrder(orderId);
+        StoreResponse.OrderStatusResult response = StoreResponse.OrderStatusResult.from(output);
+        return ApiResponse.success("음식이 픽업되었습니다.", response);
+    }
+
+    // TODO: 인증객체 추가 해야함. @CurrentUser
+    @PatchMapping("/orders/{orderId}/delivered")
+    public ApiResponse<StoreResponse.OrderStatusResult> deliverOrder(@PathVariable("orderId") UUID orderId) {
+        StoreInfo.OrderStatusResult output = storeFacade.deliveredOrder(orderId);
+        StoreResponse.OrderStatusResult response = StoreResponse.OrderStatusResult.from(output);
+        return ApiResponse.success("배달이 완료되었습니다.", response);
+    }
 }
+
