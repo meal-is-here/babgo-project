@@ -39,7 +39,7 @@ public class Search extends BaseTimeEntity {
     private String categoryName;
 
     @Column(name = "avg_rating")
-    private Double avgRating;
+    private double avgRating;
 
     @Column(name = "likes")
     private int likes;
@@ -60,7 +60,7 @@ public class Search extends BaseTimeEntity {
 
 
 
-    private Search(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, int orderCount, String storeStatus, double latitude, double longitude) {
+    private Search(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, int orderCount, String storeStatus, double latitude, double longitude) {
         this.storeId = storeId;
         this.regionCode = regionCode;
         this.storeName = storeName;
@@ -75,7 +75,7 @@ public class Search extends BaseTimeEntity {
     }
 
 
-    public static Search of(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, int orderCount, String storeStatus, double latitude, double longitude){
+    public static Search of(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, int orderCount, String storeStatus, double latitude, double longitude){
         return new Search(storeId, regionCode, storeName, categoryId, categoryName, avgRating, likes, orderCount, storeStatus, latitude, longitude);
     }
 
