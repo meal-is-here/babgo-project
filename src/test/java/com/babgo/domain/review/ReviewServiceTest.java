@@ -47,7 +47,6 @@ class ReviewServiceTest {
                 "서울시 강남구",
                 20000L
         );
-        order.updateStatus(OrderStatus.CONFIRMED);
 
         request = new ReviewCreateRequest(
                 order.getOrderId(),
@@ -64,6 +63,8 @@ class ReviewServiceTest {
                 .willReturn(Optional.of(order));
         given(reviewRepository.findByOrderId(order.getOrderId()))
                 .willReturn(Optional.empty());
+
+        order.markConfirmed();
 
         Review savedReview = Review.of(
                 5, "맛있어요!", order.getUserId(), order.getStoreId(), order.getOrderId());
@@ -92,8 +93,6 @@ class ReviewServiceTest {
     @Test
     @DisplayName("리뷰 등록 실패 - 주문 미완료 상태")
     void createReview_fail_orderNotCompleted() {
-        // given
-        order.updateStatus(OrderStatus.PENDING);
         given(orderRepository.findByOrderId(order.getOrderId()))
                 .willReturn(Optional.of(order));
 
