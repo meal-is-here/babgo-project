@@ -275,4 +275,24 @@ public class Store extends BaseTimeEntity {
             throw new CustomException(ErrorCode.INVALID, "카테고리는 필수입니다.");
         }
     }
+
+    /**
+     * 주문 생성 시 가게의 운영 상태를 확인하기 위해 사용합니다.
+     * 가게의 오픈 시간과 클로스 시간 사이에 해당하면 true
+     * 확인 후 주석 삭제해주세요
+     */
+    public boolean isOrderable(LocalTime now) {
+        if (this.getDeletedAt() != null) return false;
+        if (this.storeStatus != StoreStatus.OPEN) return false;
+
+        LocalTime open = openingHours;
+        LocalTime close = closingHours;
+        boolean crossMidnight = close.isBefore(open);
+
+        if (!crossMidnight) {
+            return !now.isBefore(open) && now.isBefore(close);
+        } else {
+            return !now.isBefore(open) || now.isBefore(close);
+        }
+    }
 }

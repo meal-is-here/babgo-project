@@ -3,11 +3,17 @@ package com.babgo.application.order;
 import com.babgo.application.order.event.OrderCreatedEvent;
 import com.babgo.application.order.port.CancelWindow;
 import com.babgo.domain.order.*;
+import com.babgo.domain.store.Store;
+import com.babgo.domain.store.StoreService;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -16,8 +22,10 @@ public class OrderFacade {
 
     private final OrderService orderService;
     private final OrderItemService orderItemService;
+    private final StoreService storeService;
     private final ApplicationEventPublisher eventPublisher;
     private final CancelWindow cancelWindow;
+
     @Transactional
     public OrderInfo.CreateResult createOrder(String idempotencyKey, OrderInfo.Create input){
         //1. 사용자 검증
@@ -29,21 +37,23 @@ public class OrderFacade {
         //3. !checkIdempotency 아이디 생성
         UUID orderId = orderService.createOrderId();
 
-        // 가게 존재하고 오픈 상태, 배달 다능 지역 확인
-        // Store store = "storeService.getStore(info.storeId)";
-        UUID store = UUID.randomUUID();
-
+        // 가게 존재하고 오픈 상태, 주문 가능인지 확인
+        Store store = storeService.findByStoreId(input.getStoreId());
+        if (!store.isOrderable(LocalTime.now())) {
+            throw new CustomException(ErrorCode.STORE_CLOSED, "현재 주문 가능한 상태가 아닙니다.");
+        }
         //4. 요청 아이템 → 엔티티 변환 오더 아이템 재고 있는지 검증 후 검증된 객체 리스트 반환
-       /* List<OrderItem> items = orderItemService.verifyOrderItemsAvailability(input.getItems(), orderId);
-*/
+        List<OrderItemSnapshot> orderItems = orderItemService.reserveStockAndCreateOrderItems(input.getStoreId(), input.getItems());
+
         //5. 총액 계산(서버 기준)
-      /*  Long totalPrice = orderService.calculateTotal(items);*/
-        Long totalPrice =10000L;
+        Long totalPrice = orderItems.stream()
+                .mapToLong(OrderItemSnapshot::lineTotal)
+                .sum();
 
         //오더 임시 객체 생성
         Order order = Order.of(
                 orderId,
-                store,
+                store.getStoreId(),
                 user,
                 input.getDeliveryRequest(),
                 input.getDeliveryAddress(),
@@ -54,9 +64,10 @@ public class OrderFacade {
         Order pendingOrder = orderService.create(order);
 
         //7. 검증 완료된 오더 아이템 저장
-        orderItemService.create(input.getItems(), pendingOrder);
+        orderItemService.create(orderItems, pendingOrder);
 
         eventPublisher.publishEvent(new OrderCreatedEvent(orderId));
+
         return OrderInfo.CreateResult.from(pendingOrder);
     }
 

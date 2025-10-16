@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,4 +29,15 @@ public class MenuRepositoryImpl implements MenuRepository {
     public List<Menu> findByStore_StoreId(UUID storeId) {
         return menuJpaRepository.findByStore_StoreId(storeId);
     }
+
+    @Override
+    public List<Menu> findAllById(List<UUID> targetMenuIds) {
+        return menuJpaRepository.findAllById(targetMenuIds);
+    }
+
+    @Override
+    public void saveAll(Collection<Menu> values) {
+        menuJpaRepository.saveAll(values);
+    }
+
 }
