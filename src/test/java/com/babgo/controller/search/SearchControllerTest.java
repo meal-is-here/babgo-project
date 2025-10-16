@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.babgo.application.search.SearchFacade;
 import com.babgo.application.search.SearchInfo;
+import com.babgo.domain.search.SearchSort;
+import com.babgo.domain.search.SearchType;
 import com.babgo.global.security.jwt.JwtTokenProvider;
 import com.babgo.MockTest;
 import java.util.List;
