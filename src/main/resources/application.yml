@@ -1,4 +1,8 @@
 spring:
+  profiles:
+    active: local
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: babgo
 
@@ -10,7 +14,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -28,9 +32,9 @@ jwt:
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
   cookie:
-    secure: ${JWT_COOKIE_SECURE:false}  # 개발환경: false, 운영환경: true
-    domain: ${JWT_COOKIE_DOMAIN:localhost}  # 운영환경에서 실제 도메인 예정
-    same-site: ${JWT_COOKIE_SAME_SITE:Lax}  # Strict, Lax, None 중 선택 가능
+    secure: ${JWT_COOKIE_SECURE:false}
+    domain: ${JWT_COOKIE_DOMAIN:localhost}
+    same-site: ${JWT_COOKIE_SAME_SITE:Lax}
 
 logging:
   level:

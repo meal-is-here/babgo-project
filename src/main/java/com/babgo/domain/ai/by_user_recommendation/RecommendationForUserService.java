@@ -1,8 +1,8 @@
-package com.babgo.domain.ai.recommendation;
+package com.babgo.domain.ai.by_user_recommendation;
 
-import com.babgo.domain.ai.recommendation.dto_recommendationService_with_python.RecomRequest;
-import com.babgo.domain.ai.recommendation.dto_recommendationService_with_python.RecomResponse;
-import com.babgo.controller.ai.RecommendationResponse;
+import com.babgo.controller.ai.RecommendationForUserResponse;
+import com.babgo.domain.ai.by_user_recommendation.dto_recommendationService_with_python.RecomRequest;
+import com.babgo.domain.ai.by_user_recommendation.dto_recommendationService_with_python.RecomResponse;
 import com.babgo.domain.store.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class RecommendationService {
+public class RecommendationForUserService {
     private final WebClient webClient;
     private final StoreRepository storeRepository;
 
@@ -22,7 +22,7 @@ public class RecommendationService {
 //    private record recomRequest(String userId) {}
 //    private record recomResponse(List<String> storeIds) {}
 
-    public Mono<RecommendationResponse> getPersonalizedRecommendations(String userId, String baseUrl) {
+    public Mono<RecommendationForUserResponse> getPersonalizedRecommendations(String userId, String baseUrl) {
         // baseUrl + 엔드포인트
         String url = baseUrl + "/recommendations";
 
@@ -38,6 +38,6 @@ public class RecommendationService {
                     // 우리 DB에서 가게 정보를 조회
                     return storeRepository.findByStoreIdIn(storeUuids);
                 })
-                .map(RecommendationResponse::fromStores); // 최종 응답 DTO로 변환
+                .map(RecommendationForUserResponse::fromStores); // 최종 응답 DTO로 변환
     }
 }

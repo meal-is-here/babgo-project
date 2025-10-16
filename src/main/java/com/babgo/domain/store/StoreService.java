@@ -1,6 +1,6 @@
 package com.babgo.domain.store;
 
-import com.babgo.domain.ai.StoreSummaryService;
+import com.babgo.domain.ai.store_summary.StoreSummaryService;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;

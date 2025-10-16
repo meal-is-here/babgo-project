@@ -1,7 +1,7 @@
-package com.babgo.domain.ai;
+package com.babgo.domain.ai.store_summary;
 
+import com.babgo.domain.ai.review_analysis.FakeReviewMLService;
 import com.babgo.domain.ai.review_analysis.ReviewAnalysis;
-import com.babgo.domain.ai.store_summary.StoreSummary;
 import com.babgo.domain.store.Store;
 import com.babgo.repository.ai.review_analysis.ReviewAnalysisRepositoryImpl;
 import com.babgo.repository.ai.store_summary.StoreSummaryRepositoryImpl;
