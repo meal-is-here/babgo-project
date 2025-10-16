@@ -44,8 +44,8 @@ public class Search extends BaseTimeEntity {
     @Column(name = "likes")
     private int likes;
 
-    @Column(name = "delivery_status")
-    private String deliveryStatus;
+    @Column(name = "order_count")
+    private int orderCount;
 
     @Column(name = "store_status")
     private String storeStatus;
@@ -60,7 +60,7 @@ public class Search extends BaseTimeEntity {
 
 
 
-    private Search(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, String deliveryStatus, String storeStatus, double latitude, double longitude) {
+    private Search(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, int orderCount, String storeStatus, double latitude, double longitude) {
         this.storeId = storeId;
         this.regionCode = regionCode;
         this.storeName = storeName;
@@ -68,15 +68,15 @@ public class Search extends BaseTimeEntity {
         this.categoryName = categoryName;
         this.avgRating = avgRating;
         this.likes = likes;
-        this.deliveryStatus = deliveryStatus;
+        this.orderCount = orderCount;
         this.storeStatus = storeStatus;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
 
-    public static Search of(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, String deliveryStatus, String storeStatus, double latitude, double longitude){
-        return new Search(storeId, regionCode, storeName, categoryId, categoryName, avgRating, likes, deliveryStatus, storeStatus, latitude, longitude);
+    public static Search of(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, Double avgRating, int likes, int orderCount, String storeStatus, double latitude, double longitude){
+        return new Search(storeId, regionCode, storeName, categoryId, categoryName, avgRating, likes, orderCount, storeStatus, latitude, longitude);
     }
 
 

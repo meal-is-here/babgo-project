@@ -20,15 +20,16 @@ public class SearchController {
     @GetMapping("/stores")
     public ApiResponse<List<SearchResponse>> getSearch( @RequestParam double latitude,
         @RequestParam  double longitude,
-        @RequestParam  SearchType searchType,
+        @RequestParam  String searchType,
+        @RequestParam String regionCode,
         @RequestParam  String keyword,
-        @RequestParam  SearchSort sort,
+        @RequestParam  String sort,
         @RequestParam int page,
         @RequestParam int size
     ) {
 
 
-        SearchRequest.Create request = SearchRequest.Create.of(latitude, longitude, searchType, keyword, sort, page, size);
+        SearchRequest.Create request = SearchRequest.Create.of(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
 
         List<CreateResult> result = searchFacade.getSearch(request.toSearchInfo());
 

@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.babgo.application.search.SearchFacade;
 import com.babgo.application.search.SearchInfo;
+import com.babgo.domain.search.SearchSort;
+import com.babgo.domain.search.SearchType;
 import com.babgo.global.security.jwt.JwtTokenProvider;
 import com.babgo.MockTest;
 import java.util.List;
@@ -53,11 +55,11 @@ public class SearchControllerTest extends MockTest {
         Mockito.when(searchFacade.getSearch(Mockito.any()))
             .thenReturn(List.of(
                     SearchInfo.CreateResult.of(UUID.randomUUID(), "교촌치킨", UUID.randomUUID(), "치킨", 4.8,
-                        120, "OPEN"),
+                        120, "OPEN", "111110"),
                     SearchInfo.CreateResult.of(UUID.randomUUID(), "BHC", UUID.randomUUID(), "치킨", 4.6,
-                        98, "OPEN"),
+                        98, "OPEN", "111110"),
                     SearchInfo.CreateResult.of(UUID.randomUUID(), "굽네치킨", UUID.randomUUID(), "치킨", 4.3,
-                        70, "CLOSED")
+                        70, "CLOSED", "111110")
                 )
             );
 
@@ -66,6 +68,7 @@ public class SearchControllerTest extends MockTest {
                 MockMvcRequestBuilders.get("/v1/search/stores")
                     .param("latitude", "37.5665")
                     .param("longitude", "126.9780")
+                    .param("regionCode", "100")
                     .param("searchType", SearchType.KATEGORIE.name())
                     .param("keyword", categoryId.toString())
                     .param("sort", SearchSort.DISTANCE.name())
@@ -78,7 +81,6 @@ public class SearchControllerTest extends MockTest {
             .andExpect(jsonPath("$.success").value(true))
             .andExpect(jsonPath("$.message").value("성공"))
             .andExpect(jsonPath("$.data").isArray());
-
     }
 
 }

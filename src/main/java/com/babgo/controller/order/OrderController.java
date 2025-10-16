@@ -26,6 +26,10 @@ public class OrderController {
         OrderInfo.Create input = OrderInfo.Create.from(request);
         OrderInfo.CreateResult output = orderFacade.createOrder(idempotencyKey, input);
         OrderResponse.Create response = OrderResponse.Create.from(output);
+
+        if (!output.isOk()) {
+            return  ApiResponse.success(output.getMessage(), response);
+        }
         return ApiResponse.success("주문이 생성되었습니다. 결제 정보를 입력해주세요.",response);
     }
 
