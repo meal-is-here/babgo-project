@@ -16,6 +16,8 @@ public enum ErrorCode {
 	NOT_FOUND(HttpStatus.NOT_FOUND, "요청하신 경로를 찾을 수 없습니다."),
 	NOT_RESOURCE_OWNER(HttpStatus.FORBIDDEN, "해당 리소스 소유자가 아닙니다."),
 	EXTERNAL(HttpStatus.BAD_GATEWAY, "외부 시스템 연동 중 오류가 발생했습니다."),
+	INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 정렬 조건입니다."),
+
 	// Valid
 	VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "Validation Error"),
 
@@ -39,12 +41,15 @@ public enum ErrorCode {
 
 	// Profile
 	ALREADY_DELETE_USER(HttpStatus.BAD_REQUEST, "이미 삭제된 계정입니다."),
-    //store
-    STORE_CLOSED(HttpStatus.UNPROCESSABLE_ENTITY, "현재 주문 가능한 상태가 아닙니다." ),
 
-    //menu
+    // Store
+    STORE_CLOSED(HttpStatus.UNPROCESSABLE_ENTITY, "현재 주문 가능한 상태가 아닙니다." ),
+	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 가게입니다."),
+
+    // Menu
     MENU_UNAVAILABLE(HttpStatus.NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
     OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "해당 메뉴의 재고가 부족합니다."),
+
     // Order
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
     ORDER_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "주문이 완료되지 않았습니다."),
@@ -56,6 +61,7 @@ public enum ErrorCode {
 
 	// Review
 	REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 해당 주문에 대한 리뷰가 존재합니다."),
+	REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."),
 
 	// Payment
 	PAYMENT_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "PG 응답이 시간 초과되었습니다."),
