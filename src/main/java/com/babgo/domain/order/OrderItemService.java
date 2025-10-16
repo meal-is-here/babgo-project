@@ -4,14 +4,12 @@ import com.babgo.application.order.OrderInfo;
 import com.babgo.domain.menu.Menu;
 import com.babgo.domain.menu.MenuRepository;
 import com.babgo.domain.menu.MenuStatus;
-import com.babgo.global.exception.CustomException;
-import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +21,7 @@ public class OrderItemService {
     private final OrderItemRepository orderItemRepository;
     private final MenuRepository menuRepository;
 
-    public void create(List<OrderItemSnapshot> items, Order order) {
+    public List<OrderItem> create(List<OrderItemSnapshot> items, Order order) {
         List<OrderItem> item = items.stream().map(i ->
                 OrderItem.of(
                         order,
@@ -33,7 +31,7 @@ public class OrderItemService {
                         i.getQuantity()
                 )).toList();
 
-        orderItemRepository.saveAll(item);
+        return orderItemRepository.saveAll(item);
     }
 
 
@@ -49,84 +47,62 @@ public class OrderItemService {
     @Retryable(
             retryFor = ObjectOptimisticLockingFailureException.class,
             maxAttempts = 5,
-            backoff = @Backoff(delay = 120, multiplier = 2.0)
+            backoff = @Backoff(delay = 10, multiplier = 2)
     )
-    @Transactional
-    public List<OrderItemSnapshot> reserveStockAndCreateOrderItems(
-            UUID orderId,
-            List<OrderInfo.OrderItemDetail> requestedItems
-    ) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public OrderItemValidationResult reserveStockAndCreateOrderItems(List<OrderInfo.OrderItemDetail> requestedItems) {
 
         if (requestedItems == null || requestedItems.isEmpty()) {
-            throw new CustomException(ErrorCode.BAD_REQUEST, "주문 항목이 비어 있습니다.");
+            return new OrderItemValidationResult(List.of(), List.of(new OrderInfo.InvalidItem(null, "EMPTY_ITEMS")));
         }
 
-        Map<UUID, Integer> requestedQtyByMenuId = requestedItems.stream()
+        Map<UUID, Integer> qtyByMenuId = requestedItems.stream()
                 .collect(Collectors.toMap(
                         OrderInfo.OrderItemDetail::getMenuId,
                         OrderInfo.OrderItemDetail::getQuantity,
                         Integer::sum
                 ));
 
+        List<Menu> loaded = menuRepository.findAllById(new ArrayList<>(qtyByMenuId.keySet()));
+        Map<UUID, Menu> byId = loaded.stream().collect(Collectors.toMap(Menu::getMenuId, it -> it));
 
-        List<UUID> targetMenuIds = new ArrayList<>(requestedQtyByMenuId.keySet());
-        List<Menu> loadedMenus = menuRepository.findAllById(targetMenuIds);
+        List<OrderInfo.InvalidItem> invalids = new ArrayList<>();
+        List<OrderItemSnapshot> valids = new ArrayList<>();
 
-        if (loadedMenus.size() != requestedQtyByMenuId.size()) {
-            throw new CustomException(ErrorCode.NOT_FOUND, "요청한 일부 메뉴를 찾을 수 없습니다.");
-        }
+        for (var e : qtyByMenuId.entrySet()) {
+            UUID menuId = e.getKey();
+            int qty = e.getValue();
+            Menu menu = byId.get(menuId);
 
-        Map<UUID, Menu> menusById = loadedMenus.stream()
-                .collect(Collectors.toMap(Menu::getMenuId, it -> it));
-
-
-        for (Map.Entry<UUID, Integer> entry : requestedQtyByMenuId.entrySet()) {
-            UUID menuId = entry.getKey();
-            int qtyRequested = entry.getValue();
-
-            if (qtyRequested <= 0) {
-                throw new CustomException(ErrorCode.BAD_REQUEST, "수량은 1 이상이어야 합니다. menuId=" + menuId);
+            if (menu == null) {
+                invalids.add(new OrderInfo.InvalidItem(menuId, "NOT_FOUND"));
+                continue;
             }
 
-            Menu menu = menusById.get(menuId);
+            if (qty <= 0) {
+                invalids.add(new OrderInfo.InvalidItem(menuId, "BAD_QUANTITY"));
+                continue;
+            }
             if (menu.getMenuStatus() != MenuStatus.AVAILABLE) {
-                throw new CustomException(ErrorCode.MENU_UNAVAILABLE, "판매 불가 메뉴가 포함되어 있습니다. menuId=" + menuId);
+                invalids.add(new OrderInfo.InvalidItem(menuId, "UNAVAILABLE"));
+                continue;
+            }
+            if (menu.getStock() < qty) {
+                invalids.add(new OrderInfo.InvalidItem(menuId, "OUT_OF_STOCK"));
+                continue;
             }
 
-            if (menu.getStock() < qtyRequested) {
-                throw new CustomException(ErrorCode.OUT_OF_STOCK, "재고 부족: menuId=" + menuId);
-            }
+            menu.decreaseStock(qty);
+            valids.add(OrderItemSnapshot.of(menuId, menu.getName(), menu.getPrice(), qty));
         }
 
-        requestedQtyByMenuId.forEach((menuId, qtyRequested) -> {
-            Menu menu = menusById.get(menuId);
-            menu.decreaseStock(qtyRequested);
-        });
+        if (!invalids.isEmpty()) {
+            return new OrderItemValidationResult(List.of(), invalids);
+        }
 
+        menuRepository.saveAll(byId.values());
 
-        menuRepository.saveAll(menusById.values());
-
-        return requestedQtyByMenuId.entrySet().stream()
-                .map(e -> {
-                    UUID menuId = e.getKey();
-                    int qty = e.getValue();
-                    Menu menu = menusById.get(menuId);
-                    return OrderItemSnapshot.of(
-                            menuId,
-                            menu.getName(),
-                            menu.getPrice(), // 서버 단가
-                            qty
-                    );
-                })
-                .toList();
+        return new OrderItemValidationResult(valids, List.of());
     }
-
-    @Recover
-    public List<OrderItemSnapshot> recoverFromOptimisticLock(ObjectOptimisticLockingFailureException e,
-                                                             UUID orderId,
-                                                             List<OrderInfo.OrderItemDetail> requestedItems) {
-        throw new CustomException(ErrorCode.CONFLICT, "요청이 증가하여 주문을 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.");
-    }
-
 }
 
