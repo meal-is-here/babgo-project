@@ -58,6 +58,15 @@ public class Menu {
     @Column(name = "deleted_by")
     private String deletedBy;
 
+    /**
+     * 주문 생성 -> 낙관적락을 위한 버전 필드 추가
+     * 이유 : 재고 차감을 진행할 때 레이스 컨디션에 위한 로스트업데이트 방지를 위해
+     * 주석은 확인 후 삭제해 주세요!
+     */
+    @Version
+    @Column(name = "menu_version", nullable = false)
+    private Long version;
+
 //    @Column(name = "store_id")
 //    private UUID storeId;
 
