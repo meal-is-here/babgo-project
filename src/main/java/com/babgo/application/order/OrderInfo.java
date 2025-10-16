@@ -3,6 +3,7 @@ package com.babgo.application.order;
 import com.babgo.controller.order.OrderRequest;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderItem;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,7 @@ public class OrderInfo {
     @Getter
     @RequiredArgsConstructor
     public static class Create{
-        private final String storeId;
+        private final UUID storeId;
         private final Long userId;
         private final String deliveryRequest;
         private final String deliveryAddress;
@@ -145,8 +146,6 @@ public class OrderInfo {
         private final UUID orderItemId;
         private final UUID menuId;
         private final String menuName;
-        private final UUID optionId;
-        private final String optionName;
         private final Long price;
         private final int quantity;
         private final Long lineTotal;
@@ -156,8 +155,6 @@ public class OrderInfo {
                     item.getOrderItemId(),
                     item.getMenuId(),
                     "메뉴이름",
-                    item.getMenuOptionId(),
-                    "옵션 이름",
                     item.getUnitPrice(),
                     item.getQuantity(),
                     item.getTotalPrice()
@@ -182,6 +179,32 @@ public class OrderInfo {
 
         public static CancelResult reject(String message) {
             return new CancelResult(false, message);
+        }
+    }
+
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class ValidationResult{
+
+        private final List<ValidatedItem> items;
+        private final long totalPrice;
+
+        @Getter
+        @AllArgsConstructor
+        public static class ValidatedItem {
+            private final UUID menuId;
+            private final String menuName;
+            private final long unitPrice;
+            private final int quantity;
+            private final long lineTotal;
+        }
+
+        public static ValidationResult from(List<ValidatedItem> items) {
+            long total = items.stream()
+                    .mapToLong(ValidatedItem::getLineTotal)
+                    .sum();
+            return new ValidationResult(items, total);
         }
     }
 }

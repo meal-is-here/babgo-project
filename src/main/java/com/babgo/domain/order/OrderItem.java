@@ -26,9 +26,6 @@ public class OrderItem{
     @Column(name = "menu_id", nullable = false)
     private UUID menuId;
 
-    @Column(name = "menu_option_id", nullable = false)
-    private UUID menuOptionId;
-
     @Column(name = "unit_price", nullable = false)
     private Long unitPrice;
 
@@ -41,7 +38,6 @@ public class OrderItem{
     private OrderItem(
             Order order,
             UUID menuId,
-            UUID menuOptionId,
             Long unitPrice,
             Long totalPrice,
             Integer quantity
@@ -59,13 +55,9 @@ public class OrderItem{
             throw new CustomException(ErrorCode.VALIDATION_ERROR,"주문 정보를 찾을 수 없습니다.");
         }
 
-        if (menuOptionId == null) {
-            throw new CustomException(ErrorCode.VALIDATION_ERROR,"메뉴의 옵션 정보를 찾을 수 없습니다.");
-        }
 
         this.order = order;
         this.menuId = menuId;
-        this.menuOptionId = menuOptionId;
         this.unitPrice = unitPrice;
         this.totalPrice = totalPrice;
         this.quantity = quantity;
@@ -74,11 +66,10 @@ public class OrderItem{
     public static OrderItem of(
             Order order,
             UUID menuId,
-            UUID menuOptionId,
             Long unitPrice,
             Long totalPrice,
             Integer quantity
     ) {
-        return new OrderItem(order, menuId, menuOptionId, unitPrice, totalPrice , quantity);
+        return new OrderItem(order, menuId, unitPrice, totalPrice , quantity);
     }
 }
