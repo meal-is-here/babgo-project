@@ -74,9 +74,4 @@ public class UserDetailInfo implements UserDetails {
     public String getEmail() {
         return user.getEmail();
     }
-
-    //편의 메소드 - 사용자 권한을 반환
-    public UserRole getRole() {
-        return user.getRole();
-    }
 }

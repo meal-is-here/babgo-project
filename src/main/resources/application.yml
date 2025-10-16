@@ -1,0 +1,65 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: babgo
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+  ai:
+    openai:
+      api-key: ${GOOGLE_AI_API_KEY}
+      google-project-id: "my-project-id"
+      google-location: "us-central1"
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completion-path: /v1beta/models
+        model: gemini-2.0-flash
+      embedding:
+        model: models/gemini-embedding-001
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+  cookie:
+    secure: ${JWT_COOKIE_SECURE:false}
+    domain: ${JWT_COOKIE_DOMAIN:localhost}
+    same-site: ${JWT_COOKIE_SAME_SITE:Lax}
+
+fastapi:
+  RECOMMENDATION_FASTAPI_URL: ${RECOMMENDATION_FASTAPI_URL}
+  REVIEW_ANALYSIS_FASTAPI_URL: ${REVIEW_ANALYSIS_FASTAPI_URL}
+
+logging:
+  level:
+    com.babgo: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+
+payment:
+  success-base-url: ${PAYMENT_BASEURL}
+  fail-base-url: ${PAYMENT_FAIL_BASEURL}
+  webhook-url: ${PAYMENT_WEBHOOK_URL}
+
+pg-sim:
+  auto: approve
