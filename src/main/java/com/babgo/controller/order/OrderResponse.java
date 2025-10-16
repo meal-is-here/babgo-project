@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -59,16 +60,57 @@ public class OrderResponse {
     @Getter
     @RequiredArgsConstructor
     public static class Create {
-        private final UUID orderId;
-        private final Long totalPrice;
-        private final String orderStatus;
 
-        public static OrderResponse.Create from(OrderInfo.CreateResult output) {
-            return new OrderResponse.Create(
+        private final boolean ok;
+        private final String message;
+        private final UUID orderId;
+        private final String orderStatus;
+        private final Long totalPrice;
+        private final List<InvalidItem> invalidItems;
+
+        /**
+         * 성공 결과 변환
+         */
+        public static Create from(OrderInfo.CreateResult output) {
+            List<InvalidItem> invalids = Optional.ofNullable(output.getInvalidItems())
+                    .orElse(List.of())
+                    .stream()
+                    .map(InvalidItem::from)
+                    .toList();
+
+            return new Create(
+                    output.isOk(),
+                    output.getMessage(),
                     output.getOrderId(),
+                    output.getStatus(),
                     output.getTotalPrice(),
-                    output.getStatus()
+                    invalids
             );
+        }
+
+        /**
+         * 실패(단순 메시지용) 결과 변환
+         */
+        public static Create fail(String message) {
+            return new Create(false, message, null, null, null, List.of());
+        }
+
+        /**
+         * 실패(상세 invalidItems 포함) 결과 변환
+         */
+        public static Create fail(String message, List<InvalidItem> invalidItems) {
+            return new Create(false, message, null, null, null, invalidItems);
+        }
+
+        @Getter
+        @RequiredArgsConstructor
+        public static class InvalidItem {
+            private final UUID menuId;
+            private final String reason;
+
+            public static InvalidItem from(OrderInfo.InvalidItem src) {
+                return new InvalidItem(src.getMenuId(), src.getReason());
+            }
         }
     }
 
