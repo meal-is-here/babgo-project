@@ -20,7 +20,7 @@ public class SearchFacade {
     @Transactional(readOnly = true)
     public List<CreateResult> getSearch(SearchInfo.Create searchInfo) {
 
-        List<Search> searchList;
+        List<SearchCommand.CreateResult> searchList;
 
         // 검색 타입에 따라 분기
         switch (SearchType.valueOf(searchInfo.getSearchType().toUpperCase())) {

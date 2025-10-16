@@ -13,12 +13,25 @@ public class SearchService {
 
     private final SearchRepository searchRepository;
 
+    private final SearchRedisRepository searchRedisRepository;
 
-    public List<Search> getStoreSearch(SearchCommand.Create searchCommand) {
-        return searchRepository.getStoreSearch(searchCommand, DEFAULT_RADIUS_METER);
+
+    public List<SearchCommand.CreateResult> getStoreSearch(SearchCommand.Create searchCommand) {
+        List<Search> list = searchRepository.getStoreSearch(searchCommand, DEFAULT_RADIUS_METER);
+        return SearchCommand.CreateResult.from(list);
     }
 
-    public List<Search> getCategorySearch(SearchCommand.Create searchCommand) {
-        return searchRepository.getCategorySearch(searchCommand, DEFAULT_RADIUS_METER);
+    public List<SearchCommand.CreateResult> getCategorySearch(SearchCommand.Create searchCommand) {
+
+        // 카테고리로 키로 레디스 있는지 확인
+        List<SearchCommand.CreateResult> searches = searchRedisRepository.getCategoryRegionCache(searchCommand);
+
+        if (searches.isEmpty()) {
+            List<Search> list = searchRepository.getCategorySearch(searchCommand, DEFAULT_RADIUS_METER);
+            return SearchCommand.CreateResult.from(list);
+        }
+
+        return searches;
+
     }
 }
