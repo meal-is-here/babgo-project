@@ -1,6 +1,8 @@
 package com.babgo.auth.jwtfilter;
 
 import com.babgo.auth.JwtTokenProvider;
+import com.babgo.auth.exception.FilterExceptionHandler;
+import com.babgo.auth.exception.JwtTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -31,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final FilterExceptionHandler filterExceptionHandler;
 
     /**
      * 모든 HTTP 요청에 대해 JWT 토큰을 검증하고 인증 정보를 설정합니다.
@@ -51,17 +54,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 1. 요청에서 액세스 토큰 추출 (Authorization 헤더 또는 accessToken 쿠키)
             String token = resolveToken(request);
 
-            // 2. 토큰 검증 및 SecurityContext에 인증 정보 저장
-            if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+            // 2. 토큰이 있는 경우에만 검증 및 인증 정보 설정
+            if (StringUtils.hasText(token)) {
+                // validateToken은 예외를 던지므로 유효한 경우에만 아래 코드 실행
+                jwtTokenProvider.validateToken(token);
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.debug("인증 성공 - user: {}", authentication.getName());
             }
-        } catch (Exception e) {
-            log.error("인증 처리 실패 - message: {}", e.getMessage());
-        }
+            // 토큰이 없는 경우는 예외를 던지지 않고 다음 필터로 진행 (인증 불필요한 엔드포인트 허용)
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+
+        } catch (JwtTokenException e) {
+            // JWT 관련 예외는 구체적인 에러 코드와 메시지로 응답
+            log.warn("JWT 토큰 검증 실패 - path: {}, exception: {}, message: {}",
+                    request.getRequestURI(), e.getClass().getSimpleName(), e.getMessage());
+            filterExceptionHandler.handleJwtException(request, response, e);
+            // 예외 발생 시 필터 체인 중단 (응답이 이미 작성됨)
+
+        } catch (Exception e) {
+            // 예상치 못한 예외도 처리
+            log.error("인증 처리 중 예상치 못한 예외 - path: {}, exception: {}",
+                    request.getRequestURI(), e.getClass().getSimpleName(), e);
+            filterExceptionHandler.handleJwtException(request, response, e);
+            // 예외 발생 시 필터 체인 중단
+        }
     }
 
     /**

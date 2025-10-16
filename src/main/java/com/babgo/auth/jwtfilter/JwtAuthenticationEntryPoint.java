@@ -1,4 +1,4 @@
-package com.babgo.auth.exception;
+package com.babgo.auth.jwtfilter;
 
 import com.babgo.auth.dto.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;

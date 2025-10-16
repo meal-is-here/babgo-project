@@ -1,7 +1,7 @@
 package com.babgo.domain.user.infrastructure;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +17,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserRedisTemplete {
 
     private final RedisTemplate<String, String> redisTemplate;
+
+    public UserRedisTemplete(@Qualifier("authRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     // Redis Key Prefix 정의
     private static final String REFRESH_TOKEN_PREFIX = "user:refresh:";

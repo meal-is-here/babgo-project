@@ -11,6 +11,7 @@ import lombok.Getter;
 public class ErrorResponse {
     private final int status;
     private final String error;
+    private final String code;
     private final String message;
     private final String path;
 
@@ -21,7 +22,7 @@ public class ErrorResponse {
      * @return ErrorResponse 객체
      */
     public static ErrorResponse unauthorized(String message, String path) {
-        return new ErrorResponse(401, "Unauthorized", message, path);
+        return new ErrorResponse(401, "Unauthorized", "UNAUTHORIZED", message, path);
     }
 
     /**
@@ -31,6 +32,6 @@ public class ErrorResponse {
      * @return ErrorResponse 객체
      */
     public static ErrorResponse forbidden(String message, String path) {
-        return new ErrorResponse(403, "Forbidden", message, path);
+        return new ErrorResponse(403, "Forbidden", "FORBIDDEN", message, path);
     }
 }

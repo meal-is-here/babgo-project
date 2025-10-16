@@ -183,10 +183,8 @@ public class AuthenticationService {
         }
 
         // 2. JWT 토큰 자체 검증 (서명, 만료시간)
-        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
-            log.warn("토큰 검증 실패 - 유효하지 않은 리프레시 토큰");
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
-        }
+        // validateRefreshToken은 예외를 던지므로 try-catch로 처리
+        jwtTokenProvider.validateRefreshToken(refreshToken);
 
         // 3. 토큰에서 userId 추출
         Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);

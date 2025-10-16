@@ -1,5 +1,6 @@
 package com.babgo.auth;
 
+import com.babgo.auth.exception.*;
 import com.babgo.auth.jwtfilter.JwtCookiesProperties;
 import com.babgo.domain.user.UserRole;
 import com.babgo.global.exception.CustomException;
@@ -114,24 +115,30 @@ public class JwtTokenProvider {
      * 서명, 만료시간, 형식 등을 확인합니다.
      *
      * @param token JWT 액세스 토큰
-     * @return 유효하면 true, 그렇지 않으면 false
+     * @throws ExpiredTokenException 토큰이 만료된 경우
+     * @throws UnsupportedTokenException 지원되지 않는 토큰 형식인 경우
+     * @throws InvalidTokenException 토큰 형식이 잘못된 경우
+     * @throws EmptyTokenException 토큰이 비어있는 경우
      */
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
-            return true;
-        } catch (ExpiredJwtException e) {
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
             log.error("토큰 검증 실패 - 만료된 토큰: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
+            throw new ExpiredTokenException();
+        } catch (io.jsonwebtoken.UnsupportedJwtException e) {
             log.error("토큰 검증 실패 - 지원되지 않는 토큰: {}", e.getMessage());
+            throw new UnsupportedTokenException();
         } catch (MalformedJwtException e) {
             log.error("토큰 검증 실패 - 잘못된 형식: {}", e.getMessage());
+            throw new InvalidTokenException();
         } catch (SecurityException e) {
             log.error("토큰 검증 실패 - 서명 검증 실패: {}", e.getMessage());
+            throw new InvalidTokenException();
         } catch (IllegalArgumentException e) {
             log.error("토큰 검증 실패 - 빈 토큰: {}", e.getMessage());
+            throw new EmptyTokenException();
         }
-        return false;
     }
 
     /**
@@ -139,22 +146,26 @@ public class JwtTokenProvider {
      * type=refresh claim 확인 및 서명/만료시간을 검증합니다.
      *
      * @param token JWT 리프레시 토큰
-     * @return 유효하면 true, 그렇지 않으면 false
+     * @throws ExpiredTokenException 토큰이 만료된 경우
+     * @throws InvalidTokenException 리프레시 토큰이 아니거나 검증에 실패한 경우
      */
-    public boolean validateRefreshToken(String token) {
+    public void validateRefreshToken(String token) {
         try {
             Claims claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
             if (!"refresh".equals(claims.get("type", String.class))) {
                 log.error("토큰 검증 실패 - 리프레시 토큰이 아님");
-                return false;
+                throw new InvalidTokenException();
             }
-            return true;
-        } catch (ExpiredJwtException e) {
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
             log.error("토큰 검증 실패 - 만료된 리프레시 토큰: {}", e.getMessage());
+            throw new ExpiredTokenException();
+        } catch (JwtTokenException e) {
+            // 이미 커스텀 예외인 경우 그대로 던짐
+            throw e;
         } catch (Exception e) {
             log.error("토큰 검증 실패 - 리프레시 토큰 검증 실패: {}", e.getMessage());
+            throw new InvalidTokenException();
         }
-        return false;
     }
 
     /**

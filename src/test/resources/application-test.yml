@@ -25,15 +25,6 @@ spring:
       port: 6379  # Redis 기본 포트
       password:
 
-jwt:
-  secret: test-secret-key-for-jwt-token-generation-minimum-256-bits-required-for-HS256-algorithm
-  access-token-expiration: 900000  # 15분 (밀리초)
-  refresh-token-expiration: 86400000  # 1일 (밀리초)
-  cookie:
-    secure: false  # 테스트 환경에서는 false
-    domain: localhost
-    same-site: Lax
-
   ai:
     openai:
       api-key: test-api-key
@@ -41,6 +32,15 @@ jwt:
         base-url: http://localhost:8000
         completion-path: /v1/chat/completions
         model: gpt-3.5-turbo
+
+jwt:
+  secret: test-secret-key-for-jwt-token-generation-minimum-256-bits-required-for-HS256-algorithm
+  access-token-expiration: 900000
+  refresh-token-expiration: 86400000
+  cookie:
+    secure: false
+    domain: localhost
+    same-site: Lax
 
 fastapi:
   RECOMMENDATION_FASTAPI_URL: http://localhost:8000  # 테스트용 더미 URL

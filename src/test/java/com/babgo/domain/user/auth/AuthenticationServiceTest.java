@@ -1,6 +1,7 @@
 package com.babgo.domain.user.auth;
 
 import com.babgo.auth.JwtTokenProvider;
+import com.babgo.auth.exception.InvalidTokenException;
 import com.babgo.auth.jwtfilter.JwtCookiesProperties;
 import com.babgo.controller.user.UserRequest;
 import com.babgo.controller.user.UserResponse;
@@ -27,6 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -232,7 +235,7 @@ class AuthenticationServiceTest {
             // given
             String refreshToken = "valid-refresh-token";
             given(userRedisTemplete.isBlacklisted(refreshToken)).willReturn(false);
-            given(jwtTokenProvider.validateRefreshToken(refreshToken)).willReturn(true);
+            willDoNothing().given(jwtTokenProvider).validateRefreshToken(refreshToken);
             given(jwtTokenProvider.getUserIdFromRefreshToken(refreshToken)).willReturn(1L);
             given(userRedisTemplete.validateRefreshToken(1L, refreshToken)).willReturn(true);
             given(userRepository.findByUserIdAndDeletedAtIsNull(1L)).willReturn(Optional.of(testUser));
@@ -266,12 +269,11 @@ class AuthenticationServiceTest {
             // given
             String refreshToken = "invalid-token";
             given(userRedisTemplete.isBlacklisted(refreshToken)).willReturn(false);
-            given(jwtTokenProvider.validateRefreshToken(refreshToken)).willReturn(false);
+            willThrow(new InvalidTokenException()).given(jwtTokenProvider).validateRefreshToken(refreshToken);
 
             // when & then
             assertThatThrownBy(() -> authenticationService.refreshAccessToken(refreshToken))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN);
+                    .isInstanceOf(InvalidTokenException.class);
         }
 
         @Test
@@ -280,7 +282,7 @@ class AuthenticationServiceTest {
             // given
             String refreshToken = "valid-but-different-token";
             given(userRedisTemplete.isBlacklisted(refreshToken)).willReturn(false);
-            given(jwtTokenProvider.validateRefreshToken(refreshToken)).willReturn(true);
+            willDoNothing().given(jwtTokenProvider).validateRefreshToken(refreshToken);
             given(jwtTokenProvider.getUserIdFromRefreshToken(refreshToken)).willReturn(1L);
             given(userRedisTemplete.validateRefreshToken(1L, refreshToken)).willReturn(false);
 
@@ -296,7 +298,7 @@ class AuthenticationServiceTest {
             // given
             String refreshToken = "valid-refresh-token";
             given(userRedisTemplete.isBlacklisted(refreshToken)).willReturn(false);
-            given(jwtTokenProvider.validateRefreshToken(refreshToken)).willReturn(true);
+            willDoNothing().given(jwtTokenProvider).validateRefreshToken(refreshToken);
             given(jwtTokenProvider.getUserIdFromRefreshToken(refreshToken)).willReturn(1L);
             given(userRedisTemplete.validateRefreshToken(1L, refreshToken)).willReturn(true);
             given(userRepository.findByUserIdAndDeletedAtIsNull(1L)).willReturn(Optional.empty());
