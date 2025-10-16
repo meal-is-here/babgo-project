@@ -3,7 +3,6 @@ package com.babgo.application.order;
 import com.babgo.controller.order.OrderRequest;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderItem;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -82,18 +81,72 @@ public class OrderInfo {
     @Getter
     @RequiredArgsConstructor
     public static class CreateResult {
+
+        private final boolean ok;
+        private final String message;
+
         private final UUID orderId;
         private final String status;
         private final Long totalPrice;
+        private final List<Item> items;
 
-        public static CreateResult from(Order order) {
+        private final List<InvalidItem> invalidItems;
+
+        public static CreateResult ok(Order order,List<Item> items ) {
             return new CreateResult(
+                    true,
+                    "주문이 정상적으로 생성되었습니다.",
                     order.getOrderId(),
                     order.getOrderStatus().name(),
-                    order.getTotalPrice()
+                    order.getTotalPrice(),
+                    items,
+                    List.of()
+            );
+        }
+
+        public static CreateResult validated(List<Item> items) {
+            long total = items.stream().mapToLong(Item::getLineTotal).sum();
+            return new CreateResult(
+                    true,
+                    "검증이 완료되었습니다.",
+                    null,
+                    null,
+                    total,
+                    items,
+                    List.of()
+            );
+        }
+
+        public static CreateResult reject(String message) {
+            return new CreateResult(
+                    false,
+                    message,
+                    null,
+                    null,
+                    null,
+                    List.of(),
+                    List.of()
+            );
+        }
+
+        public static CreateResult reject(String message, List<InvalidItem> invalidItems) {
+            return new CreateResult(
+                    false,
+                    message,
+                    null,
+                    null,
+                    null,
+                    List.of(),
+                    invalidItems == null ? List.of() : invalidItems
             );
         }
     }
+        @Getter
+        @RequiredArgsConstructor
+        public static class InvalidItem {
+            private final UUID menuId;
+            private final String reason;
+        }
 
     @Getter
     @RequiredArgsConstructor
@@ -182,29 +235,4 @@ public class OrderInfo {
         }
     }
 
-
-    @Getter
-    @RequiredArgsConstructor
-    public static class ValidationResult{
-
-        private final List<ValidatedItem> items;
-        private final long totalPrice;
-
-        @Getter
-        @AllArgsConstructor
-        public static class ValidatedItem {
-            private final UUID menuId;
-            private final String menuName;
-            private final long unitPrice;
-            private final int quantity;
-            private final long lineTotal;
-        }
-
-        public static ValidationResult from(List<ValidatedItem> items) {
-            long total = items.stream()
-                    .mapToLong(ValidatedItem::getLineTotal)
-                    .sum();
-            return new ValidationResult(items, total);
-        }
-    }
 }

@@ -5,8 +5,6 @@ import com.babgo.application.order.port.CancelWindow;
 import com.babgo.domain.order.*;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
-import com.babgo.global.exception.CustomException;
-import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -40,17 +38,19 @@ public class OrderFacade {
         // 가게 존재하고 오픈 상태, 주문 가능인지 확인
         Store store = storeService.findByStoreId(input.getStoreId());
         if (!store.isOrderable(LocalTime.now())) {
-            throw new CustomException(ErrorCode.STORE_CLOSED, "현재 주문 가능한 상태가 아닙니다.");
+            return OrderInfo.CreateResult.reject("현재 가게 운영 시간이 아닙니다.");
         }
         //4. 요청 아이템 → 엔티티 변환 오더 아이템 재고 있는지 검증 후 검증된 객체 리스트 반환
-        List<OrderItemSnapshot> orderItems = orderItemService.reserveStockAndCreateOrderItems(input.getStoreId(), input.getItems());
+        OrderItemValidationResult validation = orderItemService.reserveStockAndCreateOrderItems(input.getItems());
+        if (validation.hasInvalid()) return OrderInfo.CreateResult.reject("일부 메뉴가 주문 불가합니다.", validation.getInvalidItems());
 
         //5. 총액 계산(서버 기준)
-        Long totalPrice = orderItems.stream()
+        List<OrderItemSnapshot> orderItemsSnapshot = validation.getValidItems();
+        long totalPrice = orderItemsSnapshot.stream()
                 .mapToLong(OrderItemSnapshot::lineTotal)
                 .sum();
 
-        //오더 임시 객체 생성
+        // 6) 주문 엔티티 생성/저장
         Order order = Order.of(
                 orderId,
                 store.getStoreId(),
@@ -60,15 +60,17 @@ public class OrderFacade {
                 totalPrice
         );
 
-        //6. 저장 (Service 내부에서 order 먼저, 그 다음 items 저장)
         Order pendingOrder = orderService.create(order);
 
         //7. 검증 완료된 오더 아이템 저장
-        orderItemService.create(orderItems, pendingOrder);
+        List<OrderItem> orderItems = orderItemService.create(orderItemsSnapshot, pendingOrder);
+        List<OrderInfo.Item> items = orderItems.stream().map(OrderInfo.Item::from).toList();
 
+        // 8) 이벤트 발행
         eventPublisher.publishEvent(new OrderCreatedEvent(orderId));
 
-        return OrderInfo.CreateResult.from(pendingOrder);
+        // 9) 성공 결과
+        return OrderInfo.CreateResult.ok(pendingOrder, items);
     }
 
     @Transactional
