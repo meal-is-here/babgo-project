@@ -24,14 +24,14 @@ public class SearchService {
     public List<SearchCommand.CreateResult> getCategorySearch(SearchCommand.Create searchCommand) {
 
         // 카테고리로 키로 레디스 있는지 확인
-        List<SearchCommand.CreateResult> searches = searchRedisRepository.getCategoryRegionCache(searchCommand);
+        List<SearchCache> searches = searchRedisRepository.getCategoryRegionCache(searchCommand);
 
         if (searches.isEmpty()) {
             List<Search> list = searchRepository.getCategorySearch(searchCommand, DEFAULT_RADIUS_METER);
             return SearchCommand.CreateResult.from(list);
         }
 
-        return searches;
+        return SearchCommand.CreateResult.fromCacheList(searches);
 
     }
 }

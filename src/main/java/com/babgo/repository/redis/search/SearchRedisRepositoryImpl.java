@@ -2,8 +2,8 @@ package com.babgo.repository.redis.search;
 
 import static com.babgo.repository.redis.search.SearchRedisKeyFactory.getCategoryRegionSortCache;
 
+import com.babgo.domain.search.SearchCache;
 import com.babgo.domain.search.SearchCommand.Create;
-import com.babgo.domain.search.SearchCommand.CreateResult;
 import com.babgo.domain.search.SearchRedisRepository;
 import com.babgo.domain.search.SearchSort;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +21,8 @@ public class SearchRedisRepositoryImpl implements SearchRedisRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     public SearchRedisRepositoryImpl(@Qualifier("searchRedisTemplate") RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
@@ -29,7 +31,7 @@ public class SearchRedisRepositoryImpl implements SearchRedisRepository {
 
 
     @Override
-    public List<CreateResult> getCategoryRegionCache(Create searchCommand) {
+    public List<SearchCache> getCategoryRegionCache(Create searchCommand) {
 
         // 키 가져오기
         String key = getCategoryRegionSortCache(searchCommand.getRegionCode(), searchCommand.getKeyword(), searchCommand.getSort());
@@ -52,13 +54,10 @@ public class SearchRedisRepositoryImpl implements SearchRedisRepository {
         }
 
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-
-        List<CreateResult> results = jsonSet.stream()
+        List<SearchCache> results = jsonSet.stream()
             .map(json -> {
                 try {
-                    return objectMapper.readValue(json, CreateResult.class);
+                    return objectMapper.readValue(json, SearchCache.class);
                 } catch (JsonProcessingException e) {
                     log.error("redis 역직렬화 실패: {}", e.getMessage(), e);
                     throw new RuntimeException();

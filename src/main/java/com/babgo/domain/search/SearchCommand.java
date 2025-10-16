@@ -116,6 +116,24 @@ public class SearchCommand {
                 ))
                 .toList();
         }
+
+        public static List<SearchCommand.CreateResult> fromCacheList(List<SearchCache> searchList) {
+            return searchList.stream()
+                .map(search -> SearchCommand.CreateResult.of(
+                    search.getStoreId(),
+                    search.getStoreName(),
+                    search.getCategoryId(),
+                    search.getCategoryName(),
+                    search.getAvgRating(),
+                    search.getLikes(),
+                    search.getStoreStatus(),
+                    search.getRegionCode(),
+                    search.getLatitude(),
+                    search.getLongitude(),
+                    search.getOrderCount()
+                ))
+                .toList();
+        }
     }
 
 
