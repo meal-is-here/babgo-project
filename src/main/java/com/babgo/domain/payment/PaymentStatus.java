@@ -2,7 +2,7 @@ package com.babgo.domain.payment;
 
 public enum PaymentStatus {
     READY,
-    PENDING,
+    PROCESSING,
     PAID,
     FAILED,
     CANCELED,

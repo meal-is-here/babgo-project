@@ -1,7 +1,7 @@
 package com.babgo.application.ai;
 
-import com.babgo.controller.ai.RecommendationResponse;
-import com.babgo.domain.ai.recommendation.RecommendationService;
+import com.babgo.controller.ai.RecommendationForUserResponse;
+import com.babgo.domain.ai.by_user_recommendation.RecommendationForUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,12 +11,12 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class RecommendationFacade {
 
-    private final RecommendationService recommendationService;
+    private final RecommendationForUserService recommendationForUserService;
 
     @Value("${fastapi.RECOMMENDATION_FASTAPI_URL}")
     private String fastApiBaseUrl;
 
-    public Mono<RecommendationResponse> getRecommendations(String userId) {
-        return recommendationService.getPersonalizedRecommendations(userId, fastApiBaseUrl);
+    public Mono<RecommendationForUserResponse> getRecommendations(String userId) {
+        return recommendationForUserService.getPersonalizedRecommendations(userId, fastApiBaseUrl);
     }
 }

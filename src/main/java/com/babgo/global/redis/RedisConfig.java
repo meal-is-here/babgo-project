@@ -1,7 +1,9 @@
 package com.babgo.global.redis;
 
+import com.babgo.repository.redis.order.OrderRedisProps;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,6 +17,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties(OrderRedisProps.class)
 public class RedisConfig {
 
     @Value("${spring.data.redis.host:localhost}")
@@ -40,7 +43,7 @@ public class RedisConfig {
     }
 
     // RedisTemplate 설정 (Key/Value 모두 String 직렬화)
-    @Bean
+    @Bean(name = "authRedisTemplate")
     public RedisTemplate<String, String> redisTemplate() {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
@@ -48,6 +51,19 @@ public class RedisConfig {
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
+
+    @Bean(name = "orderRedisTemplate")
+    public RedisTemplate<String, String> orderRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(factory);
+        StringRedisSerializer s = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(s);
+        redisTemplate.setValueSerializer(s);
+        redisTemplate.setHashKeySerializer(s);
+        redisTemplate.setHashValueSerializer(s);
+        redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 }

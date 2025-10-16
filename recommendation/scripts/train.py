@@ -50,7 +50,11 @@ model = NearestNeighbors(metric='cosine', algorithm='brute')
 model.fit(user_store_matrix.T)
 print("모델 학습 완료!")
 
-model_dir = '../models'
+# 현재 스크립트 기준으로 절대 경로 만들기
+script_dir = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.path.join(script_dir, '..', 'models')
+model_dir = os.path.abspath(model_dir)  # 절대 경로 확정
+
 if not os.path.exists(model_dir):
     os.makedirs(model_dir)
 
