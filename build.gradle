@@ -5,7 +5,7 @@ plugins {
 }
 
 ext {
-    springAiVersion = "1.0.3"
+    springAiVersion = "1.1.0-M3"
 //    springAiVersion = "1.1.0"
     set('queryDslVersion', "5.0.0")
 }
@@ -43,9 +43,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     testImplementation 'io.projectreactor:reactor-test'
 
-    // ai
+//    // ai
+//    implementation "org.springframework.ai:spring-ai-spring-boot-starter"
     implementation 'org.springframework.ai:spring-ai-openai'
-//    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
+////    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
 
     // Spring Security - 인증/인가 처리
     implementation 'org.springframework.boot:spring-boot-starter-security'

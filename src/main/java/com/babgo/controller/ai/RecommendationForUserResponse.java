@@ -4,13 +4,13 @@ import com.babgo.domain.store.Store;
 
 import java.util.List;
 
-public record RecommendationResponse(List<StoreInfo> stores) {
+public record RecommendationForUserResponse(List<StoreInfo> stores) {
 
-    public static RecommendationResponse fromStores(List<Store> storeEntities) {
+    public static RecommendationForUserResponse fromStores(List<Store> storeEntities) {
         List<StoreInfo> storeInfos = storeEntities.stream()
                 .map(store -> new StoreInfo(store.getStoreId().toString(), store.getStoreName()))
                 .toList();
-        return new RecommendationResponse(storeInfos);
+        return new RecommendationForUserResponse(storeInfos);
     }
 
     public record StoreInfo(String storeId, String storeName) {}

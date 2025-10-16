@@ -45,7 +45,7 @@ class ReviewControllerTest {
                 "서울시 강남구",
                 20000L
         );
-        order.updateStatus(OrderStatus.CONFIRMED);
+        order.markConfirmed();
         orderRepository.save(order);
 
         ReviewCreateRequest request = new ReviewCreateRequest(

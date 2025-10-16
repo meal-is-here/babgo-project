@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -40,6 +42,8 @@ public class Order extends BaseTimeEntity {
     @Column(name = "order_status", nullable = false)
     private OrderStatus orderStatus;
 
+    @Transient
+    private List<OrderItemSnapshot> itemSnapshotList = Collections.emptyList();
 
     private Order(
             UUID orderId,
@@ -112,4 +116,13 @@ public class Order extends BaseTimeEntity {
     public boolean isCompleted() {
         return this.orderStatus == OrderStatus.CONFIRMED;
     }
+
+    /** 비영속 */
+    public void setConfirmedItems(List<OrderItemSnapshot> snapshots) {
+        this.itemSnapshotList.clear();
+        if (snapshots != null && !snapshots.isEmpty()) {
+            this.itemSnapshotList.addAll(snapshots);
+        }
+    }
+
 }

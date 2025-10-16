@@ -13,7 +13,7 @@ public class OrderRequest {
     @Getter
     @RequiredArgsConstructor
     public static class CreateOrder{
-        private final String storeId;
+        private final UUID storeId;
         private final Long userId;
         private final String deliveryRequest;
         private final String deliveryAddress;

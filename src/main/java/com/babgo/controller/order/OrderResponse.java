@@ -88,8 +88,6 @@ public class OrderResponse {
         public static class ItemView {
             private final UUID menuId;
             private final String menuName;
-            private final UUID optionId;
-            private final String optionName;
             private final Long price;
             private final Long totalPrice;
             private final Integer quantity;
@@ -98,8 +96,6 @@ public class OrderResponse {
                 return new ItemView(
                         item.getMenuId(),
                         item.getMenuName(),
-                        item.getOptionId(),
-                        item.getOptionName(),
                         item.getPrice(),
                         item.getLineTotal(),
                         item.getQuantity()
