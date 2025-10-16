@@ -1,5 +1,6 @@
 package com.babgo.domain.store;
 
+import com.babgo.domain.order.Order;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -10,7 +11,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -22,6 +26,7 @@ class StoreServiceTest {
 
     @Mock StoreRepository storeRepository;
     @Mock CategoryService categoryService;
+    @Mock Order order;
 
     @InjectMocks StoreService storeService;
 
@@ -34,7 +39,7 @@ class StoreServiceTest {
         when(storeRepository.save(same(input))).thenReturn(persisted);
 
         // when
-        Store result = storeService.create(input, "anyUser"); // 현재 구현은 내부에서 "userName" 하드코딩
+        Store result = storeService.create(input, "anyUser");
 
         // then
         assertThat(result).isSameAs(persisted);
@@ -91,7 +96,7 @@ class StoreServiceTest {
         changes.put("storeName", "치킨천국");
         changes.put("latitude", 37.1234d);
         changes.put("openingHours", LocalTime.of(9, 0));
-        changes.put("minOrderAmount", 15000); // Integer
+        changes.put("minOrderAmount", 15000);
         changes.put("categoryId", categoryId);
 
         // when
@@ -122,5 +127,27 @@ class StoreServiceTest {
         // then
         verify(store, times(1)).markDeletedBy("userName");
         verifyNoInteractions(storeRepository, categoryService);
+    }
+
+    @DisplayName("acceptFromConfirmed: Order.acceptFromConfirmed 메서드가 호출된다")
+    @Test
+    void acceptFromConfirmed_calls_order_method() {
+        // when
+        storeService.acceptFromConfirmed(order);
+
+        // then
+        verify(order, times(1)).acceptFromConfirmed();
+        verifyNoMoreInteractions(order);
+    }
+
+    @DisplayName("prepareFromAccepted: Order.prepareFromAccepted 메서드가 호출된다")
+    @Test
+    void prepareFromAccepted_calls_order_method() {
+        // when
+        storeService.prepareFromAccepted(order);
+
+        // then
+        verify(order, times(1)).prepareFromAccepted();
+        verifyNoMoreInteractions(order);
     }
 }
