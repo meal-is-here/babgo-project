@@ -12,10 +12,11 @@ import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -93,7 +94,7 @@ public class StoreFacade {
     }
 
     // 웹훅핸들러에서 여기로 orderId옴.
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void acceptedOrder(UUID orderId) {
         try {
             log.info("이벤트================================"+orderId);
