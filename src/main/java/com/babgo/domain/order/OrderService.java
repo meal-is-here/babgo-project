@@ -27,23 +27,6 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    /**
-     *
-     *  전제: items 는 이미 검증/재고확보 완료 (null 아님, 단가>=0, 수량>=1 보장).
-     *  역할: 합계 계산 + long 오버플로 감지.
-     */
-    public Long calculateTotal(List<OrderItem> items) {
-        if (items == null || items.isEmpty()) return 0L;
-
-        long sum = 0L;
-        for (OrderItem i : items) {
-            long line = Math.multiplyExact(i.getUnitPrice(), i.getQuantity());
-            sum = Math.addExact(sum, line);
-        }
-
-        return sum;
-    }
-
     public Page<Order> findOrders(Long userId, OrderStatus status,Pageable pageable) {
         return orderRepository.findOrders(userId, status,pageable);
     }
