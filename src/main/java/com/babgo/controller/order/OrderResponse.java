@@ -151,4 +151,7 @@ public class OrderResponse {
             );
         }
     }
+
+    public class Cancel {
+    }
 }
