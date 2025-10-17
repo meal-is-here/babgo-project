@@ -42,7 +42,7 @@ class OrderControllerTest {
         var output = new OrderInfo.Orders(List.of(newer, older), 0, 10, 2, 1, false);
 
         when(orderQueryFacade.getAllOrders(
-                any(UUID.class),   // userId
+               1L,   // userId
                 anyString(),       // status
                 anyInt(),          // page
                 anyInt(),          // size

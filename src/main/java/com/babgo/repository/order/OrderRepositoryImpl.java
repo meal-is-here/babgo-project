@@ -29,7 +29,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Page<Order> findOrders(UUID userId, OrderStatus status, Pageable pageable) {
+    public Page<Order> findOrders(Long userId, OrderStatus status, Pageable pageable) {
         return orderJpaRepository.findAllByUserIdAndOrderStatus(userId, status, pageable);
     }
 

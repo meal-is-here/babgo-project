@@ -78,7 +78,6 @@ public class OrderItemService {
                 invalids.add(new OrderInfo.InvalidItem(menuId, "NOT_FOUND"));
                 continue;
             }
-
             if (qty <= 0) {
                 invalids.add(new OrderInfo.InvalidItem(menuId, "BAD_QUANTITY"));
                 continue;
