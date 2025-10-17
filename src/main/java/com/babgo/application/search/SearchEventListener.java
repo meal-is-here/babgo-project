@@ -19,7 +19,7 @@ public class SearchEventListener {
     private final SearchService searchService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onStoreCreated(StoreCreatedEvent event) {
+    public void updateSearchCacheOnStoreCreated(StoreCreatedEvent event) {
 
         log.info("StoreCreatedEvent 수신: {}", event.storeId());
 
