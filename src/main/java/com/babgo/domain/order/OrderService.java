@@ -79,4 +79,11 @@ public class OrderService {
     @Transactional
     public void updateRefundRequested(Order order) {
     }
+
+    @Transactional
+    public void updateFailed(UUID orderId) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
+        order.markCancel();
+    }
 }
