@@ -17,15 +17,13 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-    systemProperty 'file.encoding', 'UTF-8'
+    options.release = 17
 }
 
 repositories {
@@ -90,7 +88,6 @@ dependencies {
 
     // redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.redisson:redisson-spring-boot-starter:3.18.0")
 
 
     // QueryDSL
@@ -134,6 +131,11 @@ dependencyManagement {
     }
 }
 
-tasks.withType(Test).configureEach {
+test {
     useJUnitPlatform()
+    systemProperty 'file.encoding', 'UTF-8'
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = false
+    }
 }

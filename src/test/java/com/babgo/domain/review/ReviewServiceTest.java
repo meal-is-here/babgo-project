@@ -4,7 +4,6 @@ import com.babgo.controller.review.dto.ReviewCreateRequest;
 import com.babgo.controller.review.dto.ReviewResponse;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderRepository;
-import com.babgo.domain.order.OrderStatus;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -106,6 +106,8 @@ class ReviewServiceTest {
     @DisplayName("리뷰 등록 실패 - 이미 리뷰 존재")
     void createReview_fail_duplicateReview() {
         // given
+        order.markConfirmed();
+
         given(orderRepository.findByOrderId(order.getOrderId()))
                 .willReturn(Optional.of(order));
         given(reviewRepository.findByOrderId(order.getOrderId()))

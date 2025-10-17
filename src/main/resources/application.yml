@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: local
   config:
     import: optional:file:.env[.properties]
   application:
@@ -27,6 +25,18 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
+  ai:
+    openai:
+      api-key: ${GOOGLE_AI_API_KEY}
+      google-project-id: "my-project-id"
+      google-location: "us-central1"
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completion-path: /v1beta/models
+        model: gemini-2.0-flash
+      embedding:
+        model: models/gemini-embedding-001
+
 jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
@@ -35,6 +45,10 @@ jwt:
     secure: ${JWT_COOKIE_SECURE:false}
     domain: ${JWT_COOKIE_DOMAIN:localhost}
     same-site: ${JWT_COOKIE_SAME_SITE:Lax}
+
+fastapi:
+  RECOMMENDATION_FASTAPI_URL: ${RECOMMENDATION_FASTAPI_URL}
+  REVIEW_ANALYSIS_FASTAPI_URL: ${REVIEW_ANALYSIS_FASTAPI_URL}
 
 logging:
   level:
@@ -48,4 +62,4 @@ payment:
   webhook-url: ${PAYMENT_WEBHOOK_URL}
 
 pg-sim:
-  auto: approve  # 기본 자동승인
+  auto: approve

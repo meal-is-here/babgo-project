@@ -1,8 +1,8 @@
 package com.babgo.global.security.config;
 
-import com.babgo.global.security.jwt.JwtAccessDeniedHandler;
-import com.babgo.global.security.jwt.JwtAuthenticationEntryPoint;
-import com.babgo.global.security.jwt.JwtAuthenticationFilter;
+import com.babgo.auth.exception.JwtAccessDeniedHandler;
+import com.babgo.auth.jwtfilter.JwtAuthenticationEntryPoint;
+import com.babgo.auth.jwtfilter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

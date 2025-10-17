@@ -2,15 +2,16 @@ package com.babgo.controller.review;
 
 import com.babgo.controller.review.dto.ReviewCreateRequest;
 import com.babgo.controller.review.dto.ReviewResponse;
+import com.babgo.domain.review.ReviewQueryService;
 import com.babgo.domain.review.ReviewService;
 import com.babgo.global.api.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/reviews")
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final ReviewQueryService reviewQueryService;
 
     // create review
     @PostMapping
@@ -29,5 +31,15 @@ public class ReviewController {
         Long userId = 2L;
         ReviewResponse response = reviewService.createReview(userId, request);
         return ApiResponse.success("리뷰 등록 성공", response);
+    }
+
+    // read review by store
+    @GetMapping("/{storeId}")
+    public ApiResponse<List<ReviewResponse>> getReviewsByStore(
+            @PathVariable UUID storeId,
+            @RequestParam(defaultValue = "latest") String sort
+    ) {
+        List<ReviewResponse> reviews = reviewQueryService.getReviewsByStore(storeId, sort);
+        return ApiResponse.success("리뷰 목록 조회 성공", reviews);
     }
 }

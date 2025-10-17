@@ -1,6 +1,8 @@
 src/main/resources/application-local.yml
 
 .env
+codeconvention.md
+annotaionGuide.md
 
 venv/
 

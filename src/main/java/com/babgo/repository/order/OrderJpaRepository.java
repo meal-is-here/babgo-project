@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface OrderJpaRepository extends JpaRepository<Order, UUID> {
-    Page<Order> findAllByUserIdAndOrderStatus(UUID userId, OrderStatus orderStatus, Pageable pageable);
+    Page<Order> findAllByUserIdAndOrderStatus(Long userId, OrderStatus orderStatus, Pageable pageable);
 }

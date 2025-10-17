@@ -22,17 +22,33 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6370  # 운영과 다른 포트 사용 (embedded redis)
+      port: 6379  # Redis 기본 포트
       password:
+
+  ai:
+    openai:
+      api-key: test-api-key
+      google-project-id: "test-project-id"
+      google-location: "us-central1"
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completion-path: /v1beta/models
+        model: gemini-2.0-flash
+      embedding:
+        model: models/gemini-embedding-001
 
 jwt:
   secret: test-secret-key-for-jwt-token-generation-minimum-256-bits-required-for-HS256-algorithm
-  access-token-expiration: 900000  # 15분 (밀리초)
-  refresh-token-expiration: 86400000  # 1일 (밀리초)
+  access-token-expiration: 900000
+  refresh-token-expiration: 86400000
   cookie:
-    secure: false  # 테스트 환경에서는 false
+    secure: false
     domain: localhost
     same-site: Lax
+
+fastapi:
+  RECOMMENDATION_FASTAPI_URL: http://localhost:8000  # 테스트용 더미 URL
+  REVIEW_ANALYSIS_FASTAPI_URL: http://localhost:8000  # 테스트용 더미 URL
 
 logging:
   level:
