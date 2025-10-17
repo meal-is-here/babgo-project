@@ -12,15 +12,18 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-
+@Slf4j
 @Repository
 @RequiredArgsConstructor
-public class SearchQueryDslRepositoryImpl implements SearchRepository {
+public class SearchRepositoryImpl implements SearchRepository {
 
 
     private final JPAQueryFactory jpaQueryFactory;
+
+    private final SearchJpaRepository searchJpaRepository;
 
 
     @Override
@@ -121,4 +124,11 @@ public class SearchQueryDslRepositoryImpl implements SearchRepository {
 
         };
     }
+
+
+    @Override
+    public void saveSearch(Search search) {
+        searchJpaRepository.save(search);
+    }
+
 }

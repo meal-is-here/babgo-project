@@ -5,14 +5,13 @@ import com.babgo.domain.store.Category;
 import com.babgo.domain.store.CategoryService;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +20,7 @@ public class StoreFacade {
 
     private final StoreService storeService;
     private final CategoryService categoryService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void createStore(StoreInfo.Create input) {
@@ -37,7 +37,21 @@ public class StoreFacade {
                 input.getClosingHours(),
                 category
         );
-        storeService.create(store, "userName");
+        Store result = storeService.create(store, "userName");
+
+        eventPublisher.publishEvent(new StoreCreatedEvent(
+            result.getStoreId(),
+            result.getStoreName(),
+            result.getCategory().getCategoryId(),
+            result.getCategory().getCategoryName(),
+            result.getRegionCode(),
+            result.getMinOrderAmount(),   // 임시 평점
+            result.getStoreStatus().toString(),
+            result.getLatitude(),
+            result.getLongitude(),
+            result.getCreatedAt()
+        ));
+
     }
 
     @Transactional
