@@ -79,5 +79,19 @@ public class Search extends BaseTimeEntity {
         return new Search(storeId, regionCode, storeName, categoryId, categoryName, avgRating, likes, orderCount, storeStatus, latitude, longitude);
     }
 
+    public void incrementOrderCount() {
+        this.orderCount++;
+    }
+
+    public void incrementLikeCount() {
+        this.likes++;
+    }
+
+
+    public void updateAverageRating(double avgRating) {
+        this.avgRating = avgRating;
+    }
+
+
 
 }

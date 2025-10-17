@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.geo.Circle;
@@ -115,41 +116,81 @@ public class SearchRedisRepositoryImpl implements SearchRedisRepository {
     @Override
     public void saveStoreCache(SearchCache searchCache) {
 
-        log.info("Saving cache for2 {}", searchCache);
+        saveCacheBySort(searchCache, SearchSort.DISTANCE);
+        saveCacheBySort(searchCache, SearchSort.LIKES);
+        saveCacheBySort(searchCache, SearchSort.ORDER_COUNT);
+        saveCacheBySort(searchCache, SearchSort.CREATED);
 
+    }
+
+
+
+    @Override
+    public void saveCacheBySort(SearchCache cache, SearchSort sort) {
         try {
-            saveGeoCache(searchCache);
-            saveZSetCache(searchCache, SearchSort.LIKES, searchCache.getLikes());
-            saveZSetCache(searchCache, SearchSort.ORDER_COUNT, searchCache.getOrderCount());
-            saveZSetCache(searchCache, SearchSort.CREATED, searchCache.getOrderCount());
+
+            boolean isGeo = (sort == SearchSort.DISTANCE);
+
+            String key = getCategoryRegionSortCache(cache.getRegionCode(), cache.getCategoryId().toString(), sort.name());
+
+            String json = objectMapper.writeValueAsString(cache);
+
+            if (isGeo) {
+                redisTemplate.opsForGeo().add(key, new Point(cache.getLongitude(), cache.getLatitude()), json);
+                log.info("GEO 저장 key={}, storeId={}", key, cache.getStoreId());
+            } else {
+                double score = switch (sort) {
+                    case LIKES -> cache.getLikes();
+                    case ORDER_COUNT -> cache.getOrderCount();
+                    case RATING -> cache.getAvgRating();
+                    case CREATED -> System.currentTimeMillis();
+                    default -> 0;
+                };
+                redisTemplate.opsForZSet().add(key, json, score);
+                redisTemplate.expire(key, Duration.ofHours(1));
+                log.info("ZSET 저장 key={}, storeId={}, sort={}, score={}", key, cache.getStoreId(), sort, score);
+            }
 
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            log.error("Redis 캐시 저장 실패 sort={}, error={}", sort, e.getMessage());
         }
-
-    }
-
-    // 거리순 위치는 변하지 않으니 ttl은 일단 생략
-    private void saveGeoCache(SearchCache cache) throws JsonProcessingException {
-        String key = getCategoryRegionSortCache(cache.getRegionCode(),
-            cache.getCategoryId().toString(), SearchSort.DISTANCE.name());
-        redisTemplate.opsForGeo().add(key, new Point(cache.getLongitude(), cache.getLatitude()), objectMapper.writeValueAsString(cache));
-
     }
 
 
-    // 좋아요, 주문많은순, 가개생설순
-    private void saveZSetCache(SearchCache cache, SearchSort sort, double score)
-        throws JsonProcessingException {
-        String key = getCategoryRegionSortCache(cache.getRegionCode(),
-            cache.getCategoryId().toString(), sort.name());
+    @Override
+    public void incrementOrderCountCache(UUID storeId, UUID categoryId, String regionCode) {
 
-        redisTemplate.opsForZSet().add(key, objectMapper.writeValueAsString(cache), score);
-
-        redisTemplate.expire(key, Duration.ofHours(1));
-
-        log.info("Redis 저장 결과: key={}, storeId={}, sort={}, score={}", key, cache.getStoreId(), sort, score);
+        try {
+            String key = getCategoryRegionSortCache(regionCode, categoryId.toString(), SearchSort.ORDER_COUNT.name());
+            redisTemplate.opsForZSet().incrementScore(key, storeId.toString(), 1);
+            log.info("Redis 주문 수 캐시 증가: storeId={}, key={}", storeId, key);
+        } catch (Exception e) {
+            log.error("Redis 주문 수 증가 실패: {}", e.getMessage(), e);
+        }
     }
 
+    @Override
+    public void incrementLikeCountCache(UUID storeId, UUID categoryId, String regionCode) {
+        try {
+            String key = getCategoryRegionSortCache(regionCode, categoryId.toString(), SearchSort.LIKES.name());
+            redisTemplate.opsForZSet().incrementScore(key, storeId.toString(), 1);
+            log.info("Redis 좋아요 수 캐시 증가: storeId={}, key={}", storeId, key);
+        } catch (Exception e) {
+            log.error("Redis 좋아요 수 증가 실패: {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void updateAverageRatingCache(UUID storeId, UUID categoryId, String regionCode, double averageRatinge) {
+        try {
+            String key = getCategoryRegionSortCache(regionCode, categoryId.toString(), SearchSort.LIKES.name());
+
+            //  새 평균 평점을 반영
+            redisTemplate.opsForZSet().add(key, storeId.toString(), averageRatinge);
+            log.info("Redis 평점 캐시 증가: storeId={}, key={}", storeId, key);
+        } catch (Exception e) {
+            log.error("Redis 평점 갱신 실패: {}", e.getMessage(), e);
+        }
+    }
 
 }

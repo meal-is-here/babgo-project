@@ -131,4 +131,9 @@ public class SearchRepositoryImpl implements SearchRepository {
         searchJpaRepository.save(search);
     }
 
+    @Override
+    public Search findByStoreId(UUID storeId) {
+        return searchJpaRepository.findByStoreId(storeId);
+    }
+
 }
