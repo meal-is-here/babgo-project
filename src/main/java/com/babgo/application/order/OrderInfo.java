@@ -3,6 +3,7 @@ package com.babgo.application.order;
 import com.babgo.controller.order.OrderRequest;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderItem;
+import com.babgo.domain.store.Store;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -67,10 +68,10 @@ public class OrderInfo {
         private final String status;
         private final LocalDateTime createdAt;
 
-        public static OrderDetail from(Order order) {
+        public static OrderDetail from(Order order, Store store) {
             return new OrderDetail(
                     order.getOrderId().toString(),
-                    "가게 이름",
+                    store.getStoreName(),
                     order.getTotalPrice(),
                     order.getOrderStatus().getDescription(),
                     order.getCreatedAt()

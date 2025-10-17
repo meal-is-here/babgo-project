@@ -65,7 +65,7 @@ public class OrderController {
             @RequestParam(defaultValue = "LATEST") String sortType
     ){
         // TODO: 실제 구현에선 인증 사용자에서 userId 가져오기
-        UUID userId = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        Long userId = 1L;
         OrderInfo.Orders output = orderQueryFacade.getAllOrders(userId, status, page, size, sortType);
         OrderResponse.Orders response = OrderResponse.Orders.from(output);
         return ApiResponse.success(response);
