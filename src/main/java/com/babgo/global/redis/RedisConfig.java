@@ -1,4 +1,4 @@
-package com.babgo.global.config;
+package com.babgo.global.redis;
 
 import com.babgo.repository.redis.order.OrderRedisProps;
 import lombok.RequiredArgsConstructor;

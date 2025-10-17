@@ -1,4 +1,4 @@
-package com.babgo.controller.user.dto;
+package com.babgo.controller.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

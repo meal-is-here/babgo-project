@@ -1,4 +1,4 @@
-package com.babgo.global.security.jwt;
+package com.babgo.auth.jwtfilter;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "jwt")  // application.yml의 jwt: 하위 속성들을 자동 매핑
-public class JwtProperties {
+public class JwtCookiesProperties {
     private String secret;
     private Long accessTokenExpiration;
     private Long refreshTokenExpiration;
