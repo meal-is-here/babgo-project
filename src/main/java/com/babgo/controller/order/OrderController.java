@@ -28,7 +28,7 @@ public class OrderController {
         OrderResponse.Create response = OrderResponse.Create.from(output);
 
         if (!output.isOk()) {
-            return  ApiResponse.success(output.getMessage(), response);
+            return  ApiResponse.success(response.getMessage(), response);
         }
         return ApiResponse.success("주문이 생성되었습니다. 결제 정보를 입력해주세요.",response);
     }
@@ -54,7 +54,7 @@ public class OrderController {
             return ApiResponse.success(result.getMessage());
         }
 
-        return ApiResponse.success(result.getMessage(), null);
+        return ApiResponse.success(result.getMessage());
     }
 
     @GetMapping()
@@ -65,7 +65,7 @@ public class OrderController {
             @RequestParam(defaultValue = "LATEST") String sortType
     ){
         // TODO: 실제 구현에선 인증 사용자에서 userId 가져오기
-        UUID userId = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        Long userId = 1L;
         OrderInfo.Orders output = orderQueryFacade.getAllOrders(userId, status, page, size, sortType);
         OrderResponse.Orders response = OrderResponse.Orders.from(output);
         return ApiResponse.success(response);
