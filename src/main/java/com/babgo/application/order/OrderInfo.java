@@ -45,14 +45,12 @@ public class OrderInfo {
     @RequiredArgsConstructor
     public static class OrderItemDetail {
         private final UUID menuId;
-        private final UUID menuOptionId;
         private final Long clientPrice;
         private final Integer quantity;
 
         public static OrderItemDetail from(OrderRequest.OrderItemRequest requestItem){
             return new OrderItemDetail(
                     requestItem.getMenuId(),
-                    requestItem.getMenuOptionId(),
                     requestItem.getPrice(),
                     requestItem.getQuantity()
             );

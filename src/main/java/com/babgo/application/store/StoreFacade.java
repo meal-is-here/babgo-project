@@ -96,6 +96,8 @@ public class StoreFacade {
     @Transactional
     public void acceptedOrder(UUID orderId) {
         try {
+            log.info("이벤트================================"+orderId);
+
             Order order = orderService.getOrder(orderId);
             Long userId = order.getUserId();
             // Store에 ownerId 필드 추가해야함 인증되면 ->
