@@ -66,4 +66,38 @@ public class ReviewQueryServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.STORE_NOT_FOUND.getMessage());
     }
+
+    @Test
+    @DisplayName("사용자별 리뷰 조회 성공 - 최신순")
+    void getReviewsByUser_success_latest() {
+        Long userId = 1L;
+        Review review1 = Review.of(5, "너무 맛있어요!", userId, UUID.randomUUID(), UUID.randomUUID());
+        Review review2 = Review.of(3, "그냥 그래요", userId, UUID.randomUUID(), UUID.randomUUID());
+
+        given(reviewRepository.findAllByUserIdAndDeletedAtIsNull(eq(userId), any(Sort.class)))
+                .willReturn(List.of(review1, review2));
+
+        List<ReviewResponse> result = reviewQueryService.getReviewsByUser(userId, "latest");
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getContent()).isEqualTo("너무 맛있어요!");
+    }
+
+    @Test
+    @DisplayName("사용자별 리뷰 조회 실패 - 잘못된 정렬 조건")
+    void getReviewsByUser_fail_invalidSort() {
+        Long userId = 1L;
+
+        assertThatThrownBy(() -> reviewQueryService.getReviewsByUser(userId, "wrongSort"))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(ErrorCode.INVALID_SORT_TYPE.getMessage());
+    }
+
+    @Test
+    @DisplayName("사용자별 리뷰 조회 실패 - 비로그인 상태 (userId null)")
+    void getReviewsByUser_fail_unauthorized() {
+        assertThatThrownBy(() -> reviewQueryService.getReviewsByUser(null, "latest"))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(ErrorCode.UNAUTHORIZED_USER.getMessage());
+    }
 }
