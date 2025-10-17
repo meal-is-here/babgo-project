@@ -1,6 +1,7 @@
 package com.babgo.controller.order;
 
 import com.babgo.application.order.OrderInfo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
@@ -59,6 +60,7 @@ public class OrderResponse {
 
     @Getter
     @RequiredArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Create {
 
         private final boolean ok;
@@ -88,16 +90,10 @@ public class OrderResponse {
             );
         }
 
-        /**
-         * 실패(단순 메시지용) 결과 변환
-         */
         public static Create fail(String message) {
             return new Create(false, message, null, null, null, List.of());
         }
 
-        /**
-         * 실패(상세 invalidItems 포함) 결과 변환
-         */
         public static Create fail(String message, List<InvalidItem> invalidItems) {
             return new Create(false, message, null, null, null, invalidItems);
         }

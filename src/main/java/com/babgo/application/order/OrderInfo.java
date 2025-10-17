@@ -223,10 +223,6 @@ public class OrderInfo {
         private final boolean ok;
         private final String message;
 
-        public static CancelResult ok() {
-            return new CancelResult(true, "취소되었습니다.");
-        }
-
         public static CancelResult ok(String message) {
             return new CancelResult(true, message);
         }

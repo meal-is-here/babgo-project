@@ -28,7 +28,7 @@ public class OrderController {
         OrderResponse.Create response = OrderResponse.Create.from(output);
 
         if (!output.isOk()) {
-            return  ApiResponse.success(output.getMessage(), response);
+            return  ApiResponse.success(response.getMessage(), response);
         }
         return ApiResponse.success("주문이 생성되었습니다. 결제 정보를 입력해주세요.",response);
     }
@@ -54,7 +54,7 @@ public class OrderController {
             return ApiResponse.success(result.getMessage());
         }
 
-        return ApiResponse.success(result.getMessage(), null);
+        return ApiResponse.success(result.getMessage());
     }
 
     @GetMapping()
