@@ -45,13 +45,14 @@ public class ReviewService {
         );
         Review saved = reviewRepository.save(review);
 
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-            @Override
-            public void afterCommit() {
-                // 비동기로 분석 시작 (쯕시 응답, 분석은 백그라운드)
-                reviewAnalysisService.analyzeReviewAsync(saved.getReviewId());
-            }
-        });
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void afterCommit() {
+                    reviewAnalysisService.analyzeReviewAsync(saved.getReviewId());
+                }
+            });
+        }
 
         return ReviewResponse.from(saved);
     }
