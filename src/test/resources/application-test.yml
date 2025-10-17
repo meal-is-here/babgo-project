@@ -28,10 +28,14 @@ spring:
   ai:
     openai:
       api-key: test-api-key
+      google-project-id: "test-project-id"
+      google-location: "us-central1"
       chat:
-        base-url: http://localhost:8000
-        completion-path: /v1/chat/completions
-        model: gpt-3.5-turbo
+        base-url: https://generativelanguage.googleapis.com
+        completion-path: /v1beta/models
+        model: gemini-2.0-flash
+      embedding:
+        model: models/gemini-embedding-001
 
 jwt:
   secret: test-secret-key-for-jwt-token-generation-minimum-256-bits-required-for-HS256-algorithm
