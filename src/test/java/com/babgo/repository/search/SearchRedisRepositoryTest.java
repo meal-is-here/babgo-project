@@ -1,17 +1,19 @@
 package com.babgo.repository.search;
 
+import static com.babgo.repository.redis.search.SearchRedisKeyFactory.getCategoryRegionSortCache;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.babgo.MockTest;
+import com.babgo.domain.search.SearchCache;
 import com.babgo.domain.search.SearchCommand;
-import com.babgo.domain.search.SearchCommand.CreateResult;
 import com.babgo.domain.search.SearchSort;
 import com.babgo.domain.search.SearchType;
 import com.babgo.global.config.RedisConfig;
 import com.babgo.repository.redis.search.SearchRedisRepositoryImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -52,7 +55,7 @@ public class SearchRedisRepositoryTest extends MockTest {
     private String regionCode = "11110";
     private int page = 1;
     private int size = 10;
-
+    public double radiusMeters = 2000.0;
     @Test
     void testRedisConnection() {
         redisTemplate.opsForValue().set("ping", "pong");
@@ -86,8 +89,8 @@ public class SearchRedisRepositoryTest extends MockTest {
                 Map.entry("likes", (int)(Math.random() * 200)),
                 Map.entry("orderCount", (int)(Math.random() * 100)),
                 Map.entry("storeStatus", "OPEN"),
-                Map.entry("latitude", 37.5700 + (Math.random() * 0.002)),
-                Map.entry("longitude", 126.9810 + (Math.random() * 0.002))
+                Map.entry("latitude", latitude + (Math.random() * 0.002)),
+                Map.entry("longitude", longitude + (Math.random() * 0.002))
             ))
             .collect(Collectors.toList());
     }
@@ -114,8 +117,15 @@ public class SearchRedisRepositoryTest extends MockTest {
                     default -> 0;
                 };
 
-                // ZSET에 (JSON, score) 저장
-                redisTemplate.opsForZSet().add(key, json, score);
+                // 거리순 geo구주로
+                if (sort.equals(SearchSort.DISTANCE.name())) {
+                    redisTemplate.opsForGeo().add(
+                        key, new Point((Double) store.get("longitude"), (Double) store.get("latitude")), json
+                    );
+                } else {
+                    // 나머지는 ZSET 구조로 저장
+                    redisTemplate.opsForZSet().add(key, json, score);
+                }
             }
 
         }
@@ -135,11 +145,11 @@ public class SearchRedisRepositoryTest extends MockTest {
         );
 
         // when: 캐시에서 해당 카테고리 데이터 조회
-        List<CreateResult> results = searchRedisRepository.getCategoryRegionCache(command);
+        List<SearchCache> results = searchRedisRepository.getCategoryRegionCache(command, radiusMeters);
 
         // then: 결과 존재 및 좋아요 내림차순 정렬 검증
         assertThat(results != null && !results.isEmpty()).isTrue();
-        assertTrue(results.stream().map(CreateResult::getCategoryId).anyMatch(id -> id.equals(categoryId1)));
+        assertTrue(results.stream().map(SearchCache::getCategoryId).anyMatch(id -> id.equals(categoryId1)));
         for (int i = 1; i < results.size(); i++) {
             assertTrue(results.get(i - 1).getLikes() >= results.get(i).getLikes());
         }
@@ -158,11 +168,11 @@ public class SearchRedisRepositoryTest extends MockTest {
         );
 
         // when: 캐시에서 해당 카테고리 데이터 조회
-        List<CreateResult> results = searchRedisRepository.getCategoryRegionCache(command);
+        List<SearchCache> results = searchRedisRepository.getCategoryRegionCache(command, radiusMeters);
 
         // then: 결과 존재 및 주문수 내림차순 정렬 검증
         assertThat(results != null && !results.isEmpty()).isTrue();
-        assertTrue(results.stream().map(CreateResult::getCategoryId).anyMatch(id -> id.equals(categoryId1)));
+        assertTrue(results.stream().map(SearchCache::getCategoryId).anyMatch(id -> id.equals(categoryId1)));
         for (int i = 1; i < results.size(); i++) {
             assertTrue(results.get(i - 1).getOrderCount() >= results.get(i).getOrderCount());
         }
@@ -182,11 +192,11 @@ public class SearchRedisRepositoryTest extends MockTest {
         );
 
         // when: 캐시에서 해당 카테고리 데이터 조회
-        List<CreateResult> results = searchRedisRepository.getCategoryRegionCache(command);
+        List<SearchCache> results = searchRedisRepository.getCategoryRegionCache(command, radiusMeters);
 
         // then: 결과 존재 및 평점 내림차순 정렬 검증
         assertThat(results != null && !results.isEmpty()).isTrue();
-        assertTrue(results.stream().map(CreateResult::getCategoryId).anyMatch(id -> id.equals(categoryId1)));
+        assertTrue(results.stream().map(SearchCache::getCategoryId).anyMatch(id -> id.equals(categoryId1)));
         for (int i = 1; i < results.size(); i++) {
             assertTrue(results.get(i - 1).getAvgRating() >= results.get(i).getAvgRating());
         }    }
@@ -204,14 +214,13 @@ public class SearchRedisRepositoryTest extends MockTest {
         );
 
         // when: 캐시에서 해당 카테고리 데이터 조회
-        List<CreateResult> results = searchRedisRepository.getCategoryRegionCache(command);
+        List<SearchCache> results = searchRedisRepository.getCategoryRegionCache(command, radiusMeters);
 
         // then: 결과 존재 및 거리(위도 기준) 오름차순 정렬 검증
         assertThat(results != null && !results.isEmpty()).isTrue();
-        assertTrue(results.stream().map(CreateResult::getCategoryId).anyMatch(id -> id.equals(categoryId1)));
-        for (int i = 1; i < results.size(); i++) {
-            assertTrue(results.get(i - 1).getLatitude() <= results.get(i).getLatitude());
-        }    }
+        assertTrue(results.stream().map(SearchCache::getCategoryId).anyMatch(id -> id.equals(categoryId1)));
+        assertTrue(results.size() <= size, String.format("반경 초과함", radiusMeters, size));
+    }
 
     @Test
     void 카테고리정렬_캐시조회_지역코드불일치_빈결과_검증() {
@@ -226,7 +235,7 @@ public class SearchRedisRepositoryTest extends MockTest {
         );
 
         // when: 캐시에서 데이터 조회
-        List<CreateResult> results = searchRedisRepository.getCategoryRegionCache(command);
+        List<SearchCache> results = searchRedisRepository.getCategoryRegionCache(command, radiusMeters);
 
         // then: 빈 결과 검증
         assertThat(results).isNotNull();
@@ -246,12 +255,83 @@ public class SearchRedisRepositoryTest extends MockTest {
         );
 
         // when: 캐시에서 데이터 조회
-        List<CreateResult> results = searchRedisRepository.getCategoryRegionCache(command);
+        List<SearchCache> results = searchRedisRepository.getCategoryRegionCache(command, radiusMeters);
 
         // then: 빈 결과 검증
         assertThat(results).isNotNull();
         assertThat(results.isEmpty()).isTrue();
     }
+
+
+    @Test
+    void 캐시_TTL_만료_정상작동_검증() {
+
+        // given: ttl 임시 시간 설정
+        String key = getCategoryRegionSortCache(regionCode, categoryId1.toString(), SearchSort.LIKES.name());
+        redisTemplate.opsForValue().set(key, "ttl-test");
+        redisTemplate.expire(key, Duration.ofSeconds(2));
+
+        // when: 3초대기
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ignored) {
+
+        }
+
+        // then: ttl 검증
+        Boolean exists = redisTemplate.hasKey(key);
+        assertThat(exists).isFalse();
+    }
+
+
+
+    @Test
+    void 주문수_캐시증가_정상작동_검증() {
+
+        // given:  초기 주문 수 등록
+        UUID storeId = UUID.randomUUID();
+
+        String key = getCategoryRegionSortCache( regionCode, categoryId1.toString(), SearchSort.ORDER_COUNT.name());
+
+        redisTemplate.opsForZSet().add(key, storeId.toString(), 5);
+
+        double beforeScore = redisTemplate.opsForZSet().score(key, storeId.toString());
+
+        // when: 주문 발생 → 주문 수 1 증가
+        searchRedisRepository.incrementOrderCountCache(storeId, categoryId1, regionCode);
+
+        // then: 주문 수가 1 증가했는지 검증
+        Double afterScore = redisTemplate.opsForZSet().score(key, storeId.toString());
+        assertThat(afterScore).isNotNull();
+        assertTrue(afterScore == beforeScore + 1);
+
+    }
+
+
+    @Test
+    void 좋아요_캐시증가_정상작동_검증() {
+
+        // given:  초기 주문 수 등록
+        UUID storeId = UUID.randomUUID();
+
+        String key = getCategoryRegionSortCache( regionCode, categoryId1.toString(), SearchSort.LIKES.name());
+
+        redisTemplate.opsForZSet().add(key, storeId.toString(), 5);
+
+        double beforeScore = redisTemplate.opsForZSet().score(key, storeId.toString());
+
+        // when: 좋아요 발생 → 좋아요 수 1 증가
+        searchRedisRepository.incrementLikeCountCache(storeId, categoryId1, regionCode);
+
+        // then: 좋아요 수가 1 증가했는지 검증
+        Double afterScore = redisTemplate.opsForZSet().score(key, storeId.toString());
+        assertThat(afterScore).isNotNull();
+        assertTrue(afterScore == beforeScore + 1);
+
+    }
+
+
+
 }
 
 

@@ -26,14 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
 @DataJpaTest
 @ActiveProfiles("local")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({QueryDslConfig.class, SearchQueryDslRepositoryImpl.class})
-public class SearchQueryDslRepositoryTest extends MockTest {
+@Import({QueryDslConfig.class, SearchRepositoryImpl.class})
+public class SearchRepositoryTest extends MockTest {
 
 
     private double radiusMeters = 2000.0;
 
     @Autowired
-    private SearchQueryDslRepositoryImpl searchQueryRepository;
+    private SearchRepositoryImpl searchQueryRepository;
 
     @PersistenceContext
     private EntityManager em;
