@@ -42,4 +42,16 @@ public class ReviewController {
         List<ReviewResponse> reviews = reviewQueryService.getReviewsByStore(storeId, sort);
         return ApiResponse.success("리뷰 목록 조회 성공", reviews);
     }
+
+    // read review by user
+    @GetMapping
+    public ApiResponse<List<ReviewResponse>> getMyReviews(
+            // TODO: 인증 추가 예정
+            // @AuthenticationPrincipal Long userId,
+            @RequestParam(defaultValue = "latest") String sort
+    ) {
+        Long userId = 2L;
+        List<ReviewResponse> reviews = reviewQueryService.getReviewsByUser(userId, sort);
+        return ApiResponse.success("사용자 리뷰 조회 성공", reviews);
+    }
 }

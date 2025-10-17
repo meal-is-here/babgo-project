@@ -1,4 +1,4 @@
-package com.babgo.repository.user.impl;
+package com.babgo.repository.user;
 
 import com.babgo.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

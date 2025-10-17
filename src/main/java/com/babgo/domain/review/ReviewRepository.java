@@ -13,6 +13,8 @@ import java.util.UUID;
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
     List<Review> findByStore_StoreId(UUID storeId, Sort sort);
 
+    List<Review> findAllByUserIdAndDeletedAtIsNull(Long userId, Sort sort);
+
     Optional<Review> findByOrderId(UUID orderId);
 
     boolean existsByStore_StoreId(UUID storeId);
