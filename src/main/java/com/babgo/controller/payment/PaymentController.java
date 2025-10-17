@@ -22,7 +22,6 @@ public class PaymentController {
     public ApiResponse<PaymentResponse.Ready> ready(
             @RequestBody PaymentRequest.Ready request
     ){
-        //TODO 임시 값
         Long userid = 1L;
         PaymentInfo.Ready input = PaymentInfo.Ready.from(userid, request);
         PaymentInfo.ReadyResult output = paymentFacade.ready(input);
