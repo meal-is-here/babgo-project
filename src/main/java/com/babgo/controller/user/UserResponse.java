@@ -1,4 +1,4 @@
-package com.babgo.controller.user.dto;
+package com.babgo.controller.user;
 
 import com.babgo.domain.user.UserRole;
 import lombok.AllArgsConstructor;

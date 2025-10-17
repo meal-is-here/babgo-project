@@ -1,7 +1,6 @@
-package com.babgo.repository.user.impl;
+package com.babgo.repository.user;
 
 import com.babgo.domain.user.User;
-import com.babgo.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

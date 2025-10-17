@@ -108,6 +108,15 @@ public class User extends BaseTimeEntity {
     }
 
     /**
+     * 사용자 소프트 삭제
+     */
+    @Override
+    public void markAsDeleted() {
+        this.isUserDeleted = true;
+        super.markAsDeleted();
+    }
+
+    /**
      * 소프트 딜리트된 사용자 복구
      */
     public void restore() {
