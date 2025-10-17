@@ -72,4 +72,9 @@ public class Review extends BaseTimeEntity {
     public static Review of(int rating, String content, Long userId, UUID storeId, UUID orderId) {
         return new Review(rating, content, userId, storeId, orderId);
     }
+
+    public void updateReview(int rating, String content) {
+        this.rating = rating;
+        this.content = content;
+    }
 }
