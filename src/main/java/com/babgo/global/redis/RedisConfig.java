@@ -66,4 +66,18 @@ public class RedisConfig {
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
+
+
+    @Bean(name = "searchRedisTemplate")
+    public RedisTemplate<String, String> searchRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(factory);
+        StringRedisSerializer s = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(s);
+        redisTemplate.setValueSerializer(s);
+        redisTemplate.setHashKeySerializer(s);
+        redisTemplate.setHashValueSerializer(s);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
 }

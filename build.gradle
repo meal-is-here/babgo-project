@@ -7,6 +7,7 @@ plugins {
 ext {
     springAiVersion = "1.1.0-M3"
 //    springAiVersion = "1.1.0"
+    set('queryDslVersion', "5.0.0")
 }
 
 group = 'com.babgo'
@@ -84,6 +85,41 @@ dependencies {
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
     implementation "org.springframework.cloud:spring-cloud-starter-openfeign:4.3.0"
+
+    // redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.redisson:redisson-spring-boot-starter:3.18.0")
+
+
+    // QueryDSL
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+}
+
+
+
+def queryDslSrcDir = 'src/main/generated/'
+
+tasks.withType(JavaCompile).configureEach {
+    options.getGeneratedSourceOutputDirectory().set(file(queryDslSrcDir))
+}
+
+sourceSets {
+    main.java.srcDirs += [queryDslSrcDir]
+}
+
+clean {
+    delete file(queryDslSrcDir)
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
 }
 
 springBoot {
