@@ -2,6 +2,7 @@ package com.babgo.global.config;
 
 import com.babgo.repository.redis.order.OrderRedisProps;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ import com.babgo.repository.redis.order.OrderExpiredListener;
 /**
  * Redis 설정 - Refresh Token 저장소 & Keyspace Notification
  */
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(OrderRedisProps.class)
@@ -35,14 +37,27 @@ public class RedisConfig {
     // Redis 연결 팩토리 (Lettuce 사용)
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
+        
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(host);
         config.setPort(port);
+        
         // 빈 값이 아닐 때만 password 설정
         if (password != null && !password.isEmpty()) {
             config.setPassword(password);
         }
-        return new LettuceConnectionFactory(config);
+        
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(config);
+        factory.afterPropertiesSet();
+
+        try {
+            factory.getConnection().serverCommands()
+                .setConfig("notify-keyspace-events", "Ex");
+        } catch (Exception e) {
+            log.error("Redis Keyspace Notification 설정 실패", e);
+        }
+
+        return factory;
     }
 
     // RedisTemplate 설정 (Key/Value 모두 String 직렬화)
@@ -93,7 +108,6 @@ public class RedisConfig {
         container.setConnectionFactory(connectionFactory);
 
         // Keyspace notification 구독
-        // __keyevent@0__:expired 채널 리스닝
         container.addMessageListener(
                 orderExpiredListener,
                 new PatternTopic("__keyevent@*__:expired")
