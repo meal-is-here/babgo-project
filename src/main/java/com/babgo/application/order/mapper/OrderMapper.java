@@ -21,7 +21,7 @@ public class OrderMapper {
 
         String normalized = statusStr.trim().toUpperCase().replace("-", "_");
         try {
-            return OrderStatus.valueOf(normalized);
+            return OrderStatus.valueOf(statusStr.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new CustomException(ErrorCode.INVALID, "올바르지 않은 주문 상태입니다.");
         }

@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface OrderRepository {
     UUID findNextOrderId();
     Order save(Order orderModel);
-    Page<Order> findOrders(UUID user, OrderStatus status, Pageable pageable);
+    Page<Order> findOrders(Long user, OrderStatus status, Pageable pageable);
 
     Optional<Order> findByOrderId(UUID orderId);
 }

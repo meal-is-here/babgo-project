@@ -42,7 +42,7 @@ public class OrderService {
         return sum;
     }
 
-    public Page<Order> findOrders(UUID userId, OrderStatus status,Pageable pageable) {
+    public Page<Order> findOrders(Long userId, OrderStatus status,Pageable pageable) {
         return orderRepository.findOrders(userId, status,pageable);
     }
 
