@@ -50,14 +50,15 @@ public enum ErrorCode {
     MENU_UNAVAILABLE(HttpStatus.NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
     OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "해당 메뉴의 재고가 부족합니다."),
 
-    // Order
-    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
-    ORDER_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "주문이 완료되지 않았습니다."),
-    ORDER_NOT_PAYABLE(HttpStatus.UNPROCESSABLE_ENTITY, "주문 상태상 결제를 진행할 수 없습니다."),
-    ORDER_NOT_CANCELABLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 상태에서는 주문을 취소할 수 없습니다."),
-    ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "이미 취소된 주문입니다."),
-    ORDER_ALREADY_REFUNDED(HttpStatus.CONFLICT, "이미 환불된 주문입니다."),
-    CONFLICT(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+	// Order
+	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+	ORDER_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "주문이 완료되지 않았습니다."),
+	ORDER_NOT_PAYABLE(HttpStatus.UNPROCESSABLE_ENTITY, "주문 상태상 결제를 진행할 수 없습니다."),
+	ORDER_NOT_CANCELABLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 상태에서는 주문을 취소할 수 없습니다."),
+	ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "이미 취소된 주문입니다."),
+	ORDER_ALREADY_REFUNDED(HttpStatus.CONFLICT, "이미 환불된 주문입니다."),
+	INVALID_ORDER_STATE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
+	CONFLICT(HttpStatus.CONFLICT, "리소스 충돌이 발생했습니다."),
 
 	// Review
 	REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 해당 주문에 대한 리뷰가 존재합니다."),
