@@ -72,4 +72,11 @@ public class Review extends BaseTimeEntity {
     public static Review of(int rating, String content, Long userId, UUID storeId, UUID orderId) {
         return new Review(rating, content, userId, storeId, orderId);
     }
+
+    @Enumerated(EnumType.STRING)
+    private ReviewStatus reviewStatus;
+
+    public void updateStatus(ReviewStatus reviewStatus) {
+        this.reviewStatus = reviewStatus;
+    }
 }

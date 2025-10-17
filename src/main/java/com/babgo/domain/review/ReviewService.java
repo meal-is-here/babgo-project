@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -34,7 +36,9 @@ public class ReviewService {
 
         // 중복 리뷰 방지
         reviewRepository.findByOrderId(request.getOrderId())
-                .ifPresent(r -> { throw new CustomException(ErrorCode.REVIEW_ALREADY_EXISTS); });
+                .ifPresent(r -> {
+                    throw new CustomException(ErrorCode.REVIEW_ALREADY_EXISTS);
+                });
 
         Review review = Review.of(
                 request.getRating(),
@@ -55,5 +59,22 @@ public class ReviewService {
         }
 
         return ReviewResponse.from(saved);
+    }
+
+    @Transactional
+    public void deleteReview(Long userId, UUID reviewId) {
+        Review review = reviewRepository.findByReviewIdAndReviewStatusNot(reviewId, ReviewStatus.DELETED)
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+
+        if (!review.getUser().getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN_REVIEW_DELETE);
+        }
+
+        if (review.getReviewStatus() == ReviewStatus.DELETED) {
+            throw new CustomException(ErrorCode.ALREADY_DELETED_REVIEW);
+        }
+
+        review.updateStatus(ReviewStatus.DELETED);
+        reviewRepository.save(review);
     }
 }
