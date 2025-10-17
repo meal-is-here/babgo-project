@@ -17,9 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -162,4 +165,58 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("유효하지 않은 정렬 조건입니다."));
     }
+
+
+    private void setAuthPrincipal(Long userId) {
+        SecurityContextHolder.clearContext();
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(userId, null, List.of())
+        );
+    }
+
+    @Test
+    @DisplayName("사용자별 리뷰 조회 - 성공 (최신순 기본)")
+    void getMyReviews_success_latest() throws Exception {
+        // given
+        setAuthPrincipal(1L);
+
+        // when & then
+        mockMvc.perform(get("/v1/reviews")
+                        .param("sort", "latest")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("사용자 리뷰 조회 성공"))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @DisplayName("사용자별 리뷰 조회 - 실패 (잘못된 정렬 조건)")
+    void getMyReviews_fail_invalidSort() throws Exception {
+        // given
+        setAuthPrincipal(1L);
+
+        // when & then
+        mockMvc.perform(get("/v1/reviews")
+                        .param("sort", "invalid")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("유효하지 않은 정렬 조건입니다."));
+    }
+
+//    @Test
+//    @DisplayName("사용자별 리뷰 조회 - 실패 (비로그인 401)")
+//    void getMyReviews_fail_unauthorized() throws Exception {
+//        // given
+//        SecurityContextHolder.clearContext();
+//
+//        // when & then
+//        mockMvc.perform(get("/v1/reviews")
+//                        .param("sort", "latest")
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isUnauthorized())
+//                .andExpect(jsonPath("$.success").value(false))
+//                .andExpect(jsonPath("$.message").value("로그인이 필요합니다."));
+//    }
 }
