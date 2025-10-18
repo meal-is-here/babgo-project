@@ -15,7 +15,8 @@ public enum OrderStatus {
     CANCELED("취소됨"),
     REFUNDED("환불됨"),
     REFUND_REQUESTED("환불 요청중"),
-    FAILED("실패");
+    FAILED("실패"),
+    EXPIRED("시간만료");
 
     private final String description;
 
