@@ -8,6 +8,7 @@ import com.babgo.global.exception.ErrorCode;
 import com.babgo.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -33,5 +34,17 @@ public class LikeService {
 
         Like like = Like.of(user, store);
         return likeRepository.save(like);
+    }
+
+    // unlike store
+    @Transactional
+    public void unlikeStore(Long userId, UUID storeId) {
+        Like like = likeRepository.findByUserUserIdAndStoreStoreId(userId, storeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
+
+        likeRepository.delete(like);
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
     }
 }
