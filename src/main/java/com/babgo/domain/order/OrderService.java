@@ -79,4 +79,23 @@ public class OrderService {
     @Transactional
     public void updateRefundRequested(Order order) {
     }
+
+    @Transactional
+    public void updateFailed(UUID orderId) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
+        order.markCancel();
+    }
+
+
+    @Transactional
+    public void expireOrder(UUID orderId) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "주문을 찾을 수 없습니다."));
+
+        if (order.getOrderStatus() == OrderStatus.PENDING) {
+            order.markExpired();
+        }
+    }
+
 }

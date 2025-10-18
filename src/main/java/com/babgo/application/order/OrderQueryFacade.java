@@ -1,14 +1,13 @@
 package com.babgo.application.order;
 
 import com.babgo.application.order.mapper.OrderMapper;
+import com.babgo.domain.menu.Menu;
+import com.babgo.domain.menu.MenuService;
 import com.babgo.domain.order.*;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
-import com.babgo.global.exception.CustomException;
-import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.ssl.PemSslBundleProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +15,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -26,6 +27,7 @@ public class OrderQueryFacade {
 
     private final OrderService orderService;
     private final StoreService storeService;
+    private final MenuService menuService;
 
     @Transactional(readOnly = true)
     public OrderInfo.Orders getAllOrders(
@@ -56,12 +58,22 @@ public class OrderQueryFacade {
         Order order = orderService.getOrder(orderId);
         List<OrderItem> orderItems = orderService.findAllOrderItem(order.getOrderId());
 
-        List<OrderInfo.Item> items = orderItems
-                .stream()
-                .map(OrderInfo.Item::from)
+        List<UUID> menuIds = orderItems.stream()
+                .map(OrderItem::getMenuId)
                 .toList();
 
-        return OrderInfo.OrderAndItems.from(order,items);
+        List<Menu> menus = menuService.findAllByIds(menuIds);
+        Map<UUID, Menu> menuMap = menus.stream()
+                .collect(Collectors.toMap(Menu::getMenuId, menu -> menu));
+
+        List<OrderInfo.Item> items = orderItems.stream()
+                .map(orderItem -> {
+                    Menu menu = menuMap.get(orderItem.getMenuId());
+                    return OrderInfo.Item.from(orderItem, menu);
+                })
+                .toList();
+
+        return OrderInfo.OrderAndItems.from(order, items);
 
     }
 }

@@ -22,4 +22,7 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     Optional<Review> findByReviewIdAndDeletedAtIsNull(UUID reviewId);
 
+    boolean existsByStore_StoreId(UUID storeId);
+
+    Optional<Review> findByReviewIdAndReviewStatusNot(UUID reviewId, ReviewStatus reviewStatus);
 }
