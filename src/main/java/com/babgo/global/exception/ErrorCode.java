@@ -51,6 +51,7 @@ public enum ErrorCode {
 
 	//Like
 	LIKE_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 좋아요한 가게입니다."),
+	LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 좋아요가 해제된 가게입니다."),
 
     // Menu
     MENU_UNAVAILABLE(HttpStatus.NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
