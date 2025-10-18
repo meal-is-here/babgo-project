@@ -8,7 +8,7 @@ import com.babgo.domain.search.SearchCommand;
 import com.babgo.domain.search.SearchCommand.CreateResult;
 import com.babgo.domain.search.SearchSort;
 import com.babgo.domain.search.SearchType;
-import com.babgo.global.config.RedisConfig;
+import com.babgo.global.redis.RedisConfig;
 import com.babgo.repository.redis.search.SearchRedisRepositoryImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
