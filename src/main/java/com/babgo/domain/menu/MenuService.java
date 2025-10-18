@@ -97,4 +97,7 @@ public class MenuService {
         menu.increaseStock(quantity);
         return menuRepository.save(menu);
     }
+    public List<Menu> findAllByIds(List<UUID> menuIds) {
+        return menuRepository.findAllById(menuIds);
+    }
 }

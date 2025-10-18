@@ -2,18 +2,24 @@ package com.babgo.application.order;
 
 import com.babgo.application.order.event.OrderCreatedEvent;
 import com.babgo.application.order.port.CancelWindow;
+import com.babgo.domain.menu.Menu;
+import com.babgo.domain.menu.MenuService;
 import com.babgo.domain.order.*;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OrderFacade {
@@ -21,6 +27,7 @@ public class OrderFacade {
     private final OrderService orderService;
     private final OrderItemService orderItemService;
     private final StoreService storeService;
+    private final MenuService menuService;
     private final ApplicationEventPublisher eventPublisher;
     private final CancelWindow cancelWindow;
 
@@ -64,7 +71,21 @@ public class OrderFacade {
 
         //7. 검증 완료된 오더 아이템 저장
         List<OrderItem> orderItems = orderItemService.create(orderItemsSnapshot, pendingOrder);
-        List<OrderInfo.Item> items = orderItems.stream().map(OrderInfo.Item::from).toList();
+        
+        // 메뉴 정보 조회 및 결합
+        List<UUID> menuIds = orderItems.stream()
+                .map(OrderItem::getMenuId)
+                .toList();
+        List<Menu> menus = menuService.findAllByIds(menuIds);
+        Map<UUID, Menu> menuMap = menus.stream()
+                .collect(Collectors.toMap(Menu::getMenuId, menu -> menu));
+        
+        List<OrderInfo.Item> items = orderItems.stream()
+                .map(orderItem -> {
+                    Menu menu = menuMap.get(orderItem.getMenuId());
+                    return OrderInfo.Item.from(orderItem, menu);
+                })
+                .toList();
 
         // 8) 이벤트 발행
         eventPublisher.publishEvent(new OrderCreatedEvent(orderId));

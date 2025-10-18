@@ -8,12 +8,14 @@ import com.babgo.domain.payment.PaymentService;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PaymentWebhookHandler {
@@ -51,6 +53,24 @@ public class PaymentWebhookHandler {
 
     public void handleCancelled(PaymentRequest.WebhookPayload payload) {
     }
+    /**
+     * 결제 실패 처리 (fail URL 콜백)
+     */
+    @Transactional
+    public void handlePaymentFailure(UUID orderId, String code, String message) {
+        Payment payment = paymentService.getPaymentByOrderId(orderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "결제 정보를 찾을 수 없습니다."));
+
+        // 결제 상태를 FAILED로 변경
+        payment.markFailed();
+
+        // 주문 상태도 실패로 변경
+        orderService.updateFailed(orderId);
+
+        log.info("[Payment Failure] 결제 실패 처리 완료 - orderId: {}, code: {}, message: {}",
+                orderId, code, message);
+    }
+
 
     public void handleRefund(PaymentRequest.WebhookPayload payload) {
     }

@@ -117,12 +117,17 @@ public class Order extends BaseTimeEntity {
         return this.orderStatus == OrderStatus.CONFIRMED;
     }
 
-    /** 비영속 */
-    public void setConfirmedItems(List<OrderItemSnapshot> snapshots) {
-        this.itemSnapshotList.clear();
-        if (snapshots != null && !snapshots.isEmpty()) {
-            this.itemSnapshotList.addAll(snapshots);
+    public void markExpired() {
+        if (this.orderStatus != OrderStatus.PENDING) {
+            throw new CustomException(
+                    ErrorCode.INVALID_ORDER_STATE,
+                    "PENDING 상태만 만료 처리할 수 있습니다."
+            );
         }
+        this.orderStatus = OrderStatus.EXPIRED;
     }
+
+
+
 
 }
