@@ -7,6 +7,7 @@ import com.babgo.domain.review.ReviewService;
 import com.babgo.global.api.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,5 +54,17 @@ public class ReviewController {
         Long userId = 2L;
         List<ReviewResponse> reviews = reviewQueryService.getReviewsByUser(userId, sort);
         return ApiResponse.success("사용자 리뷰 조회 성공", reviews);
+    }
+
+    // delete review
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<ApiResponse<Void>> deleteReview(
+            @PathVariable UUID reviewId
+            // TODO: 인증 추가 예정
+            // @AuthenticationPrincipal Long userId
+    ) {
+        Long userId = 2L;
+        reviewService.deleteReview(userId, reviewId);
+        return ResponseEntity.ok(ApiResponse.success("리뷰가 삭제되었습니다."));
     }
 }

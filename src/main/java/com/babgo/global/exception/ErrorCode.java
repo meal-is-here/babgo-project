@@ -66,6 +66,8 @@ public enum ErrorCode {
 	// Review
 	REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 해당 주문에 대한 리뷰가 존재합니다."),
 	REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."),
+	FORBIDDEN_REVIEW_DELETE(HttpStatus.FORBIDDEN, "본인의 리뷰만 삭제할 수 있습니다."),
+	ALREADY_DELETED_REVIEW(HttpStatus.CONFLICT, "이미 삭제된 리뷰입니다."),
 
 	// Payment
 	PAYMENT_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "PG 응답이 시간 초과되었습니다."),

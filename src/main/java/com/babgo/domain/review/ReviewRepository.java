@@ -18,4 +18,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     Optional<Review> findByOrderId(UUID orderId);
 
     boolean existsByStore_StoreId(UUID storeId);
+
+    Optional<Review> findByReviewIdAndReviewStatusNot(UUID reviewId, ReviewStatus reviewStatus);
 }
