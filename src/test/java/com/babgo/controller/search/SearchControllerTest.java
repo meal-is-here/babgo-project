@@ -4,12 +4,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.babgo.MockTest;
 import com.babgo.application.search.SearchFacade;
 import com.babgo.application.search.SearchInfo;
+import com.babgo.auth.JwtTokenProvider;
 import com.babgo.domain.search.SearchSort;
 import com.babgo.domain.search.SearchType;
-import com.babgo.global.security.jwt.JwtTokenProvider;
-import com.babgo.MockTest;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

@@ -9,7 +9,6 @@ import com.babgo.domain.search.SearchCache;
 import com.babgo.domain.search.SearchCommand;
 import com.babgo.domain.search.SearchSort;
 import com.babgo.domain.search.SearchType;
-import com.babgo.global.config.RedisConfig;
 import com.babgo.repository.redis.search.SearchRedisRepositoryImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,14 +23,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("local")
-@SpringBootTest(classes = {RedisConfig.class})
-@Import({RedisConfig.class, SearchRedisRepositoryImpl.class})
+@SpringBootTest
 public class SearchRedisRepositoryTest extends MockTest {
 
 
