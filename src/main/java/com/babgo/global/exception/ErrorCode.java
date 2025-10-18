@@ -22,11 +22,12 @@ public enum ErrorCode {
 	VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "Validation Error"),
 
 	// Auth
+	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
+	UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
 	INVALID_TOKEN(HttpStatus.BAD_REQUEST, "잘못된 토큰 값입니다."),
 	EMPTY_TOKEN(HttpStatus.UNAUTHORIZED, "JWT 토큰이 비어 있습니다."),
 	EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "JWT 토큰이 만료되었습니다."),
 	UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "지원하지 않는 JWT 토큰입니다."),
-	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
 	FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
 	// User
@@ -52,14 +53,15 @@ public enum ErrorCode {
     MENU_UNAVAILABLE(HttpStatus.NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
     OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "해당 메뉴의 재고가 부족합니다."),
 
-    // Order
-    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
-    ORDER_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "주문이 완료되지 않았습니다."),
-    ORDER_NOT_PAYABLE(HttpStatus.UNPROCESSABLE_ENTITY, "주문 상태상 결제를 진행할 수 없습니다."),
-    ORDER_NOT_CANCELABLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 상태에서는 주문을 취소할 수 없습니다."),
-    ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "이미 취소된 주문입니다."),
-    ORDER_ALREADY_REFUNDED(HttpStatus.CONFLICT, "이미 환불된 주문입니다."),
-    CONFLICT(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+	// Order
+	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+	ORDER_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "주문이 완료되지 않았습니다."),
+	ORDER_NOT_PAYABLE(HttpStatus.UNPROCESSABLE_ENTITY, "주문 상태상 결제를 진행할 수 없습니다."),
+	ORDER_NOT_CANCELABLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 상태에서는 주문을 취소할 수 없습니다."),
+	ORDER_ALREADY_CANCELED(HttpStatus.CONFLICT, "이미 취소된 주문입니다."),
+	ORDER_ALREADY_REFUNDED(HttpStatus.CONFLICT, "이미 환불된 주문입니다."),
+	INVALID_ORDER_STATE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
+	CONFLICT(HttpStatus.CONFLICT, "리소스 충돌이 발생했습니다."),
 
 	// Review
 	REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 해당 주문에 대한 리뷰가 존재합니다."),

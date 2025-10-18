@@ -1,8 +1,10 @@
 package com.babgo.application.order;
 
 import com.babgo.controller.order.OrderRequest;
+import com.babgo.domain.menu.Menu;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderItem;
+import com.babgo.domain.order.OrderStatus;
 import com.babgo.domain.store.Store;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -176,6 +178,7 @@ public class OrderInfo {
     public static class OrderAndItems {
         private final UUID orderId;
         private final long totalPrice;
+        private final OrderStatus orderStatus;
         private final String deliveryAddress;
         private final String deliveryRequest;
         private final LocalDateTime createdAt;
@@ -186,6 +189,7 @@ public class OrderInfo {
             return new OrderAndItems(
                     order.getOrderId(),
                     order.getTotalPrice(),
+                    order.getOrderStatus(),
                     order.getDeliveryAddress(),
                     order.getDeliveryRequest(),
                     order.getCreatedAt(),
@@ -204,11 +208,11 @@ public class OrderInfo {
         private final int quantity;
         private final Long lineTotal;
 
-        public static Item from(OrderItem item){
+        public static Item from(OrderItem item, Menu menu){
             return new Item(
                     item.getOrderItemId(),
-                    item.getMenuId(),
-                    "메뉴이름",
+                    menu.getMenuId(),
+                    menu.getName(),
                     item.getUnitPrice(),
                     item.getQuantity(),
                     item.getTotalPrice()

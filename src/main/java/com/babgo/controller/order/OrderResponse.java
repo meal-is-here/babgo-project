@@ -1,6 +1,7 @@
 package com.babgo.controller.order;
 
 import com.babgo.application.order.OrderInfo;
+import com.babgo.domain.order.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -90,14 +91,6 @@ public class OrderResponse {
             );
         }
 
-        public static Create fail(String message) {
-            return new Create(false, message, null, null, null, List.of());
-        }
-
-        public static Create fail(String message, List<InvalidItem> invalidItems) {
-            return new Create(false, message, null, null, null, invalidItems);
-        }
-
         @Getter
         @RequiredArgsConstructor
         public static class InvalidItem {
@@ -116,6 +109,7 @@ public class OrderResponse {
 
         private final UUID orderId;
         private final Long totalPrice;
+        private final OrderStatus orderStatus;
         private final String deliveryAddress;
         private final String deliveryRequest;
         private final LocalDateTime createdAt;
@@ -149,6 +143,7 @@ public class OrderResponse {
             return new OrderDetail(
                     output.getOrderId(),
                     output.getTotalPrice(),
+                    output.getOrderStatus(),
                     output.getDeliveryAddress(),
                     output.getDeliveryRequest(),
                     output.getCreatedAt(),
@@ -157,7 +152,6 @@ public class OrderResponse {
         }
     }
 
-    public static class Cancel {
-
+    public class Cancel {
     }
 }
