@@ -2,6 +2,7 @@ package com.babgo.controller.review;
 
 import com.babgo.controller.review.dto.ReviewCreateRequest;
 import com.babgo.controller.review.dto.ReviewResponse;
+import com.babgo.controller.review.dto.ReviewUpdateRequest;
 import com.babgo.domain.review.ReviewQueryService;
 import com.babgo.domain.review.ReviewService;
 import com.babgo.global.api.ApiResponse;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,6 +56,18 @@ public class ReviewController {
         Long userId = 2L;
         List<ReviewResponse> reviews = reviewQueryService.getReviewsByUser(userId, sort);
         return ApiResponse.success("사용자 리뷰 조회 성공", reviews);
+    }
+
+    // update review
+    @PatchMapping("/{reviewId}")
+    public ApiResponse<?> updateReview(
+            // TODO: 인증 추가 예정
+            // @AuthenticationPrincipal Long userId,
+            @PathVariable UUID reviewId,
+            @Validated @RequestBody ReviewUpdateRequest request
+    ) {
+        Long userId = 2L;
+        return ApiResponse.success("리뷰 수정 성공", reviewService.updateReview(userId, reviewId, request));
     }
 
     // delete review
