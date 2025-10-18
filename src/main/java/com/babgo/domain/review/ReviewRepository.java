@@ -11,11 +11,18 @@ import java.util.UUID;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
+
+    boolean existsByStore_StoreId(UUID storeId);
+
     List<Review> findByStore_StoreId(UUID storeId, Sort sort);
 
     List<Review> findAllByUserIdAndDeletedAtIsNull(Long userId, Sort sort);
 
     Optional<Review> findByOrderId(UUID orderId);
 
+    Optional<Review> findByReviewIdAndDeletedAtIsNull(UUID reviewId);
+
     boolean existsByStore_StoreId(UUID storeId);
+
+    Optional<Review> findByReviewIdAndReviewStatusNot(UUID reviewId, ReviewStatus reviewStatus);
 }
