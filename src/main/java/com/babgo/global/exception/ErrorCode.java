@@ -49,6 +49,9 @@ public enum ErrorCode {
     STORE_CLOSED(HttpStatus.UNPROCESSABLE_ENTITY, "현재 주문 가능한 상태가 아닙니다." ),
 	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 가게입니다."),
 
+	//Like
+	LIKE_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 좋아요한 가게입니다."),
+
     // Menu
     MENU_UNAVAILABLE(HttpStatus.NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
     OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "해당 메뉴의 재고가 부족합니다."),
