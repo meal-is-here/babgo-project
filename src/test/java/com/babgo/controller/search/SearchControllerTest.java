@@ -55,11 +55,11 @@ public class SearchControllerTest extends MockTest {
         Mockito.when(searchFacade.getSearch(Mockito.any()))
             .thenReturn(List.of(
                     SearchInfo.CreateResult.of(UUID.randomUUID(), "교촌치킨", UUID.randomUUID(), "치킨", 4.8,
-                        120, "OPEN", "111110"),
+                         "OPEN", "111110"),
                     SearchInfo.CreateResult.of(UUID.randomUUID(), "BHC", UUID.randomUUID(), "치킨", 4.6,
-                        98, "OPEN", "111110"),
+                        "OPEN", "111110"),
                     SearchInfo.CreateResult.of(UUID.randomUUID(), "굽네치킨", UUID.randomUUID(), "치킨", 4.3,
-                        70, "CLOSED", "111110")
+                        "CLOSED", "111110")
                 )
             );
 

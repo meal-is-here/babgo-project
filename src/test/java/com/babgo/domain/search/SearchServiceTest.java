@@ -53,7 +53,7 @@ public class SearchServiceTest extends MockTest {
 
 
         Mockito.when(searchRepository.getCategorySearch(command, SearchService.DEFAULT_RADIUS_METER)).thenReturn(expected);
-        Mockito.when(searchRedisRepository.getCategoryRegionCache(command, radiusMeters)).thenReturn(List.of());
+        Mockito.when(searchRedisRepository.getCacheByCategory(command, radiusMeters)).thenReturn(List.of());
 
         // when: 조회
         List<SearchCommand.CreateResult> result = searchService.getCategorySearch(command);
@@ -75,7 +75,7 @@ public class SearchServiceTest extends MockTest {
 
         Mockito.when(searchRepository.getCategorySearch(command, SearchService.DEFAULT_RADIUS_METER)).thenReturn(emptyResult);
 
-        Mockito.when(searchRedisRepository.getCategoryRegionCache(command, radiusMeters)).thenReturn(List.of());
+        Mockito.when(searchRedisRepository.getCacheByCategory(command, radiusMeters)).thenReturn(List.of());
 
 
         // when: 조회
@@ -106,8 +106,9 @@ public class SearchServiceTest extends MockTest {
                 UUID.randomUUID(),                      // categoryId
                 "카테고리" + i,                          // categoryName
                 4.0 + (i % 5) * 0.1,                    // avgRating
-                i * 3,                                  // likes
-                1,                                      // ordercount
+                (i * 3) + 10,                           // likes
+                (i % 10) + 1,                           // reviewCount
+                (i * 2) + 5,                            // orderCount
                 "영업중",                                // storeStatus
                 37.5665 + i * 0.001,                    // latitude
                 126.9780 + i * 0.001                    // longitude
@@ -118,7 +119,7 @@ public class SearchServiceTest extends MockTest {
         Mockito.when(searchRepository.getCategorySearch(command, SearchService.DEFAULT_RADIUS_METER))
             .thenReturn(mockResult);
 
-        Mockito.when(searchRedisRepository.getCategoryRegionCache(command, radiusMeters)).thenReturn(List.of());
+        Mockito.when(searchRedisRepository.getCacheByCategory(command, radiusMeters)).thenReturn(List.of());
 
         // when: 조회
         List<SearchCommand.CreateResult> result = searchService.getCategorySearch(command);
@@ -162,12 +163,12 @@ public class SearchServiceTest extends MockTest {
             latitude, longitude, regionCode, SearchType.STORE.name(), keyword, sort, page, size
         );
 
-        SearchCache searchResult1 = Mockito.mock(SearchCache.class);
-        SearchCache searchResult2 = Mockito.mock(SearchCache.class);
+        SearchCache.Result searchResult1 = Mockito.mock(SearchCache.Result.class);
+        SearchCache.Result searchResult2 = Mockito.mock(SearchCache.Result.class);
 
-        List<SearchCache> expected = List.of(searchResult1, searchResult2);
+        List<SearchCache.Result> expected = List.of(searchResult1, searchResult2);
 
-        Mockito.when(searchRedisRepository.getCategoryRegionCache(command, radiusMeters)).thenReturn(expected);
+        Mockito.when(searchRedisRepository.getCacheByCategory(command, radiusMeters)).thenReturn(expected);
 
 
         // whrn
