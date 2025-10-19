@@ -32,7 +32,7 @@ public class OrderFacade {
     private final CancelWindow cancelWindow;
 
     @Transactional
-    public OrderInfo.CreateResult createOrder(String idempotencyKey, OrderInfo.Create input){
+    public OrderInfo.CreateResult createOrder( OrderInfo.Create input){
         //1. 사용자 검증
         //User user = "userService.getUser(info.userId)";
         Long user = 1L;
@@ -106,11 +106,16 @@ public class OrderFacade {
             switch (order.getOrderStatus()) {
                 case PENDING -> {
                     orderService.updateCancel(order);
+                    List<OrderItem> items = orderService.findAllOrderItem(orderId);
+
+                    for (OrderItem item : items) {
+                        menuService.increaseStock(item.getMenuId(), item.getQuantity());
+                    }
+
                     cancelWindow.close(orderId);
                     return OrderInfo.CancelResult.ok("주문을 취소했습니다.");
                 }
                 case PAYMENT_IN_PROGRESS -> {
-                    // 결제 진행중: PG 취소 요청 비동기
                     // paymentService.requestCancel(order);
                     orderService.updateCancelRequested(order);
                     cancelWindow.close(orderId);
