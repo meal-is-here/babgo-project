@@ -3,6 +3,7 @@ package com.babgo.repository.menu;
 import com.babgo.domain.menu.Menu;
 import com.babgo.domain.menu.MenuRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,11 @@ public class MenuRepositoryImpl implements MenuRepository {
     @Override
     public void saveAll(Collection<Menu> values) {
         menuJpaRepository.saveAll(values);
+    }
+
+    @Override
+    public List<Menu> findTopKAvailableMenusByStore(UUID storeId, Pageable pageable) {
+        return menuJpaRepository.findTopKAvailableMenusByStore(storeId,pageable);
     }
 
 }

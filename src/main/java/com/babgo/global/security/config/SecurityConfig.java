@@ -49,18 +49,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)  // JWT 사용으로 CSRF 불필요
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // 세션 미사용
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/error").permitAll()
-                        // PG 시뮬/리다이렉트/웹훅
-                        .requestMatchers(
-                                "/pg-sim/**",
-                                "/v1/payments/success",
-                                "/v1/payments/fail",
-                                "/v1/payments/webhook",
-                                "/webhooks/**",
-                                "/pay/**"
-                        ).permitAll()
-                        .requestMatchers("/v1/auth/**","/v1/orders/**","/v1/orders","/v1/payments/**").permitAll()  // 회원가입/로그인/토큰갱신 인증 불필요
-                        .anyRequest().authenticated()  // 나머지 모든 요청은 인증 필요
+//                        .requestMatchers("/error").permitAll()
+//                        // PG 시뮬/리다이렉트/웹훅
+//                        .requestMatchers(
+//                                "/pg-sim/**",
+//                                "/v1/payments/success",
+//                                "/v1/payments/fail",
+//                                "/v1/payments/webhook",
+//                                "/webhooks/**",
+//                                "/pay/**"
+//                        ).permitAll()
+//                        .requestMatchers("/v1/auth/**","/v1/orders/**","/v1/orders","/v1/payments/**").permitAll()  // 회원가입/로그인/토큰갱신 인증 불필요
+//                        .anyRequest().authenticated()  // 나머지 모든 요청은 인증 필요
+                        .anyRequest().permitAll()  // 나머지 모든 요청은 인증 필요
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)  // 인증 실패 시

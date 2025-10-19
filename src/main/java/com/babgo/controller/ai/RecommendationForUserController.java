@@ -14,7 +14,7 @@ public class RecommendationForUserController {
     private final RecommendationFacade recommendationFacade;
 
     @GetMapping("/v1/recommendations/{userId}")
-    public Mono<RecommendationForUserResponse> getRecommendations(@PathVariable Long userId) {
+    public Mono<RecommendationForUserResponse> getRecommendations(@PathVariable("userId") Long userId) {
         return recommendationFacade.getRecommendations(userId);
     }
 }

@@ -2,10 +2,12 @@ package com.babgo.domain.ai.by_search_recommendation;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class RecommendedStoreDTO {
     private UUID storeId;

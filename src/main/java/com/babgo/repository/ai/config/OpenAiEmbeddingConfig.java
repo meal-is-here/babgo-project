@@ -30,6 +30,4 @@ public class OpenAiEmbeddingConfig {
         return new OpenAiEmbeddingModel(openAiApi, MetadataMode.NONE);
     }
 }
-<<<<<<< HEAD
-=======
 */
