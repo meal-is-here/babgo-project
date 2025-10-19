@@ -4,13 +4,20 @@ import com.babgo.application.order.OrderFacade;
 import com.babgo.application.order.OrderInfo;
 import com.babgo.application.order.event.OrderCreatedEvent;
 import com.babgo.application.order.port.CancelWindow;
+import com.babgo.domain.menu.Menu;
 import com.babgo.domain.menu.MenuService;
-import com.babgo.domain.order.*;
 import com.babgo.domain.order.Order;
+import com.babgo.domain.order.OrderItem;
+import com.babgo.domain.order.OrderItemService;
+import com.babgo.domain.order.OrderItemSnapshot;
+import com.babgo.domain.order.OrderItemValidationResult;
+import com.babgo.domain.order.OrderService;
+import com.babgo.domain.order.OrderStatus;
 import com.babgo.domain.store.Category;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
 import com.babgo.domain.store.status.StoreStatus;
+import com.babgo.domain.user.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -39,6 +46,8 @@ class OrderFacadeUnitTest {
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private CancelWindow cancelWindow;
 
+    @Mock private User user;
+
     @InjectMocks
     private OrderFacade orderFacade;
 
@@ -51,8 +60,10 @@ class OrderFacadeUnitTest {
         storeId = UUID.randomUUID();
         menuId = UUID.randomUUID();
         userId = 1L;
-    }
 
+        // ✅ 인증 유저 id 스텁
+        when(user.getUserId()).thenReturn(userId);
+    }
 
     private static void setPrivateField(Object target, String fieldName, Object value) {
         try {
@@ -75,7 +86,7 @@ class OrderFacadeUnitTest {
             openEnd   = now.plusHours(6);
         } else {
             openStart = now.minusHours(6);
-            openEnd   = now.minusHours(1); // now가 포함되지 않도록 종료 시각을 과거로
+            openEnd   = now.minusHours(1); // now 미포함
         }
 
         Store real = Store.of(
@@ -109,7 +120,6 @@ class OrderFacadeUnitTest {
         return it;
     }
 
-
     @Nested
     @DisplayName("createOrder")
     class CreateOrderTests {
@@ -119,15 +129,18 @@ class OrderFacadeUnitTest {
         void success() {
             OrderInfo.OrderItemDetail item =
                     new OrderInfo.OrderItemDetail(menuId, null, 5_000L, 2);
+
+            // ✅ 생성자 인자 5개 일치
+            List<OrderInfo.OrderItemDetail> items = List.of(item);
             OrderInfo.Create input = new OrderInfo.Create(
-                    storeId, userId, "요청없음", "서울 강남구", List.of(item)
+                    storeId, userId, "요청없음", "서울 강남구", items
             );
 
             UUID newOrderId = UUID.randomUUID();
-            when(orderService.createOrderId()).thenReturn(newOrderId); // ★ 반드시 스텁
+            when(orderService.createOrderId()).thenReturn(newOrderId);
 
             when(storeService.findByStoreId(storeId))
-                    .thenReturn(makeStore(true, storeId)); // 열림(실제 계산)
+                    .thenReturn(makeStore(true, storeId));
 
             OrderItemSnapshot snap = mock(OrderItemSnapshot.class);
             when(snap.getMenuId()).thenReturn(menuId);
@@ -154,7 +167,8 @@ class OrderFacadeUnitTest {
                 mocked.when(() -> OrderInfo.Item.from(any(OrderItem.class), any()))
                         .thenAnswer(inv -> mock(OrderInfo.Item.class));
 
-                OrderInfo.CreateResult result = orderFacade.createOrder(input);
+                // ✅ 인증 유저 인자 추가
+                OrderInfo.CreateResult result = orderFacade.createOrder(user, input);
 
                 assertThat(result.isOk()).isTrue();
                 assertThat(result.getOrderId()).isEqualTo(newOrderId);
@@ -177,15 +191,18 @@ class OrderFacadeUnitTest {
         void reject_storeClosed() {
             OrderInfo.OrderItemDetail item =
                     new OrderInfo.OrderItemDetail(menuId, null, 5_000L, 1);
+
+            List<OrderInfo.OrderItemDetail> items = List.of(item);
             OrderInfo.Create input = new OrderInfo.Create(
-                    storeId, userId, "요청", "주소", List.of(item)
+                    storeId, userId, "요청", "주소", items
             );
 
             when(orderService.createOrderId()).thenReturn(UUID.randomUUID()); // 안전
             when(storeService.findByStoreId(storeId))
-                    .thenReturn(makeStore(false, storeId)); // 닫힘(실제 계산)
+                    .thenReturn(makeStore(false, storeId)); // 닫힘
 
-            OrderInfo.CreateResult result = orderFacade.createOrder(input);
+            // ✅ 인증 유저 인자 추가
+            OrderInfo.CreateResult result = orderFacade.createOrder(user, input);
 
             assertThat(result.isOk()).isFalse();
             assertThat(result.getMessage()).isEqualTo("현재 가게 운영 시간이 아닙니다.");
@@ -193,18 +210,21 @@ class OrderFacadeUnitTest {
             verify(storeService).findByStoreId(storeId);
             verifyNoInteractions(orderItemService, menuService, eventPublisher);
         }
+
         @Test
         @DisplayName("실패: 일부 메뉴가 주문 불가")
         void reject_invalidItems() {
             OrderInfo.OrderItemDetail item =
                     new OrderInfo.OrderItemDetail(menuId, null, 5_000L, 2);
+
+            List<OrderInfo.OrderItemDetail> items = List.of(item);
             OrderInfo.Create input = new OrderInfo.Create(
-                    storeId, userId, "요청", "주소", List.of(item)
+                    storeId, userId, "요청", "주소", items
             );
 
             when(orderService.createOrderId()).thenReturn(UUID.randomUUID()); // 안전
             when(storeService.findByStoreId(storeId))
-                    .thenReturn(makeStore(true, storeId)); // 열림으로 검증 단계 진입
+                    .thenReturn(makeStore(true, storeId)); // 열림 → 검증 단계 진입
 
             OrderItemValidationResult validation = mock(OrderItemValidationResult.class);
             when(validation.hasInvalid()).thenReturn(true);
@@ -214,7 +234,8 @@ class OrderFacadeUnitTest {
             when(orderItemService.reserveStockAndCreateOrderItems(any()))
                     .thenReturn(validation);
 
-            OrderInfo.CreateResult result = orderFacade.createOrder(input);
+            // ✅ 인증 유저 인자 추가
+            OrderInfo.CreateResult result = orderFacade.createOrder(user, input);
 
             assertThat(result.isOk()).isFalse();
             assertThat(result.getMessage()).isEqualTo("일부 메뉴가 주문 불가합니다.");
@@ -222,31 +243,29 @@ class OrderFacadeUnitTest {
 
             verify(storeService).findByStoreId(storeId);
             verify(orderItemService).reserveStockAndCreateOrderItems(input.getItems());
-            verify(orderService, atMostOnce()).createOrderId();   // ← 허용
-
+            verify(orderService, atMostOnce()).createOrderId();   // 허용
             verify(orderService, never()).create(any(Order.class));
             verifyNoInteractions(menuService, eventPublisher);
-
             verifyNoMoreInteractions(storeService, orderItemService);
         }
-
 
         @Test
         @DisplayName("성공: 다중 메뉴 주문")
         void success_multipleItems() {
             UUID menu2 = UUID.randomUUID();
+
             OrderInfo.OrderItemDetail i1 = new OrderInfo.OrderItemDetail(menuId, null, 5_000L, 2);
             OrderInfo.OrderItemDetail i2 = new OrderInfo.OrderItemDetail(menu2,  null, 3_000L, 1);
 
+            List<OrderInfo.OrderItemDetail> items = Arrays.asList(i1, i2);
             OrderInfo.Create input = new OrderInfo.Create(
-                    storeId, userId, "요청", "서울 강남구", List.of(i1, i2)
+                    storeId, userId, "요청", "서울 강남구", items
             );
 
             UUID newOrderId = UUID.randomUUID();
-            when(orderService.createOrderId()).thenReturn(newOrderId); // ★ 반드시 스텁
+            when(orderService.createOrderId()).thenReturn(newOrderId); // 반드시 스텁
             when(storeService.findByStoreId(storeId))
-                    .thenReturn(makeStore(true, storeId)); // 열림(실제 계산)
-
+                    .thenReturn(makeStore(true, storeId)); // 열림
 
             OrderItemSnapshot s1 = mock(OrderItemSnapshot.class);
             when(s1.getMenuId()).thenReturn(menuId);
@@ -280,7 +299,8 @@ class OrderFacadeUnitTest {
                 mocked.when(() -> OrderInfo.Item.from(any(OrderItem.class), any()))
                         .thenAnswer(inv -> mock(OrderInfo.Item.class));
 
-                OrderInfo.CreateResult result = orderFacade.createOrder(input);
+                // ✅ 인증 유저 인자 추가
+                OrderInfo.CreateResult result = orderFacade.createOrder(user, input);
 
                 assertThat(result.isOk()).isTrue();
                 assertThat(result.getOrderId()).isEqualTo(newOrderId);
@@ -298,6 +318,10 @@ class OrderFacadeUnitTest {
         @DisplayName("성공: PENDING → 취소, 재고 복구, 취소 윈도우 닫힘")
         void pending_success() {
             UUID orderId = UUID.randomUUID();
+
+            // 권한 검증 모킹
+            doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
             when(cancelWindow.isOpen(orderId)).thenReturn(true);
 
             Order order = mockOrderWithStatus(OrderStatus.PENDING);
@@ -309,11 +333,12 @@ class OrderFacadeUnitTest {
             OrderItem i2 = mockOrderItem(m2, 1);
             when(orderService.findAllOrderItem(orderId)).thenReturn(List.of(i1, i2));
 
-            OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+            OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
             assertThat(result.isOk()).isTrue();
             assertThat(result.getMessage()).contains("취소했습니다");
 
+            verify(orderService).validateOrderOwnership(orderId, userId);
             verify(orderService).updateCancel(order);
             verify(orderService).findAllOrderItem(orderId);
             verify(menuService).increaseStock(m1, 2);
@@ -325,31 +350,41 @@ class OrderFacadeUnitTest {
         @DisplayName("거절: 취소 윈도우 닫힘")
         void window_closed() {
             UUID orderId = UUID.randomUUID();
+
+            // 권한 검증 모킹
+            doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
             when(cancelWindow.isOpen(orderId)).thenReturn(false);
 
-            OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+            OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
             assertThat(result.isOk()).isFalse();
             assertThat(result.getMessage()).contains("만료");
 
+            verify(orderService).validateOrderOwnership(orderId, userId);
             verify(cancelWindow).isOpen(orderId);
-            verifyNoInteractions(orderService, menuService);
+            verifyNoInteractions(menuService);
         }
 
         @Test
         @DisplayName("PAYMENT_IN_PROGRESS: 취소요청 전환")
         void payment_in_progress() {
             UUID orderId = UUID.randomUUID();
+
+            // 권한 검증 모킹
+            doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
             when(cancelWindow.isOpen(orderId)).thenReturn(true);
 
             Order order = mockOrderWithStatus(OrderStatus.PAYMENT_IN_PROGRESS);
             when(orderService.getOrder(orderId)).thenReturn(order);
 
-            OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+            OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
             assertThat(result.isOk()).isTrue();
             assertThat(result.getMessage()).contains("결제 취소를 요청했습니다");
 
+            verify(orderService).validateOrderOwnership(orderId, userId);
             verify(orderService).updateCancelRequested(order);
             verify(cancelWindow).close(orderId);
         }
@@ -358,18 +393,44 @@ class OrderFacadeUnitTest {
         @DisplayName("CONFIRMED: 환불요청 전환")
         void confirmed_refund_requested() {
             UUID orderId = UUID.randomUUID();
+
+            // 권한 검증 모킹
+            doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
             when(cancelWindow.isOpen(orderId)).thenReturn(true);
 
             Order order = mockOrderWithStatus(OrderStatus.CONFIRMED);
             when(orderService.getOrder(orderId)).thenReturn(order);
 
-            OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+            OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
             assertThat(result.isOk()).isTrue();
             assertThat(result.getMessage()).contains("환불을 요청했습니다");
 
+            verify(orderService).validateOrderOwnership(orderId, userId);
             verify(orderService).updateRefundRequested(order);
             verify(cancelWindow).close(orderId);
+        }
+
+        @Test
+        @DisplayName("실패: 권한 없음 - 다른 사용자의 주문")
+        void unauthorized_user() {
+            UUID orderId = UUID.randomUUID();
+            Long otherUserId = 999L;
+
+            // 권한 검증 실패 모킹
+            doThrow(new com.babgo.global.exception.CustomException(
+                    com.babgo.global.exception.ErrorCode.FORBIDDEN,
+                    "해당 주문에 대한 권한이 없습니다."
+            )).when(orderService).validateOrderOwnership(orderId, otherUserId);
+
+            org.junit.jupiter.api.Assertions.assertThrows(
+                    com.babgo.global.exception.CustomException.class,
+                    () -> orderFacade.cancelOrder(otherUserId, orderId)
+            );
+
+            verify(orderService).validateOrderOwnership(orderId, otherUserId);
+            verifyNoInteractions(cancelWindow, menuService);
         }
     }
 }

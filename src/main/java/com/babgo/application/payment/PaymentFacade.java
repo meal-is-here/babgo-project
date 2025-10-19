@@ -30,11 +30,11 @@ public class PaymentFacade {
 
     @Transactional
     public PaymentInfo.ReadyResult ready(PaymentInfo.Ready input) {
-        //User id 검증
-        //User user = "userService.getUser(info.userId)";
-        Long user = 1L;
+        Long userId = input.getUserId();
 
-        Order order = orderService.getOrder(input.getOrderId());
+        // 권한 검증: 본인 주문인지 확인
+        Order order = orderService.getOrderWithAuth(input.getOrderId(), userId);
+
         if (order.getOrderStatus() != OrderStatus.PENDING) {
             throw new CustomException(
                     ErrorCode.ORDER_NOT_PAYABLE,
@@ -60,7 +60,7 @@ public class PaymentFacade {
 
         Payment payment = Payment.of(
                 order.getOrderId(),
-                user,
+                userId,
                 expected,
                 input.getPaymentType(),
                 input.getCardBrand(),
