@@ -38,14 +38,13 @@ public class ReadPayment {
     @Mock private PaymentUrlResolver urlResolver;
     @Mock private PaymentGateway paymentGateway;
 
-    private PaymentFacade sut;
+    private PaymentFacade paymentFacade;
 
     @BeforeEach
     void setUp() {
-        sut = new PaymentFacade(orderService, paymentService, paymentAsyncExecutor, paymentGateway, urlResolver);
+        paymentFacade = new PaymentFacade(orderService, paymentService, paymentAsyncExecutor, paymentGateway, urlResolver);
     }
 
-    /** 공통으로 항상 쓰는 부분만 스텁(상태/ID) — 금액은 각 테스트에서 필요할 때만 스텁 */
     private static Order pendingOrder(UUID orderId) {
         Order o = mock(Order.class);
         when(o.getOrderId()).thenReturn(orderId);
@@ -68,7 +67,7 @@ public class ReadPayment {
 
         Order order = pendingOrder(orderId);
         when(orderService.getOrder(orderId)).thenReturn(order);
-        // 이 테스트에서만 금액 스텁
+
         when(order.getTotalPrice()).thenReturn(price);
 
         when(paymentService.getPaymentByOrderId(orderId)).thenReturn(Optional.empty());
@@ -77,7 +76,6 @@ public class ReadPayment {
         when(saved.getOrderId()).thenReturn(orderId);
         when(paymentService.create(any(Payment.class))).thenReturn(saved);
 
-        // URL/PG 스텁 (이 테스트에서 실제로 사용됨)
         when(urlResolver.approveUrl(saved.getOrderId())).thenReturn("http://localhost:8080/pay/success?orderId=" + orderId);
         when(urlResolver.failUrl(saved.getOrderId())).thenReturn("http://localhost:8080/pay/fail?orderId=" + orderId);
         when(urlResolver.webhookUrl()).thenReturn("http://localhost:8080/v1/payments/webhook");
@@ -87,7 +85,7 @@ public class ReadPayment {
         when(paymentGateway.create(any())).thenReturn(pgResp);
 
         PaymentInfo.Ready input = readyInput(userId, orderId, price, PaymentMethod.CARD, CardBrand.HYUNDAI, CardType.CHECK);
-        PaymentInfo.ReadyResult result = sut.ready(input);
+        PaymentInfo.ReadyResult result = paymentFacade.ready(input);
 
         ArgumentCaptor<Payment> captor = ArgumentCaptor.forClass(Payment.class);
         verify(paymentService).create(captor.capture());
@@ -112,7 +110,7 @@ public class ReadPayment {
         PaymentInfo.Ready input =
                 readyInput(userId, orderId, 1_000L, PaymentMethod.CARD, CardBrand.HYUNDAI, CardType.CHECK);
 
-        assertThatThrownBy(() -> sut.ready(input))
+        assertThatThrownBy(() -> paymentFacade.ready(input))
                 .isInstanceOf(CustomException.class)
                 .satisfies(ex -> assertThat(((CustomException) ex).getErrorCode())
                         .isEqualTo(ErrorCode.ORDER_NOT_PAYABLE));
@@ -130,7 +128,6 @@ public class ReadPayment {
 
         Order order = pendingOrder(orderId);
         when(orderService.getOrder(orderId)).thenReturn(order);
-        // 이 테스트 흐름에서는 totalPrice 비교가 호출되지 않으므로 스텁 생략 (불필요 스텁 방지)
 
         Payment existing = mock(Payment.class);
         when(paymentService.getPaymentByOrderId(orderId)).thenReturn(Optional.of(existing));
@@ -138,7 +135,7 @@ public class ReadPayment {
         PaymentInfo.Ready input =
                 readyInput(userId, orderId, price, PaymentMethod.CARD, CardBrand.HYUNDAI, CardType.CHECK);
 
-        assertThatThrownBy(() -> sut.ready(input))
+        assertThatThrownBy(() -> paymentFacade.ready(input))
                 .isInstanceOf(CustomException.class)
                 .satisfies(ex -> assertThat(((CustomException) ex).getErrorCode())
                         .isEqualTo(ErrorCode.PAYMENT_ALREADY_IN_PROGRESS));
@@ -163,7 +160,7 @@ public class ReadPayment {
         PaymentInfo.Ready input =
                 readyInput(userId, orderId, 9_000L, PaymentMethod.CARD, CardBrand.HYUNDAI, CardType.CHECK);
 
-        assertThatThrownBy(() -> sut.ready(input))
+        assertThatThrownBy(() -> paymentFacade.ready(input))
                 .isInstanceOf(CustomException.class)
                 .satisfies(ex -> assertThat(((CustomException) ex).getErrorCode())
                         .isEqualTo(ErrorCode.PAYMENT_AMOUNT_MISMATCH));
@@ -189,7 +186,7 @@ public class ReadPayment {
         PaymentInfo.Ready input =
                 readyInput(userId, orderId, price, PaymentMethod.CARD, CardBrand.HYUNDAI, CardType.CHECK);
 
-        assertThatThrownBy(() -> sut.ready(input))
+        assertThatThrownBy(() -> paymentFacade.ready(input))
                 .isInstanceOf(CustomException.class)
                 .satisfies(ex -> assertThat(((CustomException) ex).getErrorCode())
                         .isEqualTo(ErrorCode.PAYMENT_ALREADY_EXISTS));

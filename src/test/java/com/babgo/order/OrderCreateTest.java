@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+@DisplayName("Order 생성 시 검증 테스트")
 public class OrderCreateTest {
 
     UUID orderId;
