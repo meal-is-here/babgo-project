@@ -154,7 +154,7 @@ FastAPI --> |Google AI| Gemini
 ```
 
 ### 아키텍쳐
-[![architecture]()]()
+<img width="2126" height="1338" alt="image" src="https://github.com/user-attachments/assets/ebcd3acf-6ce1-43f4-b2d6-60f3c06d4d64" />
 
 ### 프로젝트 구조 & 컨벤션
 ```text
