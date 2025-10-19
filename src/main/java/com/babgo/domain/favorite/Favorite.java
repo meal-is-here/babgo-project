@@ -3,6 +3,8 @@ package com.babgo.domain.favorite;
 import com.babgo.domain.menu.Menu;
 import com.babgo.domain.user.User;
 import com.babgo.global.entity.BaseTimeEntity;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,5 +44,13 @@ public class Favorite extends BaseTimeEntity {
 
     public static Favorite create(User user, Menu menu, String option, int quantity) {
         return new Favorite(user, menu, option, quantity);
+    }
+
+    public void updateFavorite(String option, int quantity) {
+        if (option == null || option.isBlank() || quantity <= 0) {
+            throw new CustomException(ErrorCode.INVALID_FAVORITE_OPTION);
+        }
+        this.option = option;
+        this.quantity = quantity;
     }
 }
