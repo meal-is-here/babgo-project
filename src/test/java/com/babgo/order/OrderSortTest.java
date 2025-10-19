@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class OrderControllerTest {
+class OrderSortTest {
 
     private MockMvc mockMvc;
 
@@ -42,11 +42,11 @@ class OrderControllerTest {
         var output = new OrderInfo.Orders(List.of(newer, older), 0, 10, 2, 1, false);
 
         when(orderQueryFacade.getAllOrders(
-               1L,   // userId
-                anyString(),       // status
-                anyInt(),          // page
-                anyInt(),          // size
-                anyString()        // sortType
+                eq(1L),
+                eq("CONFIRMED"),
+                eq(0),
+                eq(10),
+                eq("LATEST")
         )).thenReturn(output);
 
         mockMvc.perform(get("/v1/orders")
