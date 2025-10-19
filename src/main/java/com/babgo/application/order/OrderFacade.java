@@ -7,6 +7,7 @@ import com.babgo.domain.menu.MenuService;
 import com.babgo.domain.order.*;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
+import com.babgo.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,14 +33,10 @@ public class OrderFacade {
     private final CancelWindow cancelWindow;
 
     @Transactional
-    public OrderInfo.CreateResult createOrder( OrderInfo.Create input){
-        //1. 사용자 검증
-        //User user = "userService.getUser(info.userId)";
-        Long user = 1L;
-        //2.idempotencyKey 검증
-        // checkIdempotency(idempotencyKey);
+    public OrderInfo.CreateResult createOrder(User user, OrderInfo.Create input){
 
-        //3. !checkIdempotency 아이디 생성
+        Long userId = user.getUserId();
+
         UUID orderId = orderService.createOrderId();
 
         // 가게 존재하고 오픈 상태, 주문 가능인지 확인
@@ -61,7 +58,7 @@ public class OrderFacade {
         Order order = Order.of(
                 orderId,
                 store.getStoreId(),
-                user,
+                userId,
                 input.getDeliveryRequest(),
                 input.getDeliveryAddress(),
                 totalPrice
