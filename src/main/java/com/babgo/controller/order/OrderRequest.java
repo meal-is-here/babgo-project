@@ -25,7 +25,6 @@ public class OrderRequest {
     @RequiredArgsConstructor
     public static class OrderItemRequest {
         private final UUID menuId;
-        private final UUID menuOptionId;
         private final Long price;
         private final Integer quantity;
     }

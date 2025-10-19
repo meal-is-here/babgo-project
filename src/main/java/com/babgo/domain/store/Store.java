@@ -25,6 +25,9 @@ public class Store extends BaseTimeEntity {
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID storeId;
 
+    @Column(nullable = false, updatable = false)
+    private Long ownerId;
+
     @Column(nullable = false, length = 100)
     private String storeName;
 
@@ -73,6 +76,7 @@ public class Store extends BaseTimeEntity {
     private StoreSummary storeSummary;
 
     private Store(
+            Long ownerId,
             String storeName,
             String addressLine,
             double latitude,
@@ -94,6 +98,7 @@ public class Store extends BaseTimeEntity {
         validateBusinessHours(openingHours, closingHours);
         validateCategory(category);
 
+        this.ownerId = ownerId;
         this.storeName = storeName;
         this.addressLine = addressLine;
         this.latitude = latitude;
@@ -111,6 +116,7 @@ public class Store extends BaseTimeEntity {
      * StoreStatus 는 생성 시점에 기본 값: PREPARING
      */
     public static Store of(
+            Long ownerId,
             String storeName,
             String addressLine,
             double latitude,
@@ -123,6 +129,7 @@ public class Store extends BaseTimeEntity {
             Category category
     ) {
         return new Store(
+                ownerId,
                 storeName,
                 addressLine,
                 latitude,
@@ -137,15 +144,21 @@ public class Store extends BaseTimeEntity {
         );
     }
 
+    public void verifyOwner(Long currentUserId) {
+        if (this.ownerId == null || !this.ownerId.equals(currentUserId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN, "가게 소유자가 아닙니다.");
+        }
+    }
+
     public void markCreateBy(String ownerName) {
         if (createdBy == null || createdBy.isBlank()) {
-            this.createdBy = "ownerName";
+            this.createdBy = ownerName;
         }
     }
 
     public void markUpdatedBy(String ownerName) {
         if (updatedBy == null || updatedBy.isBlank()) {
-            this.updatedBy = "ownerName";
+            this.updatedBy = ownerName;
         }
     }
 
@@ -154,7 +167,7 @@ public class Store extends BaseTimeEntity {
             throw new CustomException(ErrorCode.BAD_REQUEST, "이미 삭제된 가게입니다.");
         }
         markAsDeleted();
-        this.deletedBy = "ownerName";
+        this.deletedBy = ownerName;
     }
 
     public boolean isDeleted() {
