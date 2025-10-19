@@ -4,18 +4,18 @@ import com.babgo.controller.review.dto.ReviewCreateRequest;
 import com.babgo.controller.review.dto.ReviewResponse;
 import com.babgo.controller.review.dto.ReviewUpdateRequest;
 import com.babgo.domain.ai.review_analysis.ReviewAnalysisService;
-import com.babgo.domain.ai.store_summary.StoreSummaryService;
+import com.babgo.domain.common.ActionType;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderRepository;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ public class ReviewService {
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewAnalysisService reviewAnalysisService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     // create review
     @Transactional
@@ -59,6 +60,8 @@ public class ReviewService {
             });
         }
 
+        applicationEventPublisher.publishEvent(new ReviewChangedEvent(review.getStoreId(), review.getRating(), 0, ActionType.CREATE));
+
         return ReviewResponse.from(saved);
     }
 
@@ -71,7 +74,15 @@ public class ReviewService {
             throw new CustomException(ErrorCode.REVIEW_FORBIDDEN);
         }
 
+        // 수정전 평점
+        int oldRating = review.getRating();
+
+        // 수정 할 평점
+        int newRating = request.getRating();
+
         review.updateReview(request.getRating(), request.getContent());
+
+        applicationEventPublisher.publishEvent(new ReviewChangedEvent(review.getStoreId(), newRating, oldRating, ActionType.UPDATE));
 
         return review;
     }
@@ -90,7 +101,11 @@ public class ReviewService {
             throw new CustomException(ErrorCode.ALREADY_DELETED_REVIEW);
         }
 
+        int oldRating = review.getRating();
+
         review.updateStatus(ReviewStatus.DELETED);
         reviewRepository.save(review);
+
+        applicationEventPublisher.publishEvent(new ReviewChangedEvent(review.getStoreId(), 0, oldRating, ActionType.DELETE));
     }
 }

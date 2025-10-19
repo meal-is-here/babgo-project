@@ -2,6 +2,7 @@ package com.babgo.application.search;
 
 import com.babgo.application.store.StoreCreatedEvent;
 import com.babgo.application.store.StoreOrderCompletedEvent;
+import com.babgo.domain.like.LikeChangedEvent;
 import com.babgo.domain.review.ReviewChangedEvent;
 import com.babgo.domain.search.Search;
 import com.babgo.domain.search.SearchCache;
@@ -85,11 +86,11 @@ public class SearchEventListener {
 
     // 사용자 좋아요 검색 데이터 비동기 반영 리스너
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleLikeCount(StoreOrderCompletedEvent event) {
+    public void handleLikeCount(LikeChangedEvent event) {
 
         SearchCache.CountUpdate searchCache = SearchCache.CountUpdate.builder()
             .storeId(event.storeId())
-//            .actionType(event.ac)
+            .actionType(event.action())
             .build();
 
         // 좋아요 했을때 db 저장
