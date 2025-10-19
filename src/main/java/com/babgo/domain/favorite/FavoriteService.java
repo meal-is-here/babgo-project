@@ -58,4 +58,16 @@ public class FavoriteService {
 
         return FavoriteResponse.from(updated);
     }
+
+    // delete favorite
+    public void deleteFavorite(Long userId, UUID favoriteId) {
+        Favorite favorite = favoriteRepository.findByFavoriteIdAndUserUserId(favoriteId, userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.FAVORITE_NOT_FOUND));
+
+        if (!favorite.getUser().getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        favoriteRepository.delete(favorite);
+    }
 }
