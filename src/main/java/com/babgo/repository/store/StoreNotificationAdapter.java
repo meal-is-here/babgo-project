@@ -5,7 +5,6 @@ import com.babgo.domain.store.StoreNotificationPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,8 +20,7 @@ public class StoreNotificationAdapter implements StoreNotificationPort {
                 "type", "ORDER_STATUS_CHANGED",
                 "orderId", orderId.toString(),
                 "status", status.name(),
-                "message", message,
-                "at", Instant.now().toString()
+                "message", message
         );
         sseHub.notify(userId, "ORDER_STATUS_CHANGED", payload);
     }
