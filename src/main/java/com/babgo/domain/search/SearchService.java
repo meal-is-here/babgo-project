@@ -1,6 +1,10 @@
 package com.babgo.domain.search;
 
 import com.babgo.domain.search.SearchCache.Update;
+import com.babgo.domain.store.Store;
+import com.babgo.domain.store.StoreRepository;
+import com.babgo.global.exception.CustomException;
+import com.babgo.global.exception.ErrorCode;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,8 @@ public class SearchService {
     private final SearchRepository searchRepository;
 
     private final SearchRedisRepository searchRedisRepository;
+
+    private final StoreRepository storeRepository;
 
 
     public List<SearchCommand.CreateResult> getStoreSearch(SearchCommand.Create searchCommand) {
@@ -68,7 +74,18 @@ public class SearchService {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void incrementOrderCount(SearchCache.CountUpdate countUpdate) {
+    public void incrementOrderCount(UUID storeId) {
+
+        Store store = storeRepository.findByStoreId(storeId)
+            .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
+        SearchCache.CountUpdate countUpdate = SearchCache.CountUpdate.builder()
+            .storeId(store.getStoreId())
+            .key(SearchCache.Key.builder().categoryId(store.getCategory().getCategoryId().toString())
+                .regionCode(store.getRegionCode()).sort(
+                    SearchSort.ORDER_COUNT).build())
+            .build();
+
         Search search = getSearchByStoreId(countUpdate.getStoreId());
         search.incrementOrderCount();
 
@@ -76,8 +93,20 @@ public class SearchService {
 
 
     @Async("storeExecutor")
-    public void incrementOrderCountCache(SearchCache.CountUpdate countUpdate) {
+    public void incrementOrderCountCache(UUID storeId) {
         try {
+
+            Store store = storeRepository.findByStoreId(storeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
+            SearchCache.CountUpdate countUpdate = SearchCache.CountUpdate.builder()
+                .storeId(store.getStoreId())
+                .key(SearchCache.Key.builder().categoryId(store.getCategory().getCategoryId().toString())
+                    .regionCode(store.getRegionCode()).sort(
+                        SearchSort.ORDER_COUNT).build())
+                .build();
+
+
             searchRedisRepository.incrementOrderCountCache(countUpdate, SearchSort.ORDER_COUNT);
         } catch (Exception e) {
             log.error("Redis 주문순 캐시 저장 실패 (DB는 정상 반영됨): {}", e.getMessage());

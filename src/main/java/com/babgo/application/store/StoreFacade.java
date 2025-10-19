@@ -2,6 +2,7 @@ package com.babgo.application.store;
 
 
 import com.babgo.application.store.event.StoreEvent;
+import com.babgo.application.store.event.StoreOrderCompletedEvent;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderService;
 import com.babgo.domain.store.Category;
@@ -105,6 +106,7 @@ public class StoreFacade {
             Order order = orderService.getOrder(orderId);
             storeService.acceptFromConfirmed(order);
             publishStatusChanged(order, "주문 수락이 완료되었습니다.");
+            eventPublisher.publishEvent(new StoreOrderCompletedEvent(order.getStoreId()));
         } catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
             throw new CustomException(ErrorCode.VERSION_CONFLICT);
         }

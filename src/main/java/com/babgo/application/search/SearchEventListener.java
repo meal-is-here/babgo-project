@@ -1,13 +1,12 @@
 package com.babgo.application.search;
 
 import com.babgo.application.store.StoreCreatedEvent;
-import com.babgo.application.store.StoreOrderCompletedEvent;
+import com.babgo.application.store.event.StoreOrderCompletedEvent;
 import com.babgo.domain.like.LikeChangedEvent;
 import com.babgo.domain.review.ReviewChangedEvent;
 import com.babgo.domain.search.Search;
 import com.babgo.domain.search.SearchCache;
 import com.babgo.domain.search.SearchService;
-import com.babgo.domain.search.SearchSort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -69,17 +68,10 @@ public class SearchEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlOrderCount(StoreOrderCompletedEvent event) {
 
-        SearchCache.CountUpdate search = SearchCache.CountUpdate.builder()
-            .storeId(event.storeId())
-            .key(SearchCache.Key.builder().categoryId(event.categoryId().toString())
-                .regionCode(event.regionCode()).sort(
-                    SearchSort.ORDER_COUNT).build())
-            .build();
-
         // 주문 했을때 db 저장
-        searchService.incrementOrderCount(search);
+        searchService.incrementOrderCount(event.storeId());
 
-        searchService.incrementOrderCountCache(search);
+        searchService.incrementOrderCountCache(event.storeId());
 
     }
 
