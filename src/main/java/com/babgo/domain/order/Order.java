@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -40,6 +42,8 @@ public class Order extends BaseTimeEntity {
     @Column(name = "order_status", nullable = false)
     private OrderStatus orderStatus;
 
+    @Transient
+    private List<OrderItemSnapshot> itemSnapshotList = Collections.emptyList();
 
     private Order(
             UUID orderId,
@@ -112,4 +116,18 @@ public class Order extends BaseTimeEntity {
     public boolean isCompleted() {
         return this.orderStatus == OrderStatus.CONFIRMED;
     }
+
+    public void markExpired() {
+        if (this.orderStatus != OrderStatus.PENDING) {
+            throw new CustomException(
+                    ErrorCode.INVALID_ORDER_STATE,
+                    "PENDING 상태만 만료 처리할 수 있습니다."
+            );
+        }
+        this.orderStatus = OrderStatus.EXPIRED;
+    }
+
+
+
+
 }

@@ -4,7 +4,6 @@ import com.babgo.controller.review.dto.ReviewCreateRequest;
 import com.babgo.controller.review.dto.ReviewResponse;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderRepository;
-import com.babgo.domain.order.OrderStatus;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -47,7 +47,6 @@ class ReviewServiceTest {
                 "서울시 강남구",
                 20000L
         );
-        order.updateStatus(OrderStatus.CONFIRMED);
 
         request = new ReviewCreateRequest(
                 order.getOrderId(),
@@ -64,6 +63,8 @@ class ReviewServiceTest {
                 .willReturn(Optional.of(order));
         given(reviewRepository.findByOrderId(order.getOrderId()))
                 .willReturn(Optional.empty());
+
+        order.markConfirmed();
 
         Review savedReview = Review.of(
                 5, "맛있어요!", order.getUserId(), order.getStoreId(), order.getOrderId());
@@ -92,8 +93,6 @@ class ReviewServiceTest {
     @Test
     @DisplayName("리뷰 등록 실패 - 주문 미완료 상태")
     void createReview_fail_orderNotCompleted() {
-        // given
-        order.updateStatus(OrderStatus.PENDING);
         given(orderRepository.findByOrderId(order.getOrderId()))
                 .willReturn(Optional.of(order));
 
@@ -107,6 +106,8 @@ class ReviewServiceTest {
     @DisplayName("리뷰 등록 실패 - 이미 리뷰 존재")
     void createReview_fail_duplicateReview() {
         // given
+        order.markConfirmed();
+
         given(orderRepository.findByOrderId(order.getOrderId()))
                 .willReturn(Optional.of(order));
         given(reviewRepository.findByOrderId(order.getOrderId()))

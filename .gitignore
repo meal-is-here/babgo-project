@@ -1,7 +1,8 @@
 src/main/resources/application-local.yml
-src/main/resources/application-dev.yml
-src/main/resources/application.yml
+
 .env
+codeconvention.md
+annotaionGuide.md
 
 venv/
 
@@ -44,3 +45,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+## qurydsl
+/src/main/generated/

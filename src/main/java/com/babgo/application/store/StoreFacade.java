@@ -6,6 +6,7 @@ import com.babgo.domain.store.CategoryService;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -79,5 +81,9 @@ public class StoreFacade {
             summaryText = "요약이 존재하지 않습니다.";
         }
         return StoreInfo.Summary.of(summaryText);
+    }
+
+    public void acceptedOrder(UUID uuid) {
+        log.info("이벤트" + uuid);
     }
 }

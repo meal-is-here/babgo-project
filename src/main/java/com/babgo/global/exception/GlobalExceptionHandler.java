@@ -3,6 +3,7 @@ package com.babgo.global.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -92,5 +93,12 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(errorCode.getHttpStatus())
 			.body(ApiResponse.fail(errorCode));
+	}
+
+	@ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+	public ResponseEntity<ApiResponse<Void>> handleOle(ObjectOptimisticLockingFailureException ex) {
+		ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(ApiResponse.fail(errorCode));
 	}
 }

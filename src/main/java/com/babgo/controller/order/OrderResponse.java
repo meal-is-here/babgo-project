@@ -1,10 +1,13 @@
 package com.babgo.controller.order;
 
 import com.babgo.application.order.OrderInfo;
+import com.babgo.domain.order.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -58,17 +61,45 @@ public class OrderResponse {
 
     @Getter
     @RequiredArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Create {
-        private final UUID orderId;
-        private final Long totalPrice;
-        private final String orderStatus;
 
-        public static OrderResponse.Create from(OrderInfo.CreateResult output) {
-            return new OrderResponse.Create(
+        private final boolean ok;
+        private final String message;
+        private final UUID orderId;
+        private final String orderStatus;
+        private final Long totalPrice;
+        private final List<InvalidItem> invalidItems;
+
+        /**
+         * 성공 결과 변환
+         */
+        public static Create from(OrderInfo.CreateResult output) {
+            List<InvalidItem> invalids = Optional.ofNullable(output.getInvalidItems())
+                    .orElse(List.of())
+                    .stream()
+                    .map(InvalidItem::from)
+                    .toList();
+
+            return new Create(
+                    output.isOk(),
+                    output.getMessage(),
                     output.getOrderId(),
+                    output.getStatus(),
                     output.getTotalPrice(),
-                    output.getStatus()
+                    invalids
             );
+        }
+
+        @Getter
+        @RequiredArgsConstructor
+        public static class InvalidItem {
+            private final UUID menuId;
+            private final String reason;
+
+            public static InvalidItem from(OrderInfo.InvalidItem src) {
+                return new InvalidItem(src.getMenuId(), src.getReason());
+            }
         }
     }
 
@@ -78,6 +109,7 @@ public class OrderResponse {
 
         private final UUID orderId;
         private final Long totalPrice;
+        private final OrderStatus orderStatus;
         private final String deliveryAddress;
         private final String deliveryRequest;
         private final LocalDateTime createdAt;
@@ -88,8 +120,6 @@ public class OrderResponse {
         public static class ItemView {
             private final UUID menuId;
             private final String menuName;
-            private final UUID optionId;
-            private final String optionName;
             private final Long price;
             private final Long totalPrice;
             private final Integer quantity;
@@ -98,8 +128,6 @@ public class OrderResponse {
                 return new ItemView(
                         item.getMenuId(),
                         item.getMenuName(),
-                        item.getOptionId(),
-                        item.getOptionName(),
                         item.getPrice(),
                         item.getLineTotal(),
                         item.getQuantity()
@@ -115,6 +143,7 @@ public class OrderResponse {
             return new OrderDetail(
                     output.getOrderId(),
                     output.getTotalPrice(),
+                    output.getOrderStatus(),
                     output.getDeliveryAddress(),
                     output.getDeliveryRequest(),
                     output.getCreatedAt(),
@@ -123,7 +152,6 @@ public class OrderResponse {
         }
     }
 
-    public static class Cancel {
-
+    public class Cancel {
     }
 }

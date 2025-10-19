@@ -1,8 +1,11 @@
 package com.babgo.application.order;
 
 import com.babgo.controller.order.OrderRequest;
+import com.babgo.domain.menu.Menu;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderItem;
+import com.babgo.domain.order.OrderStatus;
+import com.babgo.domain.store.Store;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +20,7 @@ public class OrderInfo {
     @Getter
     @RequiredArgsConstructor
     public static class Create{
-        private final String storeId;
+        private final UUID storeId;
         private final Long userId;
         private final String deliveryRequest;
         private final String deliveryAddress;
@@ -67,10 +70,10 @@ public class OrderInfo {
         private final String status;
         private final LocalDateTime createdAt;
 
-        public static OrderDetail from(Order order) {
+        public static OrderDetail from(Order order, Store store) {
             return new OrderDetail(
                     order.getOrderId().toString(),
-                    "가게 이름",
+                    store.getStoreName(),
                     order.getTotalPrice(),
                     order.getOrderStatus().getDescription(),
                     order.getCreatedAt()
@@ -81,18 +84,72 @@ public class OrderInfo {
     @Getter
     @RequiredArgsConstructor
     public static class CreateResult {
+
+        private final boolean ok;
+        private final String message;
+
         private final UUID orderId;
         private final String status;
         private final Long totalPrice;
+        private final List<Item> items;
 
-        public static CreateResult from(Order order) {
+        private final List<InvalidItem> invalidItems;
+
+        public static CreateResult ok(Order order,List<Item> items ) {
             return new CreateResult(
+                    true,
+                    "주문이 정상적으로 생성되었습니다.",
                     order.getOrderId(),
                     order.getOrderStatus().name(),
-                    order.getTotalPrice()
+                    order.getTotalPrice(),
+                    items,
+                    List.of()
+            );
+        }
+
+        public static CreateResult validated(List<Item> items) {
+            long total = items.stream().mapToLong(Item::getLineTotal).sum();
+            return new CreateResult(
+                    true,
+                    "검증이 완료되었습니다.",
+                    null,
+                    null,
+                    total,
+                    items,
+                    List.of()
+            );
+        }
+
+        public static CreateResult reject(String message) {
+            return new CreateResult(
+                    false,
+                    message,
+                    null,
+                    null,
+                    null,
+                    List.of(),
+                    List.of()
+            );
+        }
+
+        public static CreateResult reject(String message, List<InvalidItem> invalidItems) {
+            return new CreateResult(
+                    false,
+                    message,
+                    null,
+                    null,
+                    null,
+                    List.of(),
+                    invalidItems == null ? List.of() : invalidItems
             );
         }
     }
+        @Getter
+        @RequiredArgsConstructor
+        public static class InvalidItem {
+            private final UUID menuId;
+            private final String reason;
+        }
 
     @Getter
     @RequiredArgsConstructor
@@ -121,6 +178,7 @@ public class OrderInfo {
     public static class OrderAndItems {
         private final UUID orderId;
         private final long totalPrice;
+        private final OrderStatus orderStatus;
         private final String deliveryAddress;
         private final String deliveryRequest;
         private final LocalDateTime createdAt;
@@ -131,6 +189,7 @@ public class OrderInfo {
             return new OrderAndItems(
                     order.getOrderId(),
                     order.getTotalPrice(),
+                    order.getOrderStatus(),
                     order.getDeliveryAddress(),
                     order.getDeliveryRequest(),
                     order.getCreatedAt(),
@@ -145,19 +204,15 @@ public class OrderInfo {
         private final UUID orderItemId;
         private final UUID menuId;
         private final String menuName;
-        private final UUID optionId;
-        private final String optionName;
         private final Long price;
         private final int quantity;
         private final Long lineTotal;
 
-        public static Item from(OrderItem item){
+        public static Item from(OrderItem item, Menu menu){
             return new Item(
                     item.getOrderItemId(),
-                    item.getMenuId(),
-                    "메뉴이름",
-                    item.getMenuOptionId(),
-                    "옵션 이름",
+                    menu.getMenuId(),
+                    menu.getName(),
                     item.getUnitPrice(),
                     item.getQuantity(),
                     item.getTotalPrice()
@@ -172,10 +227,6 @@ public class OrderInfo {
         private final boolean ok;
         private final String message;
 
-        public static CancelResult ok() {
-            return new CancelResult(true, "취소되었습니다.");
-        }
-
         public static CancelResult ok(String message) {
             return new CancelResult(true, message);
         }
@@ -184,4 +235,5 @@ public class OrderInfo {
             return new CancelResult(false, message);
         }
     }
+
 }

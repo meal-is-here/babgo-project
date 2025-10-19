@@ -1,6 +1,5 @@
 package com.babgo.controller.user;
 
-import com.babgo.controller.user.dto.UserRequest;
 import com.babgo.domain.user.User;
 import com.babgo.repository.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,19 +9,26 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.TimeUnit;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(classes = com.babgo.BabgoApplication.class)
 @AutoConfigureMockMvc
 @Transactional
-@ActiveProfiles("test")  // 테스트 프로파일 활성화 (Embedded Redis 사용)
+@ActiveProfiles("test")  // 테스트 프로파일 활성화
 class UserControllerTest {
 
     @Autowired
@@ -37,9 +43,25 @@ class UserControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @MockitoBean
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @MockitoBean
+    @SuppressWarnings("rawtypes")
+    private ValueOperations valueOperations;
+
+//    @MockitoBean
+//    private com.babgo.repository.ai.config.GoogleAiController googleAiController;
+
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
+
+        // Redis Mock 설정
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(null);
+        when(redisTemplate.delete(anyString())).thenReturn(true);
+        when(redisTemplate.expire(anyString(), anyLong(), any(TimeUnit.class))).thenReturn(true);
     }
 
     @Test

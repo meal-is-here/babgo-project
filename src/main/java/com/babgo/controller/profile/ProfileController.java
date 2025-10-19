@@ -18,7 +18,11 @@ public class ProfileController {
 
     // read profile
     @GetMapping
-    public ApiResponse<ProfileResponse> getMyProfile(@AuthenticationPrincipal Long userId) {
+    public ApiResponse<ProfileResponse> getMyProfile(
+            // TODO: 인증 추가 예정
+            // @AuthenticationPrincipal Long userId
+    ) {
+        Long userId = 1L;
         ProfileResponse response = profileFacade.getMyProfile(userId);
         return ApiResponse.success("프로필 조회를 성공했습니다.", response);
     }
@@ -26,16 +30,22 @@ public class ProfileController {
     // update profile
     @PatchMapping
     public ApiResponse<ProfileResponse> updateProfile(
-            @AuthenticationPrincipal Long userId,
+            // TODO: 인증 추가 예정
+            // @AuthenticationPrincipal Long userId,
             @Valid @RequestBody ProfileUpdateRequest request
     ) {
+        Long userId = 1L;
         ProfileResponse response = profileFacade.updateProfile(userId, request);
         return ApiResponse.success("프로필 정보가 수정되었습니다.", response);
     }
 
     // delete profile
     @DeleteMapping
-    public ApiResponse<Void> deleteProfile(@AuthenticationPrincipal Long userId) {
+    public ApiResponse<Void> deleteProfile(
+            // TODO: 인증 추가 예정
+            // @AuthenticationPrincipal Long userId
+    ) {
+        Long userId = 1L;
         profileFacade.deleteProfile(userId);
         return ApiResponse.success("계정이 삭제되었습니다.");
     }

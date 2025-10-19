@@ -2,7 +2,7 @@ package com.babgo.controller.store;
 
 import com.babgo.application.store.StoreFacade;
 import com.babgo.application.store.StoreInfo;
-import com.babgo.global.security.jwt.JwtTokenProvider;
+import com.babgo.auth.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(StoreController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@ContextConfiguration(classes = com.babgo.BabgoApplication.class)
 class StoreControllerTest {
 
     @Autowired

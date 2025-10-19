@@ -22,7 +22,6 @@ public class PaymentController {
     public ApiResponse<PaymentResponse.Ready> ready(
             @RequestBody PaymentRequest.Ready request
     ){
-        //TODO 임시 값
         Long userid = 1L;
         PaymentInfo.Ready input = PaymentInfo.Ready.from(userid, request);
         PaymentInfo.ReadyResult output = paymentFacade.ready(input);
@@ -45,10 +44,30 @@ public class PaymentController {
 
     @GetMapping("/fail")
     public ApiResponse<String> fail(
-            @RequestParam(required = false) String orderId,
+            @RequestParam(required = false) UUID orderId,
             @RequestParam(required = false) String code,
             @RequestParam(required = false) String message) {
-        return ApiResponse.success("호출실패");
+
+        log.info("[Payment Fail] 결제 실패 처리 - orderId: {}, code: {}, message: {}",
+                orderId, code, message);
+
+        if (orderId != null) {
+            try {
+                // 결제 실패 처리
+                paymentWebhookHandler.handlePaymentFailure(orderId, code, message);
+
+                log.info("[Payment Fail] 결제 실패 처리 완료 - orderId: {}", orderId);
+                return ApiResponse.success("결제가 실패했습니다. 다시 시도해주세요.");
+
+            } catch (Exception e) {
+                log.error("[Payment Fail] 결제 실패 처리 중 오류 - orderId: {}, error: {}",
+                        orderId, e.getMessage(), e);
+                return ApiResponse.fail("결제 실패 처리 중 오류가 발생했습니다.", com.babgo.global.exception.ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        log.warn("[Payment Fail] orderId가 없음 - code: {}, message: {}", code, message);
+        return ApiResponse.success("결제가 실패했습니다.");
     }
 
     @PostMapping("/webhook")
