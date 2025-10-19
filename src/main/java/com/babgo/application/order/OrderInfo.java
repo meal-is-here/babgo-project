@@ -47,14 +47,12 @@ public class OrderInfo {
     @RequiredArgsConstructor
     public static class OrderItemDetail {
         private final UUID menuId;
-        private final UUID menuOptionId;
         private final Long clientPrice;
         private final Integer quantity;
 
         public static OrderItemDetail from(OrderRequest.OrderItemRequest requestItem){
             return new OrderItemDetail(
                     requestItem.getMenuId(),
-                    requestItem.getMenuOptionId(),
                     requestItem.getPrice(),
                     requestItem.getQuantity()
             );
@@ -102,19 +100,6 @@ public class OrderInfo {
                     order.getOrderId(),
                     order.getOrderStatus().name(),
                     order.getTotalPrice(),
-                    items,
-                    List.of()
-            );
-        }
-
-        public static CreateResult validated(List<Item> items) {
-            long total = items.stream().mapToLong(Item::getLineTotal).sum();
-            return new CreateResult(
-                    true,
-                    "검증이 완료되었습니다.",
-                    null,
-                    null,
-                    total,
                     items,
                     List.of()
             );

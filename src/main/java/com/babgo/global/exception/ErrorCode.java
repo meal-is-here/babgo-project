@@ -72,6 +72,7 @@ public enum ErrorCode {
 	ORDER_ALREADY_REFUNDED(HttpStatus.CONFLICT, "이미 환불된 주문입니다."),
 	INVALID_ORDER_STATE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
 	CONFLICT(HttpStatus.CONFLICT, "리소스 충돌이 발생했습니다."),
+    VERSION_CONFLICT(HttpStatus.CONFLICT, "다른 요청에 의해 변경되었습니다."),
 
 	// Review
 	REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 해당 주문에 대한 리뷰가 존재합니다."),
