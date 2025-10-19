@@ -44,6 +44,7 @@ public class FavoriteController {
         Long userId = 1L;
         FavoriteResponse response = favoriteService.updateFavorite(userId, favoriteId, request);
         return ResponseEntity.ok(ApiResponse.success("즐겨찾기 수정 성공c", response));
+
     }
 
     // delete favorite
