@@ -1,12 +1,11 @@
 package com.babgo.domain.store;
 
-import com.babgo.domain.order.Order;
 import com.babgo.domain.ai.store_summary.StoreSummaryService;
+import com.babgo.domain.order.Order;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.Map;
@@ -22,7 +21,7 @@ public class StoreService {
     private final StoreSummaryService storeSummaryService;
 
     public Store create(Store store, String userName) {
-        store.markCreateBy("userName");
+        store.markCreateBy(userName);
         return storeRepository.save(store);
     }
 
@@ -74,11 +73,11 @@ public class StoreService {
             store.changeCategory(category);
         }
 
-        store.markUpdatedBy("ownerName");
+        store.markUpdatedBy(userName);
     }
 
     public void delete(Store store, String userName) {
-        store.markDeletedBy("userName");
+        store.markDeletedBy(userName);
     }
 
     // 세준
