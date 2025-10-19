@@ -56,7 +56,7 @@ BabGO — AI-powered food delivery project by Team Meal Is Here
             <b>팀원</b><br />
             <a href="https://github.com/minsoo-hub" style="font-size: 16px;">나민수</a>
             <div style="margin-top: 5px; font-size: 14px;">
-              <br />음식점<br /><br /><br />
+              <br />발표<br />음식점<br /><br />
             </div>
           </div>
         </td>
@@ -66,7 +66,7 @@ BabGO — AI-powered food delivery project by Team Meal Is Here
             <b>팀원</b><br />
             <a href="https://github.com/upotato200" style="font-size: 16px;">박상원</a>
             <div style="margin-top: 5px; font-size: 14px;">
-              <br />인증/인가(JWT)<br /><br /><br />
+              <br />인증/인가<br /><br /><br />
             </div>
           </div>
         </td>
@@ -154,7 +154,7 @@ FastAPI --> |Google AI| Gemini
 ```
 
 ### 아키텍쳐
-[![architecture]()]()
+<img width="2126" height="1338" alt="image" src="https://github.com/user-attachments/assets/ebcd3acf-6ce1-43f4-b2d6-60f3c06d4d64" />
 
 ### 프로젝트 구조 & 컨벤션
 ```text
