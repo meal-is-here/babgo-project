@@ -106,27 +106,24 @@ public class SearchInfo {
 
         private double avgRating;
 
-        private int likes;
-
         private String storeStatus;
 
         private String regionCode;
 
 
 
-        private CreateResult(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus, String regionCode) {
+        private CreateResult(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, String storeStatus, String regionCode) {
             this.storeId = storeId;
             this.storeName = storeName;
             this.categoryId = categoryId;
             this.categoryName = categoryName;
             this.avgRating = avgRating;
-            this.likes = likes;
             this.storeStatus = storeStatus;
             this.regionCode = regionCode;
         }
 
-        public static CreateResult of(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus, String regionCode) {
-            return new CreateResult(storeId, storeName, categoryId, categoryName, avgRating, likes, storeStatus, regionCode);
+        public static CreateResult of(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, String storeStatus, String regionCode) {
+            return new CreateResult(storeId, storeName, categoryId, categoryName, avgRating, storeStatus, regionCode);
         }
 
 
@@ -139,7 +136,6 @@ public class SearchInfo {
                     search.getCategoryId(),
                     search.getCategoryName(),
                     search.getAvgRating(),
-                    search.getLikes(),
                     search.getStoreStatus(),
                     search.getRegionCode()
                 ))

@@ -25,7 +25,7 @@ public class SearchCommand {
 
         private String keyword;
 
-        private String sort;
+        private SearchSort sort;
 
         private int page;
 
@@ -37,7 +37,7 @@ public class SearchCommand {
             this.regionCode = regionCode;
             this.searchType = searchType;
             this.keyword = keyword;
-            this.sort = sort;
+            this.sort = SearchSort.from(sort);
             this.page = page;
             this.size = size;
         }
@@ -65,8 +65,6 @@ public class SearchCommand {
 
         private double avgRating;
 
-        private int likes;
-
         private String storeStatus;
 
         private String regionCode;
@@ -75,27 +73,22 @@ public class SearchCommand {
 
         private double longitude;
 
-        private int orderCount;
 
 
-        public CreateResult(UUID storeId, String storeName, UUID categoryId, String categoryName,
-            double avgRating, int likes, String storeStatus,
-            String regionCode, double latitude, double longitude, int orderCount) {
+        public CreateResult(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating,  String storeStatus, String regionCode, double latitude, double longitude) {
             this.storeId = storeId;
             this.storeName = storeName;
             this.categoryId = categoryId;
             this.categoryName = categoryName;
             this.avgRating = avgRating;
-            this.likes = likes;
             this.storeStatus = storeStatus;
             this.regionCode = regionCode;
             this.latitude = latitude;
             this.longitude = longitude;
-            this.orderCount = orderCount;
         }
 
-        public static SearchCommand.CreateResult of(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, String storeStatus, String regionCode, double latitude, double longitude, int orderCount) {
-            return new SearchCommand.CreateResult(storeId, storeName, categoryId, categoryName, avgRating, likes, storeStatus, regionCode, latitude, longitude, orderCount
+        public static SearchCommand.CreateResult of(UUID storeId, String storeName, UUID categoryId, String categoryName, double avgRating, String storeStatus, String regionCode, double latitude, double longitude) {
+            return new SearchCommand.CreateResult(storeId, storeName, categoryId, categoryName, avgRating, storeStatus, regionCode, latitude, longitude
             );
         }
 
@@ -107,17 +100,15 @@ public class SearchCommand {
                     search.getCategoryId(),
                     search.getCategoryName(),
                     search.getAvgRating(),
-                    search.getLikes(),
                     search.getStoreStatus(),
                     search.getRegionCode(),
                     search.getLatitude(),
-                    search.getLongitude(),
-                    search.getOrderCount()
+                    search.getLongitude()
                 ))
                 .toList();
         }
 
-        public static List<SearchCommand.CreateResult> fromCacheList(List<SearchCache> searchList) {
+        public static List<SearchCommand.CreateResult> fromCacheList(List<SearchCache.Result> searchList) {
             return searchList.stream()
                 .map(search -> SearchCommand.CreateResult.of(
                     search.getStoreId(),
@@ -125,16 +116,14 @@ public class SearchCommand {
                     search.getCategoryId(),
                     search.getCategoryName(),
                     search.getAvgRating(),
-                    search.getLikes(),
                     search.getStoreStatus(),
                     search.getRegionCode(),
                     search.getLatitude(),
-                    search.getLongitude(),
-                    search.getOrderCount()
+                    search.getLongitude()
                 ))
                 .toList();
         }
     }
 
+}
 
-    }

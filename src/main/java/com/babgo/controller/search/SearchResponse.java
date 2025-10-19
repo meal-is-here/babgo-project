@@ -18,8 +18,6 @@ public class SearchResponse {
 
     private double avgRating;
 
-    private int likes;
-
     private String storeStatus;
 
 
@@ -30,7 +28,6 @@ public class SearchResponse {
         response.categoryId = result.getCategoryId();
         response.categoryName = result.getCategoryName();
         response.avgRating = result.getAvgRating();
-        response.likes = result.getLikes();
         response.storeStatus = result.getStoreStatus();
         return response;
     }
