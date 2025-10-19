@@ -44,6 +44,9 @@ public class Search extends BaseTimeEntity {
     @Column(name = "likes")
     private int likes;
 
+    @Column(name = "review_count")
+    private int reviewCount;
+
     @Column(name = "order_count")
     private int orderCount;
 
@@ -60,7 +63,7 @@ public class Search extends BaseTimeEntity {
 
 
 
-    private Search(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, int orderCount, String storeStatus, double latitude, double longitude) {
+    private Search(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, int reviewCount, int orderCount, String storeStatus, double latitude, double longitude) {
         this.storeId = storeId;
         this.regionCode = regionCode;
         this.storeName = storeName;
@@ -68,15 +71,15 @@ public class Search extends BaseTimeEntity {
         this.categoryName = categoryName;
         this.avgRating = avgRating;
         this.likes = likes;
+        this.reviewCount = reviewCount;
         this.orderCount = orderCount;
         this.storeStatus = storeStatus;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-
-    public static Search of(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, int orderCount, String storeStatus, double latitude, double longitude){
-        return new Search(storeId, regionCode, storeName, categoryId, categoryName, avgRating, likes, orderCount, storeStatus, latitude, longitude);
+    public static Search of(UUID storeId, String regionCode, String storeName, UUID categoryId, String categoryName, double avgRating, int likes, int reviewCount, int orderCount, String storeStatus, double latitude, double longitude) {
+        return new Search(storeId, regionCode, storeName, categoryId, categoryName, avgRating, likes, reviewCount, orderCount, storeStatus, latitude, longitude);
     }
 
     public void incrementOrderCount() {
@@ -87,10 +90,30 @@ public class Search extends BaseTimeEntity {
         this.likes++;
     }
 
-
-    public void updateAverageRating(double avgRating) {
-        this.avgRating = avgRating;
+    public void decrementLikeCount() {
+        if (this.likes > 0) {
+            this.likes--;
+        }
     }
+
+    public void updateAverageRating(int newAvgRating) {
+        this.avgRating = ((avgRating * reviewCount) - this.avgRating + newAvgRating) / reviewCount;
+    }
+
+    public void createAverageRating(int newAvgRating) {
+        this.avgRating = ((avgRating * reviewCount) + newAvgRating) / (reviewCount + 1);
+        reviewCount++;
+    }
+
+    public void deleteAverageRating(int oldRating) {
+        if(reviewCount > 1) {
+            this.avgRating = ((avgRating * reviewCount) - oldRating) / (reviewCount - 1);
+        } else {
+            this.avgRating = 0.0;
+        }
+        reviewCount--;
+    }
+
 
 
 
