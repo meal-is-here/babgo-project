@@ -60,6 +60,8 @@ public enum ErrorCode {
 	// Favorite
 	MENU_UNAVAILABLE(HttpStatus.BAD_REQUEST, "현재 즐겨찾기할 수 없는 메뉴입니다."),
 	FAVORITE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 즐겨찾기한 메뉴입니다."),
+	FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 즐겨찾기를 찾을 수 없습니다."),
+	INVALID_FAVORITE_OPTION(HttpStatus.BAD_REQUEST, "옵션 정보를 확인해주세요."),
 
 	// Order
 	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
