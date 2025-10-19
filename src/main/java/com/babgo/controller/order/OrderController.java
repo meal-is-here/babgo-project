@@ -42,7 +42,7 @@ public class OrderController {
             @CurrentUser User user,
             @PathVariable("orderId") UUID orderId
     ){
-       OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+       OrderInfo.CancelResult result = orderFacade.cancelOrder(user.getUserId(), orderId);
 
         if (!result.isOk()) {
             return ApiResponse.success(result.getMessage());

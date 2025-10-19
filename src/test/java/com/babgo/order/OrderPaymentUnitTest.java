@@ -12,7 +12,7 @@ import com.babgo.domain.store.Category;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
 import com.babgo.domain.store.status.StoreStatus;
-import com.babgo.domain.user.User; // ✅
+import com.babgo.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-// ✅ lenient 모드 추가
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationEventPublisher;
@@ -147,15 +146,20 @@ public class OrderPaymentUnitTest {
     @DisplayName("성공: 주문 취소 - PENDING 상태")
     void cancelOrder_success() {
         UUID orderId = UUID.randomUUID();
+
+        // 권한 검증 모킹
+        doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
         when(cancelWindow.isOpen(orderId)).thenReturn(true);
 
         Order pendingOrder = mock(Order.class);
         when(pendingOrder.getOrderStatus()).thenReturn(OrderStatus.PENDING);
         when(orderService.getOrder(orderId)).thenReturn(pendingOrder);
 
-        OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+        OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
         assertThat(result.isOk()).isTrue();
+        verify(orderService).validateOrderOwnership(orderId, userId);
         verify(orderService).updateCancel(pendingOrder);
         verify(cancelWindow).close(orderId);
     }
@@ -164,11 +168,16 @@ public class OrderPaymentUnitTest {
     @DisplayName("실패: 취소 가능 시간 만료")
     void cancelOrder_fail_window_closed() {
         UUID orderId = UUID.randomUUID();
+
+        // 권한 검증 모킹
+        doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
         when(cancelWindow.isOpen(orderId)).thenReturn(false);
 
-        OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+        OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
         assertThat(result.isOk()).isFalse();
+        verify(orderService).validateOrderOwnership(orderId, userId);
         verify(orderService, never()).updateCancel(any());
         verify(orderService, never()).getOrder(any());
     }

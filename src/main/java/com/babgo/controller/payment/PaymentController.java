@@ -3,7 +3,10 @@ package com.babgo.controller.payment;
 import com.babgo.application.payment.PaymentFacade;
 import com.babgo.application.payment.PaymentInfo;
 import com.babgo.application.payment.PaymentWebhookHandler;
+import com.babgo.domain.user.User;
 import com.babgo.global.api.ApiResponse;
+import com.babgo.global.security.annotation.CurrentUser;
+import com.babgo.global.security.annotation.RequireCustomer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +21,13 @@ public class PaymentController {
     private final PaymentFacade paymentFacade;
     private final PaymentWebhookHandler paymentWebhookHandler;
 
+    @RequireCustomer
     @PostMapping
     public ApiResponse<PaymentResponse.Ready> ready(
+            @CurrentUser User user,
             @RequestBody PaymentRequest.Ready request
     ){
-        Long userid = 1L;
-        PaymentInfo.Ready input = PaymentInfo.Ready.from(userid, request);
+        PaymentInfo.Ready input = PaymentInfo.Ready.from(user.getUserId(), request);
         PaymentInfo.ReadyResult output = paymentFacade.ready(input);
         PaymentResponse.Ready response =  PaymentResponse.Ready.from(output);
         return ApiResponse.success("결제 요청이 정상적으로 접수되었습니다.", response);

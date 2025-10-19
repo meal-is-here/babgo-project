@@ -39,22 +39,19 @@ public class OrderFacade {
 
         UUID orderId = orderService.createOrderId();
 
-        // 가게 존재하고 오픈 상태, 주문 가능인지 확인
         Store store = storeService.findByStoreId(input.getStoreId());
         if (!store.isOrderable(LocalTime.now())) {
             return OrderInfo.CreateResult.reject("현재 가게 운영 시간이 아닙니다.");
         }
-        //4. 요청 아이템 → 엔티티 변환 오더 아이템 재고 있는지 검증 후 검증된 객체 리스트 반환
+
         OrderItemValidationResult validation = orderItemService.reserveStockAndCreateOrderItems(input.getItems());
         if (validation.hasInvalid()) return OrderInfo.CreateResult.reject("일부 메뉴가 주문 불가합니다.", validation.getInvalidItems());
 
-        //5. 총액 계산(서버 기준)
         List<OrderItemSnapshot> orderItemsSnapshot = validation.getValidItems();
         long totalPrice = orderItemsSnapshot.stream()
                 .mapToLong(OrderItemSnapshot::lineTotal)
                 .sum();
 
-        // 6) 주문 엔티티 생성/저장
         Order order = Order.of(
                 orderId,
                 store.getStoreId(),
@@ -66,10 +63,8 @@ public class OrderFacade {
 
         Order pendingOrder = orderService.create(order);
 
-        //7. 검증 완료된 오더 아이템 저장
         List<OrderItem> orderItems = orderItemService.create(orderItemsSnapshot, pendingOrder);
-        
-        // 메뉴 정보 조회 및 결합
+
         List<UUID> menuIds = orderItems.stream()
                 .map(OrderItem::getMenuId)
                 .toList();
@@ -84,15 +79,15 @@ public class OrderFacade {
                 })
                 .toList();
 
-        // 8) 이벤트 발행
         eventPublisher.publishEvent(new OrderCreatedEvent(orderId));
 
-        // 9) 성공 결과
         return OrderInfo.CreateResult.ok(pendingOrder, items);
     }
 
     @Transactional
-    public OrderInfo.CancelResult cancelOrder(UUID orderId){
+    public OrderInfo.CancelResult cancelOrder(Long userId, UUID orderId){
+
+        orderService.validateOrderOwnership(orderId, userId);
 
         if (!cancelWindow.isOpen(orderId)) {
             return OrderInfo.CancelResult.reject("이미 취소되었거나, 취소 가능 시간이 만료되었습니다.");

@@ -55,7 +55,8 @@ public class OrderQueryFacade {
 
     @Transactional(readOnly = true)
     public OrderInfo.OrderAndItems getOrderAndItems(Long userId,UUID orderId) {
-        Order order = orderService.getOrder(orderId);
+        // 권한 검증 후 주문 조회
+        Order order = orderService.getOrderWithAuth(orderId, userId);
         List<OrderItem> orderItems = orderService.findAllOrderItem(order.getOrderId());
 
         List<UUID> menuIds = orderItems.stream()

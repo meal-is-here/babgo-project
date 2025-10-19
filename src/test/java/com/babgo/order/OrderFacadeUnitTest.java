@@ -46,7 +46,6 @@ class OrderFacadeUnitTest {
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private CancelWindow cancelWindow;
 
-    // ✅ 인증 유저 목
     @Mock private User user;
 
     @InjectMocks
@@ -319,6 +318,10 @@ class OrderFacadeUnitTest {
         @DisplayName("성공: PENDING → 취소, 재고 복구, 취소 윈도우 닫힘")
         void pending_success() {
             UUID orderId = UUID.randomUUID();
+
+            // 권한 검증 모킹
+            doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
             when(cancelWindow.isOpen(orderId)).thenReturn(true);
 
             Order order = mockOrderWithStatus(OrderStatus.PENDING);
@@ -330,11 +333,12 @@ class OrderFacadeUnitTest {
             OrderItem i2 = mockOrderItem(m2, 1);
             when(orderService.findAllOrderItem(orderId)).thenReturn(List.of(i1, i2));
 
-            OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+            OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
             assertThat(result.isOk()).isTrue();
             assertThat(result.getMessage()).contains("취소했습니다");
 
+            verify(orderService).validateOrderOwnership(orderId, userId);
             verify(orderService).updateCancel(order);
             verify(orderService).findAllOrderItem(orderId);
             verify(menuService).increaseStock(m1, 2);
@@ -346,31 +350,41 @@ class OrderFacadeUnitTest {
         @DisplayName("거절: 취소 윈도우 닫힘")
         void window_closed() {
             UUID orderId = UUID.randomUUID();
+
+            // 권한 검증 모킹
+            doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
             when(cancelWindow.isOpen(orderId)).thenReturn(false);
 
-            OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+            OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
             assertThat(result.isOk()).isFalse();
             assertThat(result.getMessage()).contains("만료");
 
+            verify(orderService).validateOrderOwnership(orderId, userId);
             verify(cancelWindow).isOpen(orderId);
-            verifyNoInteractions(orderService, menuService);
+            verifyNoInteractions(menuService);
         }
 
         @Test
         @DisplayName("PAYMENT_IN_PROGRESS: 취소요청 전환")
         void payment_in_progress() {
             UUID orderId = UUID.randomUUID();
+
+            // 권한 검증 모킹
+            doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
             when(cancelWindow.isOpen(orderId)).thenReturn(true);
 
             Order order = mockOrderWithStatus(OrderStatus.PAYMENT_IN_PROGRESS);
             when(orderService.getOrder(orderId)).thenReturn(order);
 
-            OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+            OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
             assertThat(result.isOk()).isTrue();
             assertThat(result.getMessage()).contains("결제 취소를 요청했습니다");
 
+            verify(orderService).validateOrderOwnership(orderId, userId);
             verify(orderService).updateCancelRequested(order);
             verify(cancelWindow).close(orderId);
         }
@@ -379,18 +393,44 @@ class OrderFacadeUnitTest {
         @DisplayName("CONFIRMED: 환불요청 전환")
         void confirmed_refund_requested() {
             UUID orderId = UUID.randomUUID();
+
+            // 권한 검증 모킹
+            doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
             when(cancelWindow.isOpen(orderId)).thenReturn(true);
 
             Order order = mockOrderWithStatus(OrderStatus.CONFIRMED);
             when(orderService.getOrder(orderId)).thenReturn(order);
 
-            OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+            OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
             assertThat(result.isOk()).isTrue();
             assertThat(result.getMessage()).contains("환불을 요청했습니다");
 
+            verify(orderService).validateOrderOwnership(orderId, userId);
             verify(orderService).updateRefundRequested(order);
             verify(cancelWindow).close(orderId);
+        }
+
+        @Test
+        @DisplayName("실패: 권한 없음 - 다른 사용자의 주문")
+        void unauthorized_user() {
+            UUID orderId = UUID.randomUUID();
+            Long otherUserId = 999L;
+
+            // 권한 검증 실패 모킹
+            doThrow(new com.babgo.global.exception.CustomException(
+                    com.babgo.global.exception.ErrorCode.FORBIDDEN,
+                    "해당 주문에 대한 권한이 없습니다."
+            )).when(orderService).validateOrderOwnership(orderId, otherUserId);
+
+            org.junit.jupiter.api.Assertions.assertThrows(
+                    com.babgo.global.exception.CustomException.class,
+                    () -> orderFacade.cancelOrder(otherUserId, orderId)
+            );
+
+            verify(orderService).validateOrderOwnership(orderId, otherUserId);
+            verifyNoInteractions(cancelWindow, menuService);
         }
     }
 }
