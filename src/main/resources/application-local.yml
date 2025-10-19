@@ -5,7 +5,7 @@ spring:
     password: testpass
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       show-sql: true
   sql:
     init:
@@ -29,6 +29,10 @@ spring:
       embedding:
         model: models/gemini-embedding-001
 
+fastapi:
+  RECOMMENDATION_URL: ${FASTAPI_RECOMMENDATION_URL:8000}
+  REVIEW_ANALYSIS_URL: ${FASTAPI_REVIEW_ANALYSIS_URL:8001}
+
 jwt:
   secret: ${JWT_SECRET:1iwoidbaoibdoi2biosfioboiwwfnpadsopnofw}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
@@ -38,6 +42,4 @@ jwt:
     domain: ${JWT_COOKIE_DOMAIN:localhost}  # 운영환경에서 실제 도메인 예정
     same-site: ${JWT_COOKIE_SAME_SITE:Lax}  # Strict, Lax, None 중 선택 가능
 
-fastapi:
-  RECOMMENDATION_FASTAPI_URL: ${RECOMMENDATION_FASTAPI_URL}
-  REVIEW_ANALYSIS_FASTAPI_URL: ${REVIEW_ANALYSIS_FASTAPI_URL}
+

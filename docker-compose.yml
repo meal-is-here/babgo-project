@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  babgo-project:
+    image: leesejoon/babgo-project:latest
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=
+    depends_on:
+#      - recommendation
+#      - review_analysis
+      - redis
+
+#  recommendation:
+#    build:
+#      context: ./recommendation
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8000:8000"
+#    env_file:
+#      - .env
+#
+#  review_analysis:
+#    build:
+#      context: ./review_analysis
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8001:8001"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"

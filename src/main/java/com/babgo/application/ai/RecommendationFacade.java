@@ -13,10 +13,10 @@ public class RecommendationFacade {
 
     private final RecommendationForUserService recommendationForUserService;
 
-    @Value("${fastapi.RECOMMENDATION_FASTAPI_URL}")
+    @Value("${fastapi.RECOMMENDATION_URL}")
     private String fastApiBaseUrl;
 
-    public Mono<RecommendationForUserResponse> getRecommendations(String userId) {
+    public Mono<RecommendationForUserResponse> getRecommendations(Long userId) {
         return recommendationForUserService.getPersonalizedRecommendations(userId, fastApiBaseUrl);
     }
 }

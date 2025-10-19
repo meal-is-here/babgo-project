@@ -22,7 +22,7 @@ public class RecommendationForUserService {
 //    private record recomRequest(String userId) {}
 //    private record recomResponse(List<String> storeIds) {}
 
-    public Mono<RecommendationForUserResponse> getPersonalizedRecommendations(String userId, String baseUrl) {
+    public Mono<RecommendationForUserResponse> getPersonalizedRecommendations(Long userId, String baseUrl) {
         // baseUrl + 엔드포인트
         String url = baseUrl + "/recommendations";
 
@@ -38,6 +38,13 @@ public class RecommendationForUserService {
                     // 우리 DB에서 가게 정보를 조회
                     return storeRepository.findByStoreIdIn(storeUuids);
                 })
-                .map(RecommendationForUserResponse::fromStores); // 최종 응답 DTO로 변환
+                .map(RecommendationForUserResponse::fromStores) // 최종 응답 DTO로 변환
+                .onErrorResume(ex -> {
+                    // 외부 API 실패 시 fallback 로직
+                    System.err.println("⚠️ 추천 모듈 연결 실패: " + ex.getMessage());
+                    // 기본 추천(랜덤 상점 5개 등)
+                    return Mono.just(RecommendationForUserResponse.fromStores(List.of()));
+                });
     }
+
 }

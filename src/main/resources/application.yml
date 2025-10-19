@@ -23,6 +23,23 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
+  ai:
+    openai:
+      api-key: ${GOOGLE_AI_API_KEY}
+      google-project-id: "my-project-id"
+      google-location: "us-central1"
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        #        base-url: https://generativelanguage.googleapis.com/v1beta/openai/
+        #        base-url: https://generativelanguage.googleapis.com
+        completion-path: /v1beta/models
+        model: gemini-2.0-flash
+      embedding:
+        model: models/gemini-embedding-001
+fastapi:
+  RECOMMENDATION_URL: ${FASTAPI_RECOMMENDATION_URL:8000}
+  REVIEW_ANALYSIS_URL: ${FASTAPI_REVIEW_ANALYSIS_URL:8001}
+
 jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
