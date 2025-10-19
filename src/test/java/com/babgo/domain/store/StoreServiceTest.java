@@ -37,49 +37,44 @@ class StoreServiceTest {
         Store input = mock(Store.class);
         Store persisted = mock(Store.class);
         when(storeRepository.save(same(input))).thenReturn(persisted);
+        String userName = "anyUser";
 
         // when
-        Store result = storeService.create(input, "anyUser");
+        Store result = storeService.create(input, userName);
 
         // then
         assertThat(result).isSameAs(persisted);
-        verify(input, times(1)).markCreateBy("userName");
-        verify(storeRepository, times(1)).save(same(input));
+        verify(input).markCreateBy(userName);
+        verify(storeRepository).save(same(input));
         verifyNoMoreInteractions(storeRepository);
     }
 
     @DisplayName("findByStoreId: 존재하면 Store를 반환한다.")
     @Test
     void findByStoreId_success() {
-        // given
         UUID storeId = UUID.randomUUID();
         Store found = mock(Store.class);
         when(storeRepository.findByStoreId(eq(storeId))).thenReturn(Optional.of(found));
 
-        // when
         Store result = storeService.findByStoreId(storeId);
 
-        // then
         assertThat(result).isSameAs(found);
-        verify(storeRepository, times(1)).findByStoreId(eq(storeId));
+        verify(storeRepository).findByStoreId(eq(storeId));
         verifyNoMoreInteractions(storeRepository);
     }
 
     @DisplayName("findByStoreId: 존재하지 않으면 CustomException(NOT_FOUND) 발생")
     @Test
     void findByStoreId_throw_notFound() {
-        // given
         UUID storeId = UUID.randomUUID();
         when(storeRepository.findByStoreId(eq(storeId))).thenReturn(Optional.empty());
 
-        // when & then
         assertThatThrownBy(() -> storeService.findByStoreId(storeId))
                 .isInstanceOf(CustomException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND)
-                .extracting("customMessage")
-                .isEqualTo("해당 가게를 찾을 수 없습니다.");
+                .extracting("customMessage").isEqualTo("해당 가게를 찾을 수 없습니다.");
 
-        verify(storeRepository, times(1)).findByStoreId(eq(storeId));
+        verify(storeRepository).findByStoreId(eq(storeId));
         verifyNoMoreInteractions(storeRepository);
     }
 
@@ -88,66 +83,65 @@ class StoreServiceTest {
     void update_applies_changes_and_marks_updated() {
         // given
         Store store = mock(Store.class);
+
+        // 병합 대상이 되는 기존 값 stubbing
+        when(store.getLongitude()).thenReturn(126.0d);
+        when(store.getClosingHours()).thenReturn(LocalTime.of(21, 0));
+
         UUID categoryId = UUID.randomUUID();
         Category category = mock(Category.class);
         when(categoryService.findByCategoryId(eq(categoryId))).thenReturn(category);
 
         Map<String, Object> changes = new HashMap<>();
         changes.put("storeName", "치킨천국");
-        changes.put("latitude", 37.1234d);
-        changes.put("openingHours", LocalTime.of(9, 0));
+        changes.put("latitude", 37.1234d);                // lon은 미포함 → 기존값으로 병합
+        changes.put("openingHours", LocalTime.of(9, 0));  // close는 미포함 → 기존값으로 병합
         changes.put("minOrderAmount", 15000);
         changes.put("categoryId", categoryId);
 
+        String userName = "anyUser";
+
         // when
-        storeService.update(store, changes, "anyUser");
+        storeService.update(store, changes, userName);
 
         // then
         verify(store).changeStoreName("치킨천국");
         verify(store).changeMinOrderAmount(15000);
-        verify(store).changeBusinessHours(eq(LocalTime.of(9,0)), nullable(LocalTime.class));
-        verify(store).changeLocation(eq(37.1234d), anyDouble()); // 경도는 병합된 값
+        verify(store).changeBusinessHours(LocalTime.of(9, 0), LocalTime.of(21, 0));
+        verify(store).changeLocation(37.1234d, 126.0d);
+
         verify(categoryService).findByCategoryId(categoryId);
         verify(store).changeCategory(category);
 
-        // 하드코딩된 문자열을 사용하는 현재 코드에 맞춰 검증
-        verify(store).markUpdatedBy("ownerName");
+        verify(store).markUpdatedBy(userName);
         verifyNoMoreInteractions(categoryService);
     }
 
     @DisplayName("delete: markDeletedBy 호출한다.")
     @Test
     void delete_marks_deleted() {
-        // given
         Store store = mock(Store.class);
+        String userName = "anyUser";
 
-        // when
-        storeService.delete(store, "anyUser");
+        storeService.delete(store, userName);
 
-        // then
-        verify(store, times(1)).markDeletedBy("userName");
+        verify(store).markDeletedBy(userName);
         verifyNoInteractions(storeRepository, categoryService);
     }
 
     @DisplayName("acceptFromConfirmed: Order.acceptFromConfirmed 메서드가 호출된다")
     @Test
     void acceptFromConfirmed_calls_order_method() {
-        // when
         storeService.acceptFromConfirmed(order);
-
-        // then
-        verify(order, times(1)).acceptFromConfirmed();
+        verify(order).acceptFromConfirmed();
         verifyNoMoreInteractions(order);
     }
 
     @DisplayName("prepareFromAccepted: Order.prepareFromAccepted 메서드가 호출된다")
     @Test
     void prepareFromAccepted_calls_order_method() {
-        // when
         storeService.prepareFromAccepted(order);
-
-        // then
-        verify(order, times(1)).prepareFromAccepted();
+        verify(order).prepareFromAccepted();
         verifyNoMoreInteractions(order);
     }
 }
