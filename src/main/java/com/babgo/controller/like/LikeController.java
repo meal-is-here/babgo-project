@@ -18,7 +18,7 @@ public class LikeController {
     private final LikeService likeService;
 
     // register like
-    @PostMapping("/{storedId}")
+    @PostMapping("/{storeId}")
     public ApiResponse<LikeResponse> registerLike(
             // TODO: 인증 추가 예정
             // @AuthenticationPrincipal Long userId,
