@@ -1,5 +1,6 @@
 package com.babgo.domain.search;
 
+import com.babgo.domain.search.SearchCache.Update;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class SearchService {
     public List<SearchCommand.CreateResult> getCategorySearch(SearchCommand.Create searchCommand) {
 
         // 카테고리로 키로 레디스 있는지 확인
-        List<SearchCache> searches = searchRedisRepository.getCategoryRegionCache(searchCommand, DEFAULT_RADIUS_METER);
+        List<SearchCache.Result> searches = searchRedisRepository.getCacheByCategory(searchCommand, DEFAULT_RADIUS_METER);
 
         if (searches.isEmpty()) {
             List<Search> list = searchRepository.getCategorySearch(searchCommand, DEFAULT_RADIUS_METER);
@@ -51,13 +52,13 @@ public class SearchService {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveSearchWithNewTransaction(Search search) {
+    public void saveSearch(Search search) {
         searchRepository.saveSearch(search);
     }
 
 
     @Async("storeExecutor")
-    public void saveCacheAsync(SearchCache cache) {
+    public void saveCacheAsync(SearchCache.Create cache) {
         try {
             searchRedisRepository.saveStoreCache(cache);
         } catch (Exception e) {
@@ -67,17 +68,17 @@ public class SearchService {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void incrementOrderCountOnOrderTransaction(UUID storeId) {
-        Search search = getSearchByStoreId(storeId);
+    public void incrementOrderCount(SearchCache.CountUpdate countUpdate) {
+        Search search = getSearchByStoreId(countUpdate.getStoreId());
         search.incrementOrderCount();
 
     }
 
 
     @Async("storeExecutor")
-    public void incrementOrderCountCache(UUID storeId, UUID categoryId, String regionCode) {
+    public void incrementOrderCountCache(SearchCache.CountUpdate countUpdate) {
         try {
-            searchRedisRepository.incrementOrderCountCache(storeId, categoryId, regionCode);
+            searchRedisRepository.incrementOrderCountCache(countUpdate, SearchSort.ORDER_COUNT);
         } catch (Exception e) {
             log.error("Redis 주문순 캐시 저장 실패 (DB는 정상 반영됨): {}", e.getMessage());
         }
@@ -85,17 +86,28 @@ public class SearchService {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void incrementLikeCountOnUserTransaction(UUID storeId) {
-        Search search = getSearchByStoreId(storeId);
-        search.incrementLikeCount();
+    public void incrementLikeCount(SearchCache.CountUpdate countUpdate) {
+        Search search = getSearchByStoreId(countUpdate.getStoreId());
+
+        switch (countUpdate.getActionType()) {
+            case CREATE -> search.incrementLikeCount();
+            case CANCEL -> search.decrementLikeCount();
+        }
 
     }
 
 
     @Async("storeExecutor")
-    public void incrementLikeCountCache(UUID storeId, UUID categoryId, String regionCode) {
+    public void incrementLikeCountCache(SearchCache.CountUpdate countUpdate) {
         try {
-            searchRedisRepository.incrementLikeCountCache(storeId, categoryId, regionCode);
+            Search search = getSearchByStoreId(countUpdate.getStoreId());
+            SearchCache.CountUpdate cache = countUpdate.toBuilder()
+                .key(SearchCache.Key.builder()
+                    .categoryId(search.getCategoryId().toString())
+                    .regionCode(search.getRegionCode())
+                    .sort(SearchSort.RATING).build())
+                .build();
+            searchRedisRepository.changeLikeCountCache(cache, SearchSort.LIKES);
         } catch (Exception e) {
             log.error("Redis 좋아요 캐시 저장 실패 (DB는 정상 반영됨): {}", e.getMessage());
         }
@@ -103,19 +115,37 @@ public class SearchService {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void updateAverageRatingOnReviewrTransaction(UUID storeId, double averageRating) {
-        Search search = getSearchByStoreId(storeId);
-        search.updateAverageRating(averageRating);
+    public void averageRatingChange(Update update) {
+        Search search = getSearchByStoreId(update.getStoreId());
+
+        switch (update.getActionType()) {
+            case CREATE -> search.createAverageRating(update.getNewRating());
+            case UPDATE -> search.updateAverageRating(update.getNewRating());
+            case DELETE -> search.deleteAverageRating(update.getOldRating());
+        }
+
     }
 
-
     @Async("storeExecutor")
-    public void updateAverageRatingCache(UUID storeId, UUID categoryId, String regionCode, double averageRatinge) {
-        try {
-            searchRedisRepository.updateAverageRatingCache(storeId, categoryId, regionCode, averageRatinge);
-        } catch (Exception e) {
-            log.error("Redis 평점 캐시 저장 실패 (DB는 정상 반영됨): {}", e.getMessage());
+    public void averageRatingCangeCache(Update update) {
+
+        Search search = getSearchByStoreId(update.getStoreId());
+
+        switch (update.getActionType()) {
+            case CREATE -> search.createAverageRating(update.getNewRating());
+            case UPDATE -> search.updateAverageRating(update.getNewRating());
+            case DELETE -> search.deleteAverageRating(update.getOldRating());
         }
+
+        SearchCache.Update cache = update.toBuilder()
+            .key(SearchCache.Key.builder()
+                .categoryId(search.getCategoryId().toString())
+                .regionCode(search.getRegionCode())
+                .sort(SearchSort.RATING).build())
+            .build();
+
+        searchRedisRepository.changeAverageRatingCache(cache, SearchSort.RATING);
+
     }
 
 
@@ -123,9 +153,10 @@ public class SearchService {
     @Async("storeExecutor")
     public void asyncRegisterCache(SearchCommand.Create searchCommand, List<Search> list) {
 
-        SearchSort sort = SearchSort.valueOf(searchCommand.getSort().toUpperCase());
+        SearchSort sort = searchCommand.getSort();
+
         for (Search search : list) {
-            SearchCache cache = SearchCache.builder()
+            SearchCache.Create cache = SearchCache.Create.builder()
                 .storeId(search.getStoreId())
                 .storeName(search.getStoreName())
                 .categoryId(search.getCategoryId())
@@ -140,7 +171,7 @@ public class SearchService {
                 .createdAt(search.getCreatedAt())
                 .build();
 
-            searchRedisRepository.saveCacheBySort(cache,sort);
+            searchRedisRepository.saveCacheBySort(cache, sort);
         }
 
 

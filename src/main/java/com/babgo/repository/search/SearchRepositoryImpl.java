@@ -48,7 +48,7 @@ public class SearchRepositoryImpl implements SearchRepository {
 
         // 정렬 조건 생성
         OrderSpecifier<?> orderSpecifier = getOrderSpecifier(searchCommand.getLongitude(),
-            searchCommand.getLatitude(), searchCommand.getSort(), qSearch);
+            searchCommand.getLatitude(), searchCommand.getSort().name(), qSearch);
 
         return jpaQueryFactory
             .selectFrom(qSearch)
@@ -88,7 +88,7 @@ public class SearchRepositoryImpl implements SearchRepository {
 
         // 정렬 조건 생성
         OrderSpecifier<?> orderSpecifier = getOrderSpecifier(searchCommand.getLongitude(),
-            searchCommand.getLatitude(), searchCommand.getSort(), qSearch);
+            searchCommand.getLatitude(), searchCommand.getSort().name(), qSearch);
 
         return jpaQueryFactory
             .selectFrom(qSearch)

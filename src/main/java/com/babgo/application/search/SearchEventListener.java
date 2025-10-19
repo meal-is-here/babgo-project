@@ -2,10 +2,11 @@ package com.babgo.application.search;
 
 import com.babgo.application.store.StoreCreatedEvent;
 import com.babgo.application.store.StoreOrderCompletedEvent;
-import com.babgo.application.store.StoreRatingUpdatedEvent;
+import com.babgo.domain.review.ReviewChangedEvent;
 import com.babgo.domain.search.Search;
 import com.babgo.domain.search.SearchCache;
 import com.babgo.domain.search.SearchService;
+import com.babgo.domain.search.SearchSort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,7 @@ public class SearchEventListener {
 
     // 가게 등록 시 검색 데이터 비동기 반영 리스너
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void updateSearchCacheOnStoreCreated(StoreCreatedEvent event) {
+    public void handleSearchCreate(StoreCreatedEvent event) {
 
         log.info("StoreCreatedEvent 수신: {}", event.storeId());
 
@@ -36,13 +37,14 @@ public class SearchEventListener {
             0,
             0,
             0,
+            0,
             event.storeStatus(),
             event.latitude(),
             event.longitude()
         );
 
         // 레디스 등록
-        SearchCache cache = SearchCache.builder()
+        SearchCache.Create cache = SearchCache.Create.builder()
             .storeId(event.storeId())
             .storeName(event.storeName())
             .categoryId(event.categoryId())
@@ -56,7 +58,7 @@ public class SearchEventListener {
             .longitude(event.longitude())
             .build();
 
-        searchService.saveSearchWithNewTransaction(search);
+        searchService.saveSearch(search);
         searchService.saveCacheAsync(cache);
 
     }
@@ -64,41 +66,53 @@ public class SearchEventListener {
 
     // 주문완료 시 검색 데이터 비동기 반영 리스너
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void incrementOrderCountOnOrderCompleted(StoreOrderCompletedEvent event) {
+    public void handlOrderCount(StoreOrderCompletedEvent event) {
 
-        log.info("StoreCreatedEvent 수신: {}", event);
+        SearchCache.CountUpdate search = SearchCache.CountUpdate.builder()
+            .storeId(event.storeId())
+            .key(SearchCache.Key.builder().categoryId(event.categoryId().toString())
+                .regionCode(event.regionCode()).sort(
+                    SearchSort.ORDER_COUNT).build())
+            .build();
 
         // 주문 했을때 db 저장
-        searchService.incrementOrderCountOnOrderTransaction(event.storeId());
+        searchService.incrementOrderCount(search);
 
-        searchService.incrementOrderCountCache(event.storeId(), event.categoryId(), event.regionCode());
+        searchService.incrementOrderCountCache(search);
 
     }
 
 
     // 사용자 좋아요 검색 데이터 비동기 반영 리스너
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void updateLikeCountOnUserAction(StoreOrderCompletedEvent event) {
+    public void handleLikeCount(StoreOrderCompletedEvent event) {
 
-        log.info("StoreCreatedEvent 수신: {}", event);
+        SearchCache.CountUpdate searchCache = SearchCache.CountUpdate.builder()
+            .storeId(event.storeId())
+//            .actionType(event.ac)
+            .build();
 
         // 좋아요 했을때 db 저장
-        searchService.incrementLikeCountOnUserTransaction(event.storeId());
+        searchService.incrementLikeCount(searchCache);
 
-        searchService.incrementLikeCountCache(event.storeId(), event.categoryId(), event.regionCode());
+        searchService.incrementLikeCountCache(searchCache);
 
     }
 
     // 가게 평균 변경 시 검색 데이터 비동기 반영 리스너
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void updateAverageRatingOnReviewUpdated(StoreRatingUpdatedEvent event) {
+    public void handleAvergeRatingChange(ReviewChangedEvent event) {
 
-        log.info("StoreCreatedEvent 수신: {}", event);
+        SearchCache.Update search = SearchCache.Update.builder()
+            .storeId(event.storeId())
+            .newRating(event.newRating())
+            .oldRating(event.oldRating())
+            .actionType(event.action())
+            .build();
 
-        // 평점 변경 했을때 db 저장
-        searchService.updateAverageRatingOnReviewrTransaction(event.storeId(), event.averageRatinge());
+        searchService.averageRatingChange(search);
 
-        searchService.updateAverageRatingCache(event.storeId(), event.categoryId(), event.regionCode(), event.averageRatinge());
+        searchService.averageRatingCangeCache(search);
 
     }
 
