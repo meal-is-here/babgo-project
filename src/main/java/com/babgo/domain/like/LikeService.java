@@ -24,6 +24,7 @@ public class LikeService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     // register like
+    @Transactional
     public Like registerLike(Long userId, UUID storeId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

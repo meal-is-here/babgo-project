@@ -46,7 +46,7 @@ public class OrderQueryFacade {
         Page<Order> orders = orderService.findOrders(userId,orderStatus, pageable);
 
         Page<OrderInfo.OrderDetail> orderDetails = orders.map(order -> {
-            Store store = storeService.findByStoreId(order.getStoreId()); // Optional이면 orElseThrow/nullable 처리
+            Store store = storeService.findByStoreId(order.getStoreId());
             return OrderInfo.OrderDetail.from(order, store);
         });
 
@@ -54,8 +54,9 @@ public class OrderQueryFacade {
     }
 
     @Transactional(readOnly = true)
-    public OrderInfo.OrderAndItems getOrderAndItems(UUID orderId) {
-        Order order = orderService.getOrder(orderId);
+    public OrderInfo.OrderAndItems getOrderAndItems(Long userId,UUID orderId) {
+        // 권한 검증 후 주문 조회
+        Order order = orderService.getOrderWithAuth(orderId, userId);
         List<OrderItem> orderItems = orderService.findAllOrderItem(order.getOrderId());
 
         List<UUID> menuIds = orderItems.stream()
