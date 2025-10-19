@@ -38,4 +38,14 @@ public class OrderRepositoryImpl implements OrderRepository {
         return orderJpaRepository.findById(orderId);
     }
 
+    @Override
+    public boolean existsByOrderIdAndUserId(UUID orderId, Long userId) {
+        return orderJpaRepository.existsByOrderIdAndUserId(orderId, userId);
+    }
+
+    @Override
+    public Optional<Order> findByOrderIdAndUserId(UUID orderId, Long userId) {
+        return orderJpaRepository.findByOrderIdAndUserId(orderId, userId);
+    }
+
 }

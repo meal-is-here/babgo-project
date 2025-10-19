@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
 
-    Optional<Like> findByUserUserIdAndStoreStoreId(Long userID, UUID storeId);
-    boolean existsByUserUserIdAndStoreStoreId(Long userID, UUID storeId);
+    Optional<Like> findByUserUserIdAndStoreStoreId(Long userId, UUID storeId);
+    boolean existsByUserUserIdAndStoreStoreId(Long userId, UUID storeId);
 }

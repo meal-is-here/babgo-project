@@ -12,6 +12,7 @@ import com.babgo.domain.store.Category;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreService;
 import com.babgo.domain.store.status.StoreStatus;
+import com.babgo.domain.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalTime;
@@ -31,6 +34,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("Order & Payment 단위 테스트")
 public class OrderPaymentUnitTest {
 
@@ -40,17 +44,21 @@ public class OrderPaymentUnitTest {
     @Mock private MenuService menuService;
     @Mock private CancelWindow cancelWindow;
     @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private User user;
 
     @InjectMocks
     private OrderFacade orderFacade;
 
     private UUID testStoreId;
     private UUID testMenuId;
+    private Long userId;
 
     @BeforeEach
     void setUp() {
         testStoreId = UUID.randomUUID();
         testMenuId = UUID.randomUUID();
+        userId = 1L;
+        when(user.getUserId()).thenReturn(userId);
     }
 
     private Store makeStore(boolean orderable, UUID forcedStoreId) {
@@ -58,7 +66,7 @@ public class OrderPaymentUnitTest {
         LocalTime now = LocalTime.now();
 
         LocalTime openStart = now.minusHours(6);
-        LocalTime openEnd   = orderable ? now.plusHours(6) : now.minusHours(1); // 닫힘이면 now가 범위 밖
+        LocalTime openEnd   = orderable ? now.plusHours(6) : now.minusHours(1);
 
         Store real = Store.of(
                 "가게", "서울시 강남구",
@@ -84,7 +92,7 @@ public class OrderPaymentUnitTest {
         OrderInfo.OrderItemDetail itemDetail =
                 new OrderInfo.OrderItemDetail(testMenuId, null, 5000L, 2);
         OrderInfo.Create input =
-                new OrderInfo.Create(testStoreId, 1L, "요청", "주소", List.of(itemDetail));
+                new OrderInfo.Create(testStoreId, userId, "요청", "주소", List.of(itemDetail));
 
         when(orderService.createOrderId()).thenReturn(orderId);
         when(storeService.findByStoreId(testStoreId)).thenReturn(makeStore(true, testStoreId));
@@ -99,7 +107,7 @@ public class OrderPaymentUnitTest {
         when(pending.getOrderStatus()).thenReturn(OrderStatus.PENDING);
         when(orderService.create(any(Order.class))).thenReturn(pending);
 
-        OrderInfo.CreateResult result = orderFacade.createOrder(input);
+        OrderInfo.CreateResult result = orderFacade.createOrder(user, input);
 
         assertThat(result.isOk()).isTrue();
         verify(orderService).createOrderId();
@@ -111,7 +119,6 @@ public class OrderPaymentUnitTest {
         verify(eventPublisher, times(1)).publishEvent(eventCaptor.capture());
         Object published = eventCaptor.getValue();
         assertThat(published).isInstanceOf(com.babgo.application.order.event.OrderCreatedEvent.class);
-
     }
 
     @Test
@@ -120,12 +127,12 @@ public class OrderPaymentUnitTest {
         OrderInfo.OrderItemDetail itemDetail =
                 new OrderInfo.OrderItemDetail(testMenuId, null, 5000L, 1);
         OrderInfo.Create input =
-                new OrderInfo.Create(testStoreId, 1L, "요청", "주소", List.of(itemDetail));
+                new OrderInfo.Create(testStoreId, userId, "요청", "주소", List.of(itemDetail));
 
         when(orderService.createOrderId()).thenReturn(UUID.randomUUID());
         when(storeService.findByStoreId(testStoreId)).thenReturn(makeStore(false, testStoreId));
 
-        OrderInfo.CreateResult result = orderFacade.createOrder(input);
+        OrderInfo.CreateResult result = orderFacade.createOrder(user, input);
 
         assertThat(result.isOk()).isFalse();
         assertThat(result.getMessage()).contains("운영 시간");
@@ -139,15 +146,20 @@ public class OrderPaymentUnitTest {
     @DisplayName("성공: 주문 취소 - PENDING 상태")
     void cancelOrder_success() {
         UUID orderId = UUID.randomUUID();
+
+        // 권한 검증 모킹
+        doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
         when(cancelWindow.isOpen(orderId)).thenReturn(true);
 
         Order pendingOrder = mock(Order.class);
         when(pendingOrder.getOrderStatus()).thenReturn(OrderStatus.PENDING);
         when(orderService.getOrder(orderId)).thenReturn(pendingOrder);
 
-        OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+        OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
         assertThat(result.isOk()).isTrue();
+        verify(orderService).validateOrderOwnership(orderId, userId);
         verify(orderService).updateCancel(pendingOrder);
         verify(cancelWindow).close(orderId);
     }
@@ -156,11 +168,16 @@ public class OrderPaymentUnitTest {
     @DisplayName("실패: 취소 가능 시간 만료")
     void cancelOrder_fail_window_closed() {
         UUID orderId = UUID.randomUUID();
+
+        // 권한 검증 모킹
+        doNothing().when(orderService).validateOrderOwnership(orderId, userId);
+
         when(cancelWindow.isOpen(orderId)).thenReturn(false);
 
-        OrderInfo.CancelResult result = orderFacade.cancelOrder(orderId);
+        OrderInfo.CancelResult result = orderFacade.cancelOrder(userId, orderId);
 
         assertThat(result.isOk()).isFalse();
+        verify(orderService).validateOrderOwnership(orderId, userId);
         verify(orderService, never()).updateCancel(any());
         verify(orderService, never()).getOrder(any());
     }

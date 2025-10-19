@@ -40,6 +40,17 @@ public class OrderService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
     }
 
+    public void validateOrderOwnership(UUID orderId, Long userId) {
+        if (!orderRepository.existsByOrderIdAndUserId(orderId, userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN, "해당 주문에 대한 권한이 없습니다.");
+        }
+    }
+
+    public Order getOrderWithAuth(UUID orderId, Long userId) {
+        return orderRepository.findByOrderIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN, "해당 주문에 대한 권한이 없습니다."));
+    }
+
     @Transactional
     public void updateConfirmed(UUID orderId) {
         Order order = orderRepository.findByOrderId(orderId)
@@ -71,7 +82,6 @@ public class OrderService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
         order.markCancel();
     }
-
 
     @Transactional
     public void expireOrder(UUID orderId) {
