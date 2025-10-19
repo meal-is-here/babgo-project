@@ -50,8 +50,8 @@ class UserControllerTest {
     @SuppressWarnings("rawtypes")
     private ValueOperations valueOperations;
 
-    @MockitoBean
-    private com.babgo.repository.ai.config.GoogleAiController googleAiController;
+//    @MockitoBean
+//    private com.babgo.repository.ai.config.GoogleAiController googleAiController;
 
     @BeforeEach
     void setUp() {

@@ -1,12 +1,14 @@
 package com.babgo.repository.redis.order;
 
 import com.babgo.application.order.port.CancelWindow;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
 public class OrderCancelRedisRepository implements CancelWindow {
 
@@ -27,10 +29,15 @@ public class OrderCancelRedisRepository implements CancelWindow {
 
     @Override
     public void open(UUID orderId) {
-        redis.opsForValue().setIfAbsent(
-                cancelKey(orderId), "1",
+        String key = cancelKey(orderId);
+        
+        Boolean result = redis.opsForValue().setIfAbsent(
+                key, "1",
                 props.cancelWindowTtlSeconds(), TimeUnit.SECONDS
         );
+
+        Boolean exists = redis.hasKey(key);
+        Long ttl = redis.getExpire(key, TimeUnit.SECONDS);
     }
 
     @Override
@@ -43,5 +50,4 @@ public class OrderCancelRedisRepository implements CancelWindow {
         redis.delete(cancelKey(orderId));
     }
 
-    //5분 이내 결제가 이루어지지 않았을 경우 쓰레기 ,, 주문이라고 판단하고 주문 상태 변경
 }

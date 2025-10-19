@@ -36,4 +36,22 @@ public class ReviewQueryService {
                 .map(ReviewResponse::from)
                 .toList();
     }
+
+    // read review by user
+    public List<ReviewResponse> getReviewsByUser(Long userId, String sort) {
+        if (userId == null) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_USER);
+        }
+        Sort sortOption = switch (sort.toLowerCase()) {
+            case "high" -> Sort.by(Sort.Direction.DESC, "rating");
+            case "low" -> Sort.by(Sort.Direction.ASC, "rating");
+            case "latest" -> Sort.by(Sort.Direction.DESC, "createdAt");
+            default -> throw new CustomException(ErrorCode.INVALID_SORT_TYPE);
+        };
+
+        return reviewRepository.findAllByUserIdAndDeletedAtIsNull(userId, sortOption)
+                .stream()
+                .map(ReviewResponse::from)
+                .toList();
+    }
 }

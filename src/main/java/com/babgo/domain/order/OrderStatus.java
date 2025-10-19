@@ -16,6 +16,7 @@ public enum OrderStatus {
     REFUNDED("환불됨"),
     REFUND_REQUESTED("환불 요청중"),
     FAILED("실패"),
+    EXPIRED("시간만료"),
 
     // 추가(사장님 액션 단계)
     ACCEPTED("주문 수락"),
