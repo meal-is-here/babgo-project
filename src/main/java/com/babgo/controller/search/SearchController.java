@@ -3,6 +3,7 @@ package com.babgo.controller.search;
 import com.babgo.application.search.SearchFacade;
 import com.babgo.application.search.SearchInfo.CreateResult;
 import com.babgo.global.api.ApiResponse;
+import com.babgo.global.security.annotation.CurrentUser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +19,9 @@ public class SearchController {
     private final SearchFacade searchFacade;
 
     @GetMapping("/stores")
-    public ApiResponse<List<SearchResponse>> getSearch( @RequestParam double latitude,
-        @RequestParam  double longitude,
+    public ApiResponse<List<SearchResponse>> getSearch(
+        @CurrentUser Long userId,
         @RequestParam  String searchType,
-        @RequestParam String regionCode,
         @RequestParam  String keyword,
         @RequestParam  String sort,
         @RequestParam int page,
@@ -29,7 +29,7 @@ public class SearchController {
     ) {
 
 
-        SearchRequest.Create request = SearchRequest.Create.of(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
+        SearchRequest.Create request = SearchRequest.Create.of(userId, searchType, keyword, sort, page, size);
 
         List<CreateResult> result = searchFacade.getSearch(request.toSearchInfo());
 

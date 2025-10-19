@@ -41,4 +41,19 @@ public class UserDetailService implements UserDetailsService {
 
         return new UserDetailInfo(user);
     }
+
+
+    @Transactional(readOnly = true)
+    public User getUser(Long userId) {
+
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
+
+        if (user.getIsUserDeleted()) {
+            throw new UsernameNotFoundException("삭제된 사용자입니다: " + user.getUserId());
+        }
+
+        return user;
+    }
 }

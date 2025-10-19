@@ -20,11 +20,7 @@ public class SearchInfo {
     @NoArgsConstructor
     public static class Create{
 
-        private double latitude;
-
-        private double longitude;
-
-        private String regionCode;
+        private Long userid;
 
         private String searchType;
 
@@ -36,22 +32,19 @@ public class SearchInfo {
 
         private int size;
 
-        private Create(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, int page, int size) {
-            this.latitude = latitude;
-            this.longitude = longitude;
-            this.regionCode = regionCode;
+        private Create(Long userId, String searchType, String keyword, String sort, int page, int size) {
+            this.userid = userId;
             this.searchType = searchType;
             this.keyword = keyword;
             this.sort = sort;
             this.page = page;
             this.size = size;
         }
-
-        public static Create of(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, int page, int size) {
-            return new Create(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
+        public static Create of(Long userId, String searchType, String keyword, String sort, int page, int size) {
+            return new Create(userId, searchType, keyword, sort, page, size);
         }
 
-        public SearchCommand.Create toCommand(){
+        public SearchCommand.Create toCommand(double latitude, double longitude, String regionCode){
 
             return SearchCommand.Create.of(latitude, longitude, regionCode, validateSearchType(searchType), keyword, validateSort(sort), page, size);
 
