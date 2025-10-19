@@ -1,7 +1,8 @@
 package com.babgo.domain.favorite;
 
-import com.babgo.controller.favorite.dto.FavoriteRequest;
+import com.babgo.controller.favorite.dto.FavoriteCreateRequest;
 import com.babgo.controller.favorite.dto.FavoriteResponse;
+import com.babgo.controller.favorite.dto.FavoriteUpdateRequest;
 import com.babgo.domain.menu.Menu;
 import com.babgo.domain.menu.MenuRepository;
 import com.babgo.domain.menu.MenuStatus;
@@ -13,6 +14,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class FavoriteService {
@@ -23,7 +26,7 @@ public class FavoriteService {
 
     // add favorite
     @Transactional
-    public FavoriteResponse addFavorite(Long userId, FavoriteRequest request) {
+    public FavoriteResponse addFavorite(Long userId, FavoriteCreateRequest request) {
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -35,11 +38,24 @@ public class FavoriteService {
         }
 
         favoriteRepository.findByUserUserIdAndMenuMenuId(userId, menu.getMenuId())
-                .ifPresent(f -> { throw new CustomException(ErrorCode.FAVORITE_ALREADY_EXISTS); });
+                .ifPresent(f -> {
+                    throw new CustomException(ErrorCode.FAVORITE_ALREADY_EXISTS);
+                });
 
         Favorite favorite = Favorite.create(user, menu, request.getOption(), request.getQuantity());
         Favorite saved = favoriteRepository.save(favorite);
 
         return FavoriteResponse.from(saved);
+    }
+
+    // update favorite
+    public FavoriteResponse updateFavorite(Long userId, UUID favoriteId, FavoriteUpdateRequest request) {
+        Favorite favorite = favoriteRepository.findByFavoriteIdAndUserUserId(favoriteId, userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.FAVORITE_NOT_FOUND));
+
+        favorite.updateFavorite(request.getOption(), request.getQuantity());
+        Favorite updated = favoriteRepository.save(favorite);
+
+        return FavoriteResponse.from(updated);
     }
 }
