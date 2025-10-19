@@ -44,5 +44,18 @@ public class FavoriteController {
         Long userId = 1L;
         FavoriteResponse response = favoriteService.updateFavorite(userId, favoriteId, request);
         return ResponseEntity.ok(ApiResponse.success("즐겨찾기 수정 성공c", response));
+
+    }
+
+    // delete favorite
+    @DeleteMapping("/{favoriteId}")
+    public ResponseEntity<ApiResponse<Void>> deleteFavorite(
+            // TODO: 인증 추가 예정
+            // @AuthenticationPrincipal Long userId,
+            @PathVariable UUID favoriteId
+    ) {
+        Long userId = 1L;
+        favoriteService.deleteFavorite(userId, favoriteId);
+        return ResponseEntity.ok(ApiResponse.success("즐겨찾기 해제 성공"));
     }
 }
