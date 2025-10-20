@@ -1,5 +1,6 @@
 package com.babgo.global.redis;
 
+import com.babgo.repository.redis.order.OrderExpiredListener;
 import com.babgo.repository.redis.order.OrderRedisProps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,14 +8,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import com.babgo.repository.redis.order.OrderExpiredListener;
 
 /**
  * Redis 설정 - Refresh Token 저장소 & Keyspace Notification
@@ -114,5 +116,15 @@ public class RedisConfig {
         );
 
         return container;
+    }
+
+
+
+    @Bean
+    public DefaultRedisScript<String> updateStoreCacheScript() {
+        DefaultRedisScript<String> script = new DefaultRedisScript<>();
+        script.setLocation(new ClassPathResource("update_store_cache.lua"));
+        script.setResultType(String.class);
+        return script;
     }
 }

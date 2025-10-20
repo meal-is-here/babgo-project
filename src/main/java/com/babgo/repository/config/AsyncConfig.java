@@ -21,4 +21,16 @@ public class AsyncConfig {
         return executor;
     }
 
+
+    @Bean(name = "storeExecutor")
+    public ThreadPoolTaskExecutor storeExecutor(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(8);
+        executor.setMaxPoolSize(16);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("store-");
+        executor.initialize();
+        return executor;
+    }
+
 }

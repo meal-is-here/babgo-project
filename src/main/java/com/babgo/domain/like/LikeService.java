@@ -1,5 +1,6 @@
 package com.babgo.domain.like;
 
+import com.babgo.domain.common.ActionType;
 import com.babgo.domain.store.Store;
 import com.babgo.domain.store.StoreRepository;
 import com.babgo.domain.user.User;
@@ -7,6 +8,7 @@ import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import com.babgo.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     // register like
     @Transactional
@@ -34,7 +37,14 @@ public class LikeService {
         }
 
         Like like = Like.of(user, store);
-        return likeRepository.save(like);
+
+        Like savedLike = likeRepository.save(like);
+
+        // 비동기 이벤트 발행
+        applicationEventPublisher.publishEvent(new LikeChangedEvent(savedLike.getStore().getStoreId(), ActionType.CREATE)
+        );
+
+        return savedLike;
     }
 
     // unlike store
@@ -47,5 +57,7 @@ public class LikeService {
 
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
+        applicationEventPublisher.publishEvent(new LikeChangedEvent(storeId, ActionType.CANCEL));
     }
 }

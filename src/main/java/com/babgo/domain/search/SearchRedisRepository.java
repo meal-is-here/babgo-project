@@ -1,11 +1,19 @@
 package com.babgo.domain.search;
 
-import com.babgo.domain.search.SearchCommand.CreateResult;
 import java.util.List;
 
 public interface SearchRedisRepository {
 
 
-    List<CreateResult> getCategoryRegionCache(SearchCommand.Create searchCommand);
+    List<SearchCache.Result> getCacheByCategory(SearchCommand.Create searchCommand, double radiusMeters);
 
+    void saveStoreCache(SearchCache.Create cache);
+
+    void incrementOrderCountCache(SearchCache.CountUpdate cache, SearchSort sort);
+
+    void changeLikeCountCache(SearchCache.CountUpdate cache, SearchSort sort);
+
+    void changeAverageRatingCache(SearchCache.Update cache, SearchSort sort);
+
+    void saveCacheBySort(SearchCache.Create cache, SearchSort sort);
 }
