@@ -15,4 +15,13 @@ public enum SearchSort {
 
     private final String description;
 
+    public static SearchSort from(String value) {
+        for (SearchSort sort : values()) {
+            if (sort.name().equalsIgnoreCase(value)) {
+                return sort;
+            }
+        }
+        throw new IllegalArgumentException("Invalid sort type: " + value);
+    }
+
 }

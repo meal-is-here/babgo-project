@@ -18,11 +18,7 @@ public class SearchRequest {
     @NoArgsConstructor
     public static class Create{
 
-        private double latitude;
-
-        private double longitude;
-
-        private String regionCode;
+        private Long userId;
 
         private String searchType;
 
@@ -35,26 +31,9 @@ public class SearchRequest {
         private int size;
 
 
-        private Create(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, Integer page, Integer size) {
+        private Create(Long userId, String searchType, String keyword, String sort, Integer page, Integer size) {
 
-           // 위도 검증
-            if (latitude < -90.0 || latitude > 90.0) {
-                throw new  CustomException(ErrorCode.BAD_REQUEST, "위도는 -90 이상 90 이하이어야 합니다.");
-            }
-            this.latitude = latitude;
-
-            // 경도 검증
-            if (longitude < -180.0 || longitude > 180.0) {
-                new CustomException(ErrorCode.BAD_REQUEST, "경도는 -180 이상 180 이하이어야 합니다.");
-            }
-            this.longitude = longitude;
-
-
-            // 위치코드
-            if(regionCode == null || regionCode.isEmpty()){
-                throw new  CustomException(ErrorCode.BAD_REQUEST, "위치코드가 없습니다.");
-            }
-            this.regionCode = regionCode;
+            this.userId =userId;
 
             // 검색 타입 검증
             this.searchType = searchType;
@@ -76,13 +55,13 @@ public class SearchRequest {
 
         }
 
-        public static Create of(double latitude, double longitude, String regionCode, String searchType, String keyword, String sort, Integer page, Integer size) {
-            return new Create(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
+        public static Create of(Long userId, String searchType, String keyword, String sort, Integer page, Integer size) {
+            return new Create(userId, searchType, keyword, sort, page, size);
         }
 
         public SearchInfo.Create toSearchInfo(){
 
-            return SearchInfo.Create.of(latitude, longitude, regionCode, searchType, keyword, sort, page, size);
+            return SearchInfo.Create.of(userId, searchType, keyword, sort, page, size);
         }
 
 

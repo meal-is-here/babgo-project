@@ -2,6 +2,7 @@ package com.babgo.application.store;
 
 
 import com.babgo.application.store.event.StoreEvent;
+import com.babgo.application.store.event.StoreOrderCompletedEvent;
 import com.babgo.domain.order.Order;
 import com.babgo.domain.order.OrderService;
 import com.babgo.domain.store.Category;
@@ -41,17 +42,17 @@ public class StoreFacade {
         Category category = categoryService.findByCategoryId(input.getCategoryId());
         Long ownerId = user.getUserId();
         Store store = Store.of(
-                ownerId,
-                input.getStoreName(),
-                input.getAddressLine(),
-                input.getLatitude(),
-                input.getLongitude(),
-                input.getRegionCode(),
-                input.getPhoneNumber(),
-                input.getMinOrderAmount(),
-                input.getOpeningHours(),
-                input.getClosingHours(),
-                category
+            ownerId,
+            input.getStoreName(),
+            input.getAddressLine(),
+            input.getLatitude(),
+            input.getLongitude(),
+            input.getRegionCode(),
+            input.getPhoneNumber(),
+            input.getMinOrderAmount(),
+            input.getOpeningHours(),
+            input.getClosingHours(),
+            category
         );
         storeService.create(store, displayName(user));
     }
@@ -85,7 +86,7 @@ public class StoreFacade {
     // 가게조회
     public StoreInfo.Detail getStoreById(UUID id) {
         Store store = storeService.getStoreById(id)
-                .orElseThrow(() -> new RuntimeException("STORE_NOT_FOUND"));
+            .orElseThrow(() -> new RuntimeException("STORE_NOT_FOUND"));
         return StoreInfo.Detail.fromEntity(store);
     }
 
@@ -105,6 +106,7 @@ public class StoreFacade {
             Order order = orderService.getOrder(orderId);
             storeService.acceptFromConfirmed(order);
             publishStatusChanged(order, "주문 수락이 완료되었습니다.");
+            eventPublisher.publishEvent(new StoreOrderCompletedEvent(order.getStoreId()));
         } catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
             throw new CustomException(ErrorCode.VERSION_CONFLICT);
         }
@@ -154,12 +156,12 @@ public class StoreFacade {
 
     private void publishStatusChanged(Order order, String message) {
         eventPublisher.publishEvent(
-                StoreEvent.StatusChanged.of(
-                        order.getUserId(),
-                        order.getOrderId(),
-                        order.getOrderStatus(),
-                        message
-                )
+            StoreEvent.StatusChanged.of(
+                order.getUserId(),
+                order.getOrderId(),
+                order.getOrderStatus(),
+                message
+            )
         );
     }
 
