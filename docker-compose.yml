@@ -1,4 +1,4 @@
-version: '3.8'
+#version: '3'
 services:
   babgo-project:
     image: leesejoon/babgo-project:latest
@@ -34,5 +34,12 @@ services:
 
   redis:
     image: redis:7
+    restart: always
     ports:
       - "6379:6379"
+    command: redis-server --appendonly yes --notify-keyspace-events Ex
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
