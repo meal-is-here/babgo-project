@@ -66,7 +66,8 @@ public class ReadPayment {
         long price = 15_000L;
 
         Order order = pendingOrder(orderId);
-        when(orderService.getOrder(orderId)).thenReturn(order);
+
+        when(orderService.getOrderWithAuth(orderId, userId)).thenReturn(order);
 
         when(order.getTotalPrice()).thenReturn(price);
 
@@ -105,7 +106,8 @@ public class ReadPayment {
 
         Order order = mock(Order.class);
         when(order.getOrderStatus()).thenReturn(OrderStatus.CANCELED);
-        when(orderService.getOrder(orderId)).thenReturn(order);
+
+        when(orderService.getOrderWithAuth(orderId, userId)).thenReturn(order);
 
         PaymentInfo.Ready input =
                 readyInput(userId, orderId, 1_000L, PaymentMethod.CARD, CardBrand.HYUNDAI, CardType.CHECK);
@@ -127,7 +129,8 @@ public class ReadPayment {
         long price = 12_000L;
 
         Order order = pendingOrder(orderId);
-        when(orderService.getOrder(orderId)).thenReturn(order);
+
+        when(orderService.getOrderWithAuth(orderId, userId)).thenReturn(order);
 
         Payment existing = mock(Payment.class);
         when(paymentService.getPaymentByOrderId(orderId)).thenReturn(Optional.of(existing));
@@ -152,7 +155,8 @@ public class ReadPayment {
         long price = 10_000L;
 
         Order order = pendingOrder(orderId);
-        when(orderService.getOrder(orderId)).thenReturn(order);
+
+        when(orderService.getOrderWithAuth(orderId, userId)).thenReturn(order);
         when(order.getTotalPrice()).thenReturn(price); // 이 테스트에서만 필요
 
         when(paymentService.getPaymentByOrderId(orderId)).thenReturn(Optional.empty());
@@ -177,7 +181,8 @@ public class ReadPayment {
         long price = 20_000L;
 
         Order order = pendingOrder(orderId);
-        when(orderService.getOrder(orderId)).thenReturn(order);
+
+        when(orderService.getOrderWithAuth(orderId, userId)).thenReturn(order);
         when(order.getTotalPrice()).thenReturn(price); // 이 테스트에서만 필요
         when(paymentService.getPaymentByOrderId(orderId)).thenReturn(Optional.empty());
         when(paymentService.create(any(Payment.class)))

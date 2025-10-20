@@ -128,6 +128,31 @@ public class Order extends BaseTimeEntity {
     }
 
 
+    public void acceptFromConfirmed() {
+        if (!orderStatus.canAcceptFromConfirmed()) {
+            throw new CustomException(ErrorCode.BAD_REQUEST, "CONFIRMED 상태에서만 수락할 수 있습니다.");
+        }
+        this.orderStatus = OrderStatus.ACCEPTED;
+    }
 
+    public void prepareFromAccepted() {
+        if (!orderStatus.canPreparedFromAccepted()) {
+            throw new CustomException(ErrorCode.BAD_REQUEST, "ACCEPTED 상태에서만 조리 완료할 수 있습니다.");
+        }
+        this.orderStatus = OrderStatus.PREPARED;
+    }
 
+    public void pickupFromPrepared() {
+        if(!orderStatus.canPickedUpFromPrepared()) {
+            throw new CustomException(ErrorCode.BAD_REQUEST, "PREPARED 상태에서만 픽업할 수 있습니다.");
+        }
+        this.orderStatus = OrderStatus.PICKED_UP;
+    }
+
+    public void deliverFromPickedUp() {
+        if (!orderStatus.canDeliveredFromPickedUp()) {
+            throw new CustomException(ErrorCode.BAD_REQUEST, "PICKED_UP 상태에서만 배달완료할 수 있습니다.");
+        }
+        this.orderStatus = OrderStatus.DELIVERED;
+    }
 }

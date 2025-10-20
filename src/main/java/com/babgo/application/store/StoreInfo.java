@@ -1,5 +1,7 @@
 package com.babgo.application.store;
 
+import com.babgo.domain.order.Order;
+import com.babgo.domain.order.OrderStatus;
 import com.babgo.domain.store.Store;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -126,6 +128,17 @@ public class StoreInfo {
 
         public static Summary of(String summary) {
             return new Summary(summary);
+        }
+    }
+
+    @Getter
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class OrderStatusResult {
+        private final UUID orderId;
+        private final OrderStatus status;
+
+        public static OrderStatusResult from(Order order) {
+            return new OrderStatusResult(order.getOrderId(), order.getOrderStatus());
         }
     }
 }

@@ -54,8 +54,14 @@ public enum ErrorCode {
 	LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 좋아요가 해제된 가게입니다."),
 
     // Menu
-    MENU_UNAVAILABLE(HttpStatus.NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
+    MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
     OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "해당 메뉴의 재고가 부족합니다."),
+
+	// Favorite
+	MENU_UNAVAILABLE(HttpStatus.BAD_REQUEST, "현재 즐겨찾기할 수 없는 메뉴입니다."),
+	FAVORITE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 즐겨찾기한 메뉴입니다."),
+	FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 즐겨찾기를 찾을 수 없습니다."),
+	INVALID_FAVORITE_OPTION(HttpStatus.BAD_REQUEST, "옵션 정보를 확인해주세요."),
 
 	// Order
 	ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
@@ -66,6 +72,7 @@ public enum ErrorCode {
 	ORDER_ALREADY_REFUNDED(HttpStatus.CONFLICT, "이미 환불된 주문입니다."),
 	INVALID_ORDER_STATE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
 	CONFLICT(HttpStatus.CONFLICT, "리소스 충돌이 발생했습니다."),
+    VERSION_CONFLICT(HttpStatus.CONFLICT, "다른 요청에 의해 변경되었습니다."),
 
 	// Review
 	REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 해당 주문에 대한 리뷰가 존재합니다."),

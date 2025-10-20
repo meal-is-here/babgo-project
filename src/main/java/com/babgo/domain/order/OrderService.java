@@ -3,6 +3,7 @@ package com.babgo.domain.order;
 import com.babgo.global.exception.CustomException;
 import com.babgo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -25,23 +27,6 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    /**
-     *
-     *  전제: items 는 이미 검증/재고확보 완료 (null 아님, 단가>=0, 수량>=1 보장).
-     *  역할: 합계 계산 + long 오버플로 감지.
-     */
-    public Long calculateTotal(List<OrderItem> items) {
-        if (items == null || items.isEmpty()) return 0L;
-
-        long sum = 0L;
-        for (OrderItem i : items) {
-            long line = Math.multiplyExact(i.getUnitPrice(), i.getQuantity());
-            sum = Math.addExact(sum, line);
-        }
-
-        return sum;
-    }
-
     public Page<Order> findOrders(Long userId, OrderStatus status,Pageable pageable) {
         return orderRepository.findOrders(userId, status,pageable);
     }
@@ -53,6 +38,17 @@ public class OrderService {
     public Order getOrder(UUID orderId) {
         return orderRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
+    }
+
+    public void validateOrderOwnership(UUID orderId, Long userId) {
+        if (!orderRepository.existsByOrderIdAndUserId(orderId, userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN, "해당 주문에 대한 권한이 없습니다.");
+        }
+    }
+
+    public Order getOrderWithAuth(UUID orderId, Long userId) {
+        return orderRepository.findByOrderIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.FORBIDDEN, "해당 주문에 대한 권한이 없습니다."));
     }
 
     @Transactional
@@ -86,7 +82,6 @@ public class OrderService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND,""));
         order.markCancel();
     }
-
 
     @Transactional
     public void expireOrder(UUID orderId) {

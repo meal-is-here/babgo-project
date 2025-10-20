@@ -18,6 +18,7 @@ import java.util.UUID;
 public class Like extends BaseTimeEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID likeId;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -16,7 +16,13 @@ public enum OrderStatus {
     REFUNDED("환불됨"),
     REFUND_REQUESTED("환불 요청중"),
     FAILED("실패"),
-    EXPIRED("시간만료");
+    EXPIRED("시간만료"),
+
+    // 추가(사장님 액션 단계)
+    ACCEPTED("주문 수락"),
+    PREPARED("조리 완료"),
+    PICKED_UP("음식 수령"),
+    DELIVERED("배송 완료");
 
     private final String description;
 
@@ -24,4 +30,19 @@ public enum OrderStatus {
         this.description = description;
     }
 
+    public boolean canAcceptFromConfirmed() {
+        return this == CONFIRMED;
+    }
+
+    public boolean canPreparedFromAccepted() {
+        return this == ACCEPTED;
+    }
+
+    public boolean canPickedUpFromPrepared() {
+        return this == PREPARED;
+    }
+
+    public boolean canDeliveredFromPickedUp() {
+        return this == PICKED_UP;
+    }
 }
