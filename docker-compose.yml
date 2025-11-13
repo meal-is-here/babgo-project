@@ -1,0 +1,45 @@
+#version: '3'
+services:
+  babgo-project:
+    image: leesejoon/babgo-project:latest
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=
+    depends_on:
+#      - recommendation
+#      - review_analysis
+      - redis
+
+#  recommendation:
+#    build:
+#      context: ./recommendation
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8000:8000"
+#    env_file:
+#      - .env
+#
+#  review_analysis:
+#    build:
+#      context: ./review_analysis
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8001:8001"
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --notify-keyspace-events Ex
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

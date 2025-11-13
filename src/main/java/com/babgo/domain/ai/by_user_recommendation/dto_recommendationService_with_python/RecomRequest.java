@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class RecomRequest {
-    private String userId;
+    private Long userId;
 
-    public RecomRequest(String userId) {
+    public RecomRequest(Long userId) {
         this.userId = userId;
     }
 }

@@ -32,10 +32,15 @@ spring:
       google-location: "us-central1"
       chat:
         base-url: https://generativelanguage.googleapis.com
+        #        base-url: https://generativelanguage.googleapis.com/v1beta/openai/
+        #        base-url: https://generativelanguage.googleapis.com
         completion-path: /v1beta/models
         model: gemini-2.0-flash
       embedding:
         model: models/gemini-embedding-001
+fastapi:
+  RECOMMENDATION_URL: ${FASTAPI_RECOMMENDATION_URL:8000}
+  REVIEW_ANALYSIS_URL: ${FASTAPI_REVIEW_ANALYSIS_URL:8001}
 
 jwt:
   secret: ${JWT_SECRET}
@@ -45,10 +50,6 @@ jwt:
     secure: ${JWT_COOKIE_SECURE:false}
     domain: ${JWT_COOKIE_DOMAIN:localhost}
     same-site: ${JWT_COOKIE_SAME_SITE:Lax}
-
-fastapi:
-  RECOMMENDATION_FASTAPI_URL: ${RECOMMENDATION_FASTAPI_URL}
-  REVIEW_ANALYSIS_FASTAPI_URL: ${REVIEW_ANALYSIS_FASTAPI_URL}
 
 logging:
   level:
@@ -62,4 +63,4 @@ payment:
   webhook-url: ${PAYMENT_WEBHOOK_URL}
 
 pg-sim:
-  auto: approve
+  auto: approve  # 기본 자동승인

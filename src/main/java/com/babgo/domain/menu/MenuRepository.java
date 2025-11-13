@@ -1,5 +1,8 @@
 package com.babgo.domain.menu;
 
+import feign.Param;
+import org.springframework.data.domain.Pageable;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -11,4 +14,7 @@ public interface MenuRepository {
     List<Menu> findByStore_StoreId(UUID storeId);
     List<Menu> findAllById(List<UUID> targetMenuIds);
     void saveAll(Collection<Menu> values);
+
+    List<Menu> findTopKAvailableMenusByStore(@Param("storeId") UUID storeId, Pageable pageable);
+
 }

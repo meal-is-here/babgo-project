@@ -1,4 +1,5 @@
 /*
+>>>>>>> be758c50e748cf814c552c35bd6935be951a1e47
 package com.babgo.repository.ai.config;
 
 import com.babgo.domain.ai.by_search_recommendation.OpenAiProperties;

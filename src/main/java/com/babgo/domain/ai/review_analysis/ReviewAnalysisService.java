@@ -21,7 +21,7 @@ public class ReviewAnalysisService {
     private final ReviewAnalysisRepositoryImpl reviewAnalysisRepository;
     private final FakeReviewMLService fakeReviewMLService;
 
-    @Value("${fastapi.REVIEW_ANALYSIS_FASTAPI_URL}")
+    @Value("${fastapi.REVIEW_ANALYSIS_URL}")
     private String fastApiBaseUrl;
 
     /**

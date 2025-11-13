@@ -28,7 +28,7 @@ public class StoreSummaryService {
     private final StoreSummaryRepositoryImpl storeSummaryRepository;
     private final FakeReviewMLService fakeReviewMLService;
 
-    @Value("${fastapi.REVIEW_ANALYSIS_FASTAPI_URL}")
+    @Value("${fastapi.REVIEW_ANALYSIS_URL}")
     private String fastApiBaseUrl;
 
     /**
